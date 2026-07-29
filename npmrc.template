@@ -1,0 +1,16 @@
+# ---------------------------------------------------------------------------
+# Celonis GitHub Packages auth for ems-frontend (@celonis/* scoped packages)
+#
+# 1. Replace GITHUB_PAT_HERE with a GitHub Personal Access Token (classic)
+#    that has the `read:packages` scope (add `repo` too if you also clone
+#    private repos over HTTPS).
+# 2. Authorize that token for the `celonis` org via SAML SSO (GitHub token
+#    page → "Configure SSO" → Authorize for celonis).
+# 3. Copy this file to your home directory:
+#        cp npmrc.template ~/.npmrc
+#    (If you already have a ~/.npmrc, append these two lines to it instead
+#    of overwriting it.)
+# ---------------------------------------------------------------------------
+
+@celonis:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=GITHUB_PAT_HERE

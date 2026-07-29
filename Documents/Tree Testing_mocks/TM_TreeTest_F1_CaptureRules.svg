@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="540" viewBox="0 0 480 540" font-family="Arial, Helvetica, sans-serif">
+  <style>
+    :root { color-scheme: light; }
+    .screen { fill:#ffffff; stroke:#e2e8f0; stroke-width:1.5; }
+    .title { fill:#0f172a; font-weight:bold; }
+    .row { fill:#ffffff; stroke:#cbd5e1; stroke-width:1.3; }
+    .label { fill:#1e293b; }
+    .sublabel { fill:#94a3b8; }
+    .chev { fill:#94a3b8; }
+    .back { fill:#475569; }
+    .frameid { fill:#cbd5e1; font-style:italic; }
+    .cta { fill:#334155; }
+    .ctatext { fill:#ffffff; font-weight:bold; }
+    .hint { fill:#b6c0cc; font-style:italic; }
+  </style>
+
+  <rect x="20" y="20" width="440" height="500" rx="14" class="screen"/>
+  <text x="436" y="40" text-anchor="end" font-size="10" class="frameid">F1 · Capture Rules</text>
+
+  <text x="44" y="54" font-size="13" class="back">&#8249; Back</text>
+  <text x="44" y="90" font-size="22" class="title">Capture Rules</text>
+  <line x1="44" y1="106" x2="436" y2="106" stroke="#eef2f6" stroke-width="1.5"/>
+
+  <!-- Default rule -->
+  <rect x="44" y="126" width="392" height="58" rx="8" class="row"/>
+  <text x="66" y="151" font-size="15" class="label">Default rule</text>
+  <text x="66" y="170" font-size="11.5" class="sublabel">baseline for anything not covered by a rule</text>
+  <text x="414" y="159" font-size="20" class="chev">&#8250;</text>
+
+  <!-- Create new rule -->
+  <rect x="44" y="196" width="392" height="58" rx="8" class="row"/>
+  <text x="66" y="221" font-size="15" class="label">+  Create new rule</text>
+  <text x="66" y="240" font-size="11.5" class="sublabel">set capture for specific applications or URLs</text>
+  <text x="414" y="229" font-size="20" class="chev">&#8250;</text>
+
+  <!-- list hint -->
+  <text x="66" y="286" font-size="11.5" class="hint">Your rules appear here, in the order they run.</text>
+
+  <!-- commit button -->
+  <rect x="44" y="446" width="392" height="46" rx="8" class="cta"/>
+  <text x="240" y="475" text-anchor="middle" font-size="14" class="ctatext">&#10003;  This is where I'd do it</text>
+</svg>

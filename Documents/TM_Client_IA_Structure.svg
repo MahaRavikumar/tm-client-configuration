@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="530" viewBox="0 0 900 530" font-family="Arial, Helvetica, sans-serif">
+  <style>
+    :root { color-scheme: light; }
+    .t { fill:#0f172a; font-weight:bold; }
+    .box { fill:#ffffff; stroke:#cbd5e1; stroke-width:1.4; }
+    .name { fill:#1e293b; font-weight:bold; }
+    .sub { fill:#64748b; }
+    .inset { fill:#f8fafc; stroke:#e2e8f0; stroke-width:1; }
+    .rule { fill:#334155; }
+  </style>
+
+  <text x="30" y="34" font-size="18" class="t">Proposed Information Architecture</text>
+  <text x="30" y="52" font-size="11.5" fill="#94a3b8">One structure, organised around what an Admin works with — no Basic / Advanced split.</text>
+
+  <!-- Capture Rules (primary) -->
+  <rect x="30" y="66" width="840" height="98" rx="10" class="box"/>
+  <rect x="30" y="66" width="7" height="98" rx="3" fill="#4338ca"/>
+  <text x="52" y="92" font-size="16" class="name">Capture Rules</text>
+  <text x="52" y="113" font-size="12" class="sub">Default rule (starts on Full) · plus specific rules you create</text>
+  <rect x="48" y="124" width="804" height="30" rx="6" class="inset"/>
+  <text x="62" y="144" font-size="11.5" class="rule">Each rule:  Scope  ·  Capture level (Full / Usage-only / Deny)  ·  Captured data (Events + Data fields)  ·  Screenshots</text>
+
+  <!-- Privacy & Consent -->
+  <rect x="30" y="176" width="840" height="52" rx="10" class="box"/>
+  <rect x="30" y="176" width="7" height="52" rx="3" fill="#64748b"/>
+  <text x="52" y="200" font-size="15" class="name">Privacy &amp; Consent</text>
+  <text x="52" y="218" font-size="12" class="sub">Data Redaction · Hashing · User Consent</text>
+
+  <!-- Client Behaviour -->
+  <rect x="30" y="240" width="840" height="52" rx="10" class="box"/>
+  <rect x="30" y="240" width="7" height="52" rx="3" fill="#64748b"/>
+  <text x="52" y="264" font-size="15" class="name">Client Behaviour</text>
+  <text x="52" y="282" font-size="12" class="sub">Recording behaviour (incl. Live Event Monitor) · Startup Mode</text>
+
+  <!-- Data Connection -->
+  <rect x="30" y="304" width="840" height="52" rx="10" class="box"/>
+  <rect x="30" y="304" width="7" height="52" rx="3" fill="#64748b"/>
+  <text x="52" y="328" font-size="15" class="name">Data Connection</text>
+  <text x="52" y="346" font-size="12" class="sub">Platform Upload · Caching</text>
+
+  <!-- User Attributes -->
+  <rect x="30" y="368" width="410" height="52" rx="10" class="box"/>
+  <rect x="30" y="368" width="7" height="52" rx="3" fill="#94a3b8"/>
+  <text x="52" y="392" font-size="15" class="name">User Attributes</text>
+  <text x="52" y="410" font-size="12" class="sub">Custom fields that enrich capture</text>
+
+  <!-- Integrations & Extensions -->
+  <rect x="460" y="368" width="410" height="52" rx="10" class="box"/>
+  <rect x="460" y="368" width="7" height="52" rx="3" fill="#94a3b8"/>
+  <text x="482" y="392" font-size="15" class="name">Integrations &amp; Extensions</text>
+  <text x="482" y="410" font-size="12" class="sub">Web-page extraction · SAP Integration</text>
+
+  <text x="30" y="452" font-size="11" fill="#94a3b8" font-style="italic">User Attributes and Integrations sit below Capture Rules — supporting sources, surfaced only when relevant.</text>
+</svg>

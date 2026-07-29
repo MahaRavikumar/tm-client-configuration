@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node_modules/.bin/ngc -p libs/task-mining/client-configuration/tsconfig.lib.json --noEmit)",
+      "Bash(grep -n \"querySelector\\\\|\\\\\\\\\\\\$ *=\" /Users/m.ravikumar/Documents/TM_ClientConfiguration/TM_Client_Config_App.html)",
+      "WebSearch",
+      "WebFetch(domain:www.nngroup.com)",
+      "WebFetch(domain:react-querybuilder.js.org)",
+      "WebFetch(domain:uxdesign.cc)",
+      "Bash(python3 -c \"import pptx; print\\('python-pptx', pptx.__version__\\)\")",
+      "Bash(/opt/homebrew/bin/python3.12 -m venv /tmp/deckvenv)",
+      "Bash(/tmp/deckvenv/bin/pip install *)",
+      "Bash(/tmp/deckvenv/bin/python -c \"import pptx,defusedxml,lxml,PIL,markitdown; print\\('all deps ok in venv'\\)\")",
+      "Bash(/tmp/deckvenv/bin/python edit.py)",
+      "Bash(/tmp/deckvenv/bin/python -m markitdown TM_Client_Config.pptx)",
+      "Bash(grep -inE \"\\\\bx{3,}\\\\b|lorem|ipsum|really awesome|template|XX\\\\.XX|topic\\\\.|second line|placeholder|Effective|Efficient|Strategic|Operational\")",
+      "Bash(/tmp/deckvenv/bin/python -)",
+      "Bash(/tmp/deckvenv/bin/python -c ' *)",
+      "Bash(/tmp/deckvenv/bin/python -c \"import sys; d=sys.stdin.read\\(\\); print\\(d\\)\")",
+      "Bash(/tmp/deckvenv/bin/python '/Users/m.ravikumar/Library/Application Support/Claude-3p/local-agent-mode-sessions/skills-plugin/F46D5FBE-E47A-42FD-B658-2621C7D692F5/c212ddea-623f-4068-9c46-a382c7482134/skills/pptx/scripts/add_slide.py' unpacked/ slide24.xml)",
+      "Bash(grep -iE \"\\\\bx{3,}\\\\b|lorem|ipsum|\\\\bTODO|\\\\[insert|placeholder|sample|XX\\\\.XX\")",
+      "Bash(/tmp/deckvenv/bin/python -m markitdown \"/Users/m.ravikumar/Documents/TM_ClientConfiguration/Documents/Research/Research Plan_TaskMining_Client.docx\")",
+      "Read(//private/tmp/**)",
+      "Bash(rm -rf rp_extract)",
+      "Bash(mkdir rp_extract)"
+    ]
+  }
+}

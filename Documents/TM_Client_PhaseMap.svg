@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300" font-family="Arial, Helvetica, sans-serif">
+  <style>
+    :root { color-scheme: light; }
+    .t { fill:#0f172a; font-weight:bold; }
+    .muted { fill:#94a3b8; }
+    .now { fill:#eef2ff; stroke:#6366f1; stroke-width:1.6; }
+    .mvp { fill:#ecfdf5; stroke:#34d399; stroke-width:1.6; }
+    .post { fill:#fff7ed; stroke:#fb923c; stroke-width:1.6; }
+    .ph { fill:#0f172a; font-weight:bold; }
+    .sub { fill:#475569; }
+    .tag { fill:#94a3b8; font-style:italic; }
+  </style>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+
+  <text x="30" y="34" font-size="17" class="t">Phased approach  ·  new projects only</text>
+
+  <!-- NOW / Done -->
+  <rect x="30" y="60" width="270" height="190" rx="12" class="now"/>
+  <text x="48" y="88" font-size="14" class="ph">Now — validated</text>
+  <text x="48" y="106" font-size="10.5" class="tag">research · IA · capture model</text>
+  <text x="48" y="132" font-size="11.5" class="sub">• Research &amp; inventory audit</text>
+  <text x="48" y="152" font-size="11.5" class="sub">• Object-based IA</text>
+  <text x="48" y="172" font-size="11.5" class="sub">• Capture-level model</text>
+  <text x="48" y="192" font-size="11.5" class="sub">  (Full / Custom / Deny)</text>
+  <text x="48" y="212" font-size="11.5" class="sub">• Tree-test validation</text>
+
+  <!-- MVP -->
+  <rect x="345" y="60" width="270" height="190" rx="12" class="mvp"/>
+  <text x="363" y="88" font-size="14" class="ph">MVP</text>
+  <text x="363" y="106" font-size="10.5" class="tag">ship the new configuration</text>
+  <text x="363" y="132" font-size="11.5" class="sub">• Unified configuration (IA +</text>
+  <text x="363" y="150" font-size="11.5" class="sub">  capture levels + privacy group)</text>
+  <text x="363" y="172" font-size="11.5" class="sub">• Live Event Monitor (admin-gated)</text>
+  <text x="363" y="194" font-size="11.5" class="sub">• Duplicate rule sets for reuse</text>
+  <text x="363" y="220" font-size="10.5" class="tag">guidance is built into the design</text>
+
+  <!-- POST-MVP -->
+  <rect x="660" y="60" width="270" height="190" rx="12" class="post"/>
+  <text x="678" y="88" font-size="14" class="ph">Post-MVP</text>
+  <text x="678" y="106" font-size="10.5" class="tag">validation &amp; assistance</text>
+  <text x="678" y="132" font-size="11.5" class="sub">• Rule Capture Simulator</text>
+  <text x="678" y="150" font-size="11.5" class="sub">  (preview on mock data)</text>
+  <text x="678" y="172" font-size="11.5" class="sub">• Redaction suggestions</text>
+  <text x="678" y="190" font-size="11.5" class="sub">  (pre-built libraries)</text>
+
+  <line x1="302" y1="155" x2="343" y2="155" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="617" y1="155" x2="658" y2="155" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <text x="30" y="278" font-size="10.5" class="tag">Timelines to be set with Engineering (config behaviour, rule limits, simulator feasibility).</text>
+</svg>

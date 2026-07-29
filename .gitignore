@@ -1,0 +1,21 @@
+# ---------------------------------------------------------------------------
+# Excluded on purpose — see the repo README for why.
+# ---------------------------------------------------------------------------
+
+# A separate Celonis repo (celonis/ems-frontend) that happens to be checked out
+# inside this folder. 5.6 GB, not part of this project, has its own history.
+ems-frontend/
+
+# Celonis product source, kept out of this design repo.
+client-configuration/
+
+# Internal captures of unreleased product UI.
+Screenshots/
+
+# Confidential and unrelated to this project.
+*confidential*
+
+# OS / tooling noise
+.DS_Store
+**/.DS_Store
+node_modules/

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TM Client Configuration — Lo-fi Wireframe</title>
+<style>
+  /* ---- Greyscale wireframe palette. No brand colour on purpose. ---- */
+  :root{
+    --bg:#f4f4f5; --paper:#ffffff; --ink:#1f1f1f; --ink2:#555; --ink3:#888;
+    --line:#d9d9d9; --line2:#c4c4c4; --fill:#efeff0; --fill2:#e4e4e6;
+    --sel:#dcdcde; --selborder:#7a7a7a; --lock:#f0f0f0;
+    --anno:#666; --annobg:#f7f7f7;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);font-size:14px;line-height:1.4}
+  .app{display:flex;height:100vh;overflow:hidden}
+
+  /* ---------- Shell chrome (non-interactive) ---------- */
+  .rail{width:48px;background:var(--fill2);border-right:1px solid var(--line);
+        display:flex;flex-direction:column;align-items:center;gap:14px;padding:12px 0;flex:none}
+  .rail .logo{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink3);
+        display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink2);font-weight:700}
+  .rail .ic{width:22px;height:22px;border-radius:5px;background:var(--line)}
+  .rail .ic.active{background:var(--ink3)}
+  .rail .spring{flex:1}
+
+  .projnav{width:212px;background:var(--paper);border-right:1px solid var(--line);
+        padding:14px 10px;flex:none;overflow:auto}
+  .projnav .grouphdr{font-size:11px;letter-spacing:.4px;color:var(--ink3);
+        text-transform:uppercase;margin:16px 8px 6px}
+  .navitem{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;
+        color:var(--ink2);cursor:default;font-size:13px}
+  .navitem .dot{width:15px;height:15px;border-radius:4px;background:var(--line);flex:none}
+  .navitem.active{background:var(--sel);color:var(--ink);font-weight:600}
+  .navitem.active .dot{background:var(--ink3)}
+
+  /* ---------- Config sub-nav (interactive) ---------- */
+  .subnav{width:196px;background:var(--fill);border-right:1px solid var(--line);
+        padding:16px 10px;flex:none;overflow:auto}
+  .subnav .hdr{font-size:11px;letter-spacing:.4px;color:var(--ink3);text-transform:uppercase;margin:0 8px 10px}
+  .subitem{padding:9px 10px;border-radius:7px;cursor:pointer;color:var(--ink2);font-size:13px;
+        display:flex;justify-content:space-between;align-items:center}
+  .subitem:hover{background:var(--fill2)}
+  .subitem.active{background:var(--paper);border:1px solid var(--line2);color:var(--ink);font-weight:600}
+  .subitem .chev{color:var(--ink3)}
+
+  /* ---------- Main content ---------- */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .topbar{padding:10px 22px;border-bottom:1px solid var(--line);background:var(--paper);flex:none}
+  .crumb{font-size:12px;color:var(--ink3)}
+  .crumb b{color:var(--ink2);font-weight:600}
+  .headrow{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+  .headrow h1{font-size:20px;margin:0}
+  .headright{display:flex;align-items:center;gap:14px}
+  .annotoggles{display:flex;gap:14px;font-size:12px;color:var(--ink2)}
+  .annotoggles label{display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none}
+  .btn{border:1px solid var(--line2);background:var(--fill);border-radius:7px;padding:8px 14px;
+        font-size:13px;cursor:pointer;color:var(--ink);font-family:inherit}
+  .btn:hover{background:var(--fill2)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{background:#000}
+  .btn.ghost{background:transparent}
+
+  .scroll{overflow:auto;padding:24px 26px 60px;flex:1}
+  .wrap{max-width:860px}
+  .lead{color:var(--ink2);margin:2px 0 18px;font-size:13px}
+
+  /* cards / rows */
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:0;margin-bottom:14px;overflow:hidden}
+  .card .chdr{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .card .chdr h3{margin:0;font-size:15px}
+  .card .cbody{padding:14px 16px}
+  .muted{color:var(--ink3)}
+  .sub{font-size:12px;color:var(--ink3)}
+
+  .rulerow{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+  .rulerow:last-child{border-bottom:none}
+  .rulerow:hover{background:var(--fill)}
+  .rulerow .order{width:22px;height:22px;border-radius:50%;background:var(--fill2);color:var(--ink2);
+        font-size:11px;display:flex;align-items:center;justify-content:center;flex:none}
+  .rulerow .rname{font-weight:600;font-size:14px}
+  .rulerow .rmeta{font-size:12px;color:var(--ink3)}
+  .rulerow .grow{flex:1}
+  .pill{border:1px solid var(--line2);border-radius:20px;padding:3px 11px;font-size:12px;background:var(--fill);white-space:nowrap}
+  .pill.full{background:var(--fill2)}
+  .tag{font-size:11px;color:var(--ink3);border:1px dashed var(--line2);border-radius:5px;padding:2px 7px}
+
+  /* editor sections */
+  .section{background:var(--paper);border:1px solid var(--line);border-radius:10px;margin-bottom:14px}
+  .section > .shdr{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .section .step{width:22px;height:22px;border-radius:50%;border:1px solid var(--line2);font-size:11px;
+        display:flex;align-items:center;justify-content:center;color:var(--ink2);flex:none}
+  .section .shdr h3{margin:0;font-size:15px;flex:1}
+  .section .sbody{padding:16px}
+
+  /* level selector cards */
+  .levels{display:flex;gap:12px}
+  .level{flex:1;border:1px solid var(--line2);border-radius:10px;padding:14px;cursor:pointer;background:var(--paper)}
+  .level:hover{border-color:var(--ink3)}
+  .level.sel{border:2px solid var(--selborder);background:var(--sel);padding:13px}
+  .level .lname{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+  .level .radio{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--ink3);flex:none;position:relative}
+  .level.sel .radio{border-color:var(--ink)}
+  .level.sel .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--ink)}
+  .level .lsum{font-size:12px;color:var(--ink2);margin:8px 0}
+  .level .lcap{font-size:11.5px;color:var(--ink3);line-height:1.5}
+  .level .lockbadge{font-size:10.5px;color:var(--ink3);border:1px solid var(--line2);border-radius:4px;padding:1px 6px;margin-left:auto}
+
+  /* captured-data preview */
+  .previewwrap{margin-top:16px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .previewwrap .pvhdr{background:var(--fill);padding:10px 14px;border-bottom:1px solid var(--line);
+        display:flex;align-items:center;justify-content:space-between}
+  .previewwrap .pvhdr .what{font-size:12.5px;color:var(--ink2)}
+  .previewwrap .pvhdr .what b{color:var(--ink)}
+  .pvsection{padding:12px 14px}
+  .pvsection + .pvsection{border-top:1px solid var(--line)}
+  .pvsection .pshdr{font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
+  .field{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13px}
+  .field:last-child{border-bottom:none}
+  .field .box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--line2);flex:none;position:relative;background:#fff}
+  .field.on .box{background:var(--ink);border-color:var(--ink)}
+  .field.on .box::after{content:"✓";color:#fff;font-size:11px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .field.locked .box{opacity:.5}
+  .field .fname{flex:1}
+  .field.off .fname{color:var(--ink3)}
+  .field .note{font-size:11px;color:var(--ink3);font-style:italic}
+  .field.editable{cursor:pointer}
+  .field.editable:hover{background:var(--fill)}
+  .lockednote{font-size:12px;color:var(--ink3);padding:10px 14px;background:var(--lock);font-style:italic}
+
+  .toggle{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .toggle:last-child{border-bottom:none}
+  .switch{width:34px;height:19px;border-radius:20px;background:var(--line2);position:relative;flex:none;cursor:pointer}
+  .switch.on{background:var(--ink)}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.15s}
+  .switch.on::after{left:17px}
+  .toggle .tgrow{flex:1}
+  .toggle .tname{font-weight:500}
+
+  .radios label{display:block;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px}
+  .radios label:last-child{border-bottom:none}
+  .radios input{margin-right:9px}
+
+  /* annotation layers */
+  .anno{border:1px dashed var(--anno);background:var(--annobg);border-radius:8px;padding:10px 12px;
+        margin:10px 0;font-size:12.5px;color:var(--ink2);display:none}
+  .anno.show{display:block}
+  .anno .atag{display:inline-block;font-size:10px;letter-spacing:.5px;text-transform:uppercase;
+        border:1px solid var(--anno);border-radius:4px;padding:1px 6px;margin-right:8px;color:var(--anno)}
+  body.map .anno.map{display:block}
+  body.open .anno.open{display:block}
+  .anno.map,.anno.open{display:none}
+
+  .backlink{font-size:13px;color:var(--ink2);cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-bottom:6px}
+  .backlink:hover{color:var(--ink)}
+  .stub{color:var(--ink3);font-size:13px;padding:14px 0}
+  .kv{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .kv:last-child{border-bottom:none}
+  .kv .k{width:200px;color:var(--ink2)}
+  .inline-affordance{border:1px dashed var(--line2);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--ink2);margin-top:10px;background:var(--fill)}
+  .inline-affordance a{color:var(--ink);text-decoration:underline;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- icon rail (shell chrome, non-interactive placeholders) -->
+  <div class="rail">
+    <div class="logo">C</div>
+    <div class="ic"></div><div class="ic"></div><div class="ic"></div>
+    <div class="spring"></div>
+    <div class="ic active"></div><div class="ic"></div><div class="ic"></div>
+  </div>
+
+  <!-- project nav (shell chrome) -->
+  <div class="projnav">
+    <div class="navitem"><span class="dot"></span>Home</div>
+    <div class="navitem active"><span class="dot"></span>Client Settings</div>
+    <div class="navitem"><span class="dot"></span>Users &amp; Invite</div>
+    <div class="navitem"><span class="dot"></span>Project Connection</div>
+    <div class="grouphdr">Data Configuration</div>
+    <div class="navitem"><span class="dot"></span>Run &amp; Schedule</div>
+    <div class="navitem"><span class="dot"></span>Labels</div>
+    <div class="navitem"><span class="dot"></span>Business Events</div>
+    <div class="navitem"><span class="dot"></span>Tasks</div>
+    <div class="navitem"><span class="dot"></span>AI Task Discovery</div>
+  </div>
+
+  <!-- config sub-nav (interactive) -->
+  <div class="subnav" id="subnav"></div>
+
+  <!-- main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb">Projects › <b>Customer_Ticketing_Team_AI_Task_Discovery</b> › <b>Client Settings</b></div>
+      <div class="headrow">
+        <h1 id="pageTitle">Client Settings</h1>
+        <div class="headright">
+          <div class="annotoggles">
+            <label><input type="checkbox" id="tglMap"> Old-page mapping</label>
+            <label><input type="checkbox" id="tglOpen"> Open decisions</label>
+          </div>
+          <button class="btn primary">Save Client Settings</button>
+        </div>
+      </div>
+    </div>
+    <div class="scroll"><div class="wrap" id="content"></div></div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   In-memory state only (no localStorage per brief).
+   ============================================================ */
+const AREAS = [
+  {id:'capture-rules', label:'Capture Rules'},
+  {id:'privacy',       label:'Privacy'},
+  {id:'data-connection',label:'Data Connection'},
+  {id:'client-behaviour',label:'Client Behaviour'},
+  {id:'user-attributes',label:'User Attributes'},
+  {id:'integrations',  label:'Integrations'},
+  {id:'config-file',   label:'Configuration File'},
+];
+
+/* Field catalogue for the Captured-data preview.
+   'content' fields are the privacy-sensitive ones Custom turns OFF by default (option b). */
+const EVENTS = [
+  {id:'winchange', name:'Active window / tab changed'},
+  {id:'click',     name:'Mouse click'},
+  {id:'keyboard',  name:'Keyboard shortcut'},
+  {id:'typed',     name:'Text entered (that typing happened)'},
+  {id:'copy',      name:'Copy to clipboard (that a copy happened)'},
+];
+const FIELDS = [
+  {id:'timestamp', name:'Timestamp (local)'},
+  {id:'apptitle',  name:'Application / window title'},
+  {id:'url',       name:'URL'},
+  {id:'element',   name:'Element name'},
+  {id:'enteredtxt',name:'Entered text (content)', content:true},
+  {id:'cliptxt',   name:'Clipboard text (content)', content:true},
+  {id:'seltxt',    name:'Selected text (content)', content:true},
+  {id:'elementid', name:'Element ID / class name', agentic:true},
+];
+
+/* Custom default set = option (b): interactions ON, content OFF, screenshots OFF */
+function defaultCustom(){
+  const events={}, fields={};
+  EVENTS.forEach(e=>events[e.id]=true);
+  FIELDS.forEach(f=>fields[f.id]= f.content ? false : (f.id==='elementid'? false : true));
+  return {events, fields, screenshots:false};
+}
+
+const state = {
+  area:'capture-rules',
+  ruleView:'list',        // 'list' | 'editor'
+  editingId:null,
+  rules:[
+    {id:'r1', name:'SAP GUI (SAP customer)', scope:'Process: saplogon.exe', level:'full', custom:defaultCustom()},
+    {id:'r2', name:'Payroll web app', scope:'URL: payroll.acme.com', level:'custom', custom:defaultCustom()},
+    {id:'r3', name:'Online banking portal', scope:'URL: *.mybank.com', level:'deny', custom:defaultCustom()},
+    {id:'default', name:'Default rule', scope:null, isDefault:true, level:'full', custom:defaultCustom()},
+  ],
+  sapEnabled:false,
+};
+
+/* ---------- level metadata (the "what this captures" summaries) ---------- */
+const LEVELS = {
+  full:{name:'Full', locked:true,
+    summary:'Captures every interaction and its content, plus screenshots.',
+    caps:['All events on','All data fields on (incl. typed & clipboard content)','Screenshots on']},
+  custom:{name:'Custom', locked:false,
+    summary:'You choose exactly what is captured. Starts from a privacy-safe set.',
+    caps:['Interaction events on','Content fields off by default','Screenshots off by default']},
+  deny:{name:'Deny', locked:true,
+    summary:'Captures nothing for this scope. Used to exclude apps or URLs.',
+    caps:['No events','No data fields','No screenshots']},
+};
+
+/* ============================================================ render ============================================================ */
+const $=(s,r=document)=>r.querySelector(s);
+const el=(html)=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;};
+
+function renderSubnav(){
+  const n=$('#subnav');
+  n.innerHTML='<div class="hdr">Configuration</div>'+
+    AREAS.map(a=>`<div class="subitem ${a.id===state.area?'active':''}" data-area="${a.id}">
+        <span>${a.label}</span><span class="chev">›</span></div>`).join('');
+}
+
+function render(){
+  renderSubnav();
+  const c=$('#content');
+  if(state.area==='capture-rules'){
+    c.innerHTML = state.ruleView==='editor' ? ruleEditorHTML() : rulesListHTML();
+  } else {
+    c.innerHTML = areaStubHTML(state.area);
+  }
+}
+
+/* ---------- Capture Rules: list ---------- */
+function rulesListHTML(){
+  const rows = state.rules.map((r,i)=>{
+    const lv=LEVELS[r.level];
+    return `<div class="rulerow" data-open="${r.id}">
+      <div class="order">${r.isDefault?'—':i+1}</div>
+      <div>
+        <div class="rname">${r.name}</div>
+        <div class="rmeta">${r.isDefault?'Catch-all · no scope (applies when no other rule matches)':r.scope}</div>
+      </div>
+      <div class="grow"></div>
+      <div class="pill ${r.level}">${lv.name}</div>
+      <div class="chev muted">›</div>
+    </div>`;
+  }).join('');
+
+  return `
+  <p class="lead">Rules decide what the client captures where. Evaluation is <b>first-match</b>: the most specific matching rule wins; the <b>Default rule</b> is the fallback when nothing else matches.</p>
+
+  <div class="anno map"><span class="atag">Old page</span>The old <b>Captured Applications</b> radios (capture all / selected / all-but-exclude) are re-homed here: <b>Default = Full</b> is "capture all", <b>specific rules</b> are "selected", <b>Deny rules</b> are "exclude".</div>
+  <div class="anno map"><span class="atag">Old page</span>The old <b>Use basic / advanced settings</b> radios are <b>dissolved</b> — everyone configures through rules and capture levels.</div>
+
+  <div class="card">
+    <div class="chdr"><h3>Capture Rules</h3><button class="btn" data-new="1">+ Create new rule</button></div>
+    ${rows}
+  </div>
+  <p class="sub">Order = precedence (top matches first). The Default rule always sits last as the fallback.</p>`;
+}
+
+/* ---------- Capture Rules: editor ---------- */
+function ruleEditorHTML(){
+  const r=state.rules.find(x=>x.id===state.editingId);
+  const isNew = r._new;
+  let step=1;
+  const scopeSection = r.isDefault ? '' : `
+    <div class="section">
+      <div class="shdr"><span class="step">${step++}</span><h3>Scope</h3><span class="sub">Which apps / URLs / elements this rule applies to</span></div>
+      <div class="sbody">
+        <div class="kv"><div class="k">Match type</div><div>Application, URL, or element condition</div></div>
+        <div class="kv"><div class="k">Condition</div><div>${r.scope||'e.g. URL contains payroll.acme.com'}</div></div>
+        <p class="sub" style="margin-top:10px">Conditions can be combined (AND / OR). Matching reaches embedded browsers via base-URL / process-name.</p>
+      </div>
+    </div>`;
+
+  return `
+  <div class="backlink" data-back="1">‹ Back to Capture Rules</div>
+  <div class="crumb" style="margin-bottom:12px">Capture Rules › <b>${r.isDefault?'Default rule':(isNew?'New rule':r.name)}</b></div>
+
+  ${r.isDefault?`<div class="anno" style="display:block;border-style:solid;background:var(--fill);"><span class="atag">Default</span>The Default rule is the catch-all fallback — it has <b>no scope</b>, only a capture level. Out of the box it is set to <b>Full</b>.</div>`:''}
+
+  ${scopeSection}
+
+  <div class="section">
+    <div class="shdr"><span class="step">${step++}</span><h3>Capture level</h3>
+      <span class="sub">${isNew?'Choose a level to continue':'The posture for this scope'}</span></div>
+    <div class="sbody">
+      <div class="anno map"><span class="atag">Old page</span>The old <b>Captured Details</b> toggle list is re-homed here — it is now governed by the capture level. Full locks everything on; Custom lets you edit it.</div>
+      ${levelSelectorHTML(r)}
+      ${capturedDataHTML(r)}
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="shdr"><span class="step">${step++}</span><h3>Screenshots</h3><span class="sub">Peer setting — not nested under the level</span></div>
+    <div class="sbody">
+      ${screenshotsHTML(r)}
+    </div>
+  </div>`;
+}
+
+function levelSelectorHTML(r){
+  return `<div class="levels">`+
+    ['full','custom','deny'].map(k=>{
+      const lv=LEVELS[k]; const sel=r.level===k;
+      return `<div class="level ${sel?'sel':''}" data-level="${k}">
+        <div class="lname"><span class="radio"></span>${lv.name}
+          ${lv.locked?'<span class="lockbadge">locked</span>':'<span class="lockbadge" style="border-style:dashed">editable</span>'}</div>
+        <div class="lsum">${lv.summary}</div>
+        <div class="lcap">${lv.caps.map(c=>'• '+c).join('<br>')}</div>
+      </div>`;
+    }).join('')+`</div>`;
+}
+
+/* live captured-data preview — reflects the selected level */
+function capturedDataHTML(r){
+  if(!r.level) return `<div class="previewwrap"><div class="lockednote">Select a capture level above to see what will be captured.</div></div>`;
+  const lv=LEVELS[r.level];
+  const editable = r.level==='custom';
+
+  const evOn=(id)=> r.level==='full'?true : r.level==='deny'?false : !!r.custom.events[id];
+  const fOn =(id)=> r.level==='full'?true : r.level==='deny'?false : !!r.custom.fields[id];
+
+  const eventsList = EVENTS.map(e=>fieldRow(e.name, evOn(e.id), editable, `ev:${e.id}`)).join('');
+  const fieldsList = FIELDS.filter(f=>true).map(f=>{
+    let note='';
+    if(f.content && r.level==='custom' && !fOn(f.id)) note='off — content not stored';
+    let extra = f.agentic ? `<span class="anno open" style="display:none"></span>` : '';
+    return fieldRow(f.name, fOn(f.id), editable, `f:${f.id}`, note, f.agentic);
+  }).join('');
+
+  return `
+  <div class="previewwrap">
+    <div class="pvhdr">
+      <div class="what"><b>What this captures:</b> ${lv.summary}</div>
+    </div>
+    ${lv.locked?`<div class="lockednote">${lv.name} is locked — no per-field control. ${r.level==='deny'?'Nothing is recorded for this scope.':'Everything below is captured.'}</div>`:''}
+    <div class="pvsection">
+      <div class="pshdr">Events · which interactions to record</div>
+      ${eventsList}
+    </div>
+    <div class="pvsection">
+      <div class="pshdr">Data fields · logged for each event</div>
+      ${fieldsList}
+      <div class="anno open"><span class="atag">Open</span><b>Element ID / class name:</b> analytics noise vs. "retain for agentic" (agents need identifiers to act on UI elements) — PM call. Framed here as a separate flag, off by default.</div>
+      ${state.sapEnabled
+        ? `<div class="field on"><span class="box"></span><span class="fname">SAP transaction fields (24)</span><span class="note">available — SAP enabled</span></div>`
+        : `<div class="inline-affordance">SAP fields aren't available — <a data-goto="integrations">enable SAP Integration</a> to capture transaction, screen number, etc. (situational, hidden until enabled).</div>`}
+    </div>
+  </div>
+  ${editable?`<p class="sub" style="margin-top:8px">Custom starts privacy-safe: it records that an action happened (typed / pasted / copied) without storing the content. Add content fields or screenshots as needed.</p>`:''}`;
+}
+
+function fieldRow(name,on,editable,key,note,agentic){
+  const cls=['field', on?'on':'off', editable?'editable':'locked', agentic?'agentic':''].join(' ');
+  return `<div class="${cls}" ${editable?`data-toggle="${key}"`:''}>
+    <span class="box"></span><span class="fname">${name}</span>
+    ${note?`<span class="note">${note}</span>`:''}
+  </div>`;
+}
+
+function screenshotsHTML(r){
+  if(r.level==='full') return `<div class="toggle"><div class="switch on"></div><div class="tgrow"><div class="tname">Screenshots on</div><div class="sub">Locked on at Full.</div></div></div>`;
+  if(r.level==='deny') return `<div class="toggle"><div class="switch"></div><div class="tgrow"><div class="tname">Screenshots off</div><div class="sub">Nothing captured at Deny.</div></div></div>`;
+  if(r.level==='custom') return `<div class="toggle" data-shot="1"><div class="switch ${r.custom.screenshots?'on':''}"></div><div class="tgrow"><div class="tname">Capture screenshots</div><div class="sub">Off by default in Custom — click to toggle.</div></div></div>`;
+  return `<div class="stub">Select a capture level first.</div>`;
+}
+
+/* ---------- other config areas (breadth, lighter fidelity) ---------- */
+function areaStubHTML(area){
+  switch(area){
+    case 'privacy': return `
+      <p class="lead">Global privacy controls applied across all rules.</p>
+      <div class="card"><div class="chdr"><h3>Data redaction</h3><button class="btn" >+ Add pattern</button></div>
+        <div class="cbody"><div class="kv"><div class="k">Credit-card numbers</div><div>Pattern · applied before upload</div></div>
+        <div class="kv"><div class="k">Ordering</div><div>Patterns run top-down (9-digit before 5-digit)</div></div>
+        <p class="sub" style="margin-top:8px">Direction: pre-built GDPR / HIPAA libraries + testability (not yet specced).</p></div></div>
+      <div class="card"><div class="chdr"><h3>Hashing</h3></div>
+        <div class="cbody"><div class="toggle"><div class="switch on"></div><div class="tgrow"><div class="tname">Hash usernames &amp; machine IDs</div><div class="sub">Anonymise identifiers globally.</div></div></div>
+        <div class="anno open"><span class="atag">Open</span>Hashing scope — <b>global</b> (here) vs <b>per-rule</b> override. Lean: global default; add per-rule only if VEs confirm it's used.</div></div></div>
+      <div class="card"><div class="chdr"><h3>User consent</h3></div>
+        <div class="cbody"><div class="toggle"><div class="switch on"></div><div class="tgrow"><div class="tname">Require consent before capture starts</div></div></div></div></div>`;
+    case 'data-connection': return `
+      <p class="lead">Where captured data is sent and how it's buffered.</p>
+      <div class="card"><div class="chdr"><h3>Platform upload</h3></div><div class="cbody">
+        <div class="kv"><div class="k">Data pool / table</div><div>Task Mining pool → activity table</div></div>
+        <div class="kv"><div class="k">Server</div><div>eu-1.celonis.cloud</div></div>
+        <div class="kv"><div class="k">Image bucket</div><div>Screenshot storage</div></div></div></div>
+      <div class="card"><div class="chdr"><h3>Caching</h3></div><div class="cbody">
+        <div class="kv"><div class="k">Offline buffer</div><div>Cache locally when disconnected</div></div></div></div>`;
+    case 'client-behaviour': return `
+      <p class="lead">How the desktop client runs and reports.</p>
+      <div class="card"><div class="chdr"><h3>Recording behaviour</h3></div><div class="cbody">
+        <div class="kv"><div class="k">Snippet split / idle</div><div>Session segmentation thresholds</div></div>
+        <div class="kv"><div class="k">Client &amp; extension version</div><div>Logged for rollout monitoring</div></div>
+        <div class="toggle" style="margin-top:6px"><div class="switch"></div><div class="tgrow"><div class="tname">Live Event Monitor</div><div class="sub">Real-time view of captured events (validation).</div></div></div>
+        <div class="anno open"><span class="atag">Open</span><b>Live Event Monitor placement + access.</b> Lean: keep here under Client Behaviour as its own item, gated to admins only (project/user level) — not enabled for all clients.</div></div></div>
+      <div class="card"><div class="chdr"><h3>Startup mode</h3></div><div class="cbody">
+        <div class="radios">
+          <label><input type="radio" name="startup" checked> Start capture automatically on login</label>
+          <label><input type="radio" name="startup"> Start manually</label>
+        </div></div></div>
+      <div class="anno open"><span class="atag">Open</span>IA grouping — one VE suggested grouping Client Behaviour with Data Connection (both concern how/where data is transmitted). Try both.</div>`;
+    case 'user-attributes': return `
+      <p class="lead">Custom attributes that enrich captured data (a producer of rule fields).</p>
+      <div class="card"><div class="chdr"><h3>User attributes</h3><button class="btn">+ Add attribute</button></div><div class="cbody">
+        <div class="kv"><div class="k">Department</div><div>From directory · available to rules</div></div>
+        <div class="kv"><div class="k">Region</div><div>From directory · available to rules</div></div>
+        <p class="sub" style="margin-top:8px">Enabled attributes become available in a rule's Captured-data list (they aren't auto-captured).</p></div></div>`;
+    case 'integrations': return `
+      <p class="lead">Optional data sources that add fields to rules when enabled.</p>
+      <div class="card"><div class="chdr"><h3>SAP Integration</h3>
+        <div class="switch ${state.sapEnabled?'on':''}" data-sap="1"></div></div><div class="cbody">
+        <div class="sub">Enable to make SAP transaction fields (24) available in capture rules.</div>
+        <div class="anno open"><span class="atag">Open</span>SAP enablement — <b>global</b> (here) vs <b>within a rule's scope</b>. Lean: global + fields appear in a rule only when enabled (conditional display) with an inline "enable SAP" affordance from the rule.</div></div></div>
+      <div class="card"><div class="chdr"><h3>Web page data extraction</h3></div><div class="cbody">
+        <div class="sub">Extract specific values from web pages by URL.</div>
+        <div class="anno open"><span class="atag">Open</span>Placement — <b>Integrations</b> (here) vs <b>Capture Rules</b> (extraction is URL-conditional like scope). Lean: Integrations for MVP; revisit once the rule/scope model is stable.</div></div></div>
+      <div class="card"><div class="chdr"><h3>Extensions</h3></div><div class="cbody"><div class="sub">Browser extension for web capture.</div></div></div>`;
+    case 'config-file': return `
+      <p class="lead">Import, export, and deploy this configuration.</p>
+      <div class="card"><div class="cbody">
+        <div class="kv"><div class="k">Import</div><div><button class="btn ghost">Import config…</button></div></div>
+        <div class="kv"><div class="k">Export</div><div><button class="btn ghost">Export config</button></div></div>
+        <div class="kv"><div class="k">Duplicate rule set</div><div><button class="btn ghost">Reuse in another project</button> <span class="sub">New projects only — no migration of existing.</span></div></div>
+        <div class="kv"><div class="k">Deploy</div><div><button class="btn ghost">Deploy to machines</button></div></div>
+      </div></div>`;
+    default: return `<div class="stub">—</div>`;
+  }
+}
+
+/* ============================================================ events ============================================================ */
+$('#tglMap').addEventListener('change',e=>document.body.classList.toggle('map',e.target.checked));
+$('#tglOpen').addEventListener('change',e=>document.body.classList.toggle('open',e.target.checked));
+
+document.addEventListener('click',e=>{
+  const t=e.target;
+  const closest=(a)=>t.closest(`[${a}]`);
+
+  // config area switch
+  const areaEl=closest('data-area');
+  if(areaEl){ state.area=areaEl.dataset.area; state.ruleView='list'; render(); return; }
+
+  // goto (inline affordance)
+  const goto=closest('data-goto');
+  if(goto){ state.area=goto.dataset.goto; state.ruleView='list'; render(); return; }
+
+  // open a rule
+  const open=closest('data-open');
+  if(open){ state.editingId=open.dataset.open; state.ruleView='editor';
+    const r=state.rules.find(x=>x.id===state.editingId); delete r._new; render(); return; }
+
+  // new rule
+  if(closest('data-new')){
+    const id='r'+(state.rules.length+1);
+    const nr={id, name:'New rule', scope:'', level:null, custom:defaultCustom(), _new:true};
+    state.rules.splice(state.rules.length-1,0,nr); // before Default
+    state.editingId=id; state.ruleView='editor'; render(); return;
+  }
+
+  // back to list
+  if(closest('data-back')){ state.ruleView='list'; render(); return; }
+
+  // pick a capture level
+  const lvl=closest('data-level');
+  if(lvl){ const r=state.rules.find(x=>x.id===state.editingId); r.level=lvl.dataset.level; render(); return; }
+
+  // toggle a Custom field/event
+  const tog=closest('data-toggle');
+  if(tog){ const r=state.rules.find(x=>x.id===state.editingId);
+    const [kind,id]=tog.dataset.toggle.split(':');
+    if(kind==='ev') r.custom.events[id]=!r.custom.events[id];
+    else r.custom.fields[id]=!r.custom.fields[id];
+    render(); return; }
+
+  // screenshots toggle (Custom)
+  if(closest('data-shot')){ const r=state.rules.find(x=>x.id===state.editingId);
+    r.custom.screenshots=!r.custom.screenshots; render(); return; }
+
+  // SAP enable toggle
+  if(closest('data-sap')){ state.sapEnabled=!state.sapEnabled; render(); return; }
+});
+
+render();
+</script>
+</body>
+</html>

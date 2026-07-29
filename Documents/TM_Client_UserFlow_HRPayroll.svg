@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="800" viewBox="0 0 720 800" font-family="Arial, Helvetica, sans-serif">
+  <style>
+    :root { color-scheme: light; }
+    .title { fill:#0f172a; font-weight:bold; }
+    .sub { fill:#64748b; }
+    .oval { fill:#eef2ff; stroke:#6366f1; stroke-width:1.5; }
+    .box { fill:#ffffff; stroke:#cbd5e1; stroke-width:1.5; }
+    .priv { fill:#ede9fe; stroke:#a78bfa; stroke-width:1.5; }
+    .diamond { fill:#fff7ed; stroke:#fb923c; stroke-width:1.5; }
+    .lead { fill:#1e293b; font-weight:bold; }
+    .tag { fill:#94a3b8; font-style:italic; }
+    .lbl { fill:#475569; font-weight:bold; }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#475569"/></marker>
+  </defs>
+
+  <text x="380" y="28" text-anchor="middle" font-size="17" class="title">User flow — HR Payroll, strict Default-rule only</text>
+  <text x="380" y="46" text-anchor="middle" font-size="11.5" class="sub">One rule does all the work · grey tag = location in the nav tree</text>
+
+  <!-- Start -->
+  <ellipse cx="380" cy="72" rx="150" ry="22" class="oval"/>
+  <text x="380" y="77" text-anchor="middle" font-size="12.5" class="lead">Open Configuration — HR Payroll project</text>
+  <line x1="380" y1="94" x2="380" y2="110" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- S1 -->
+  <rect x="220" y="112" width="320" height="50" rx="9" class="box"/>
+  <text x="380" y="134" text-anchor="middle" font-size="12.5" class="lead">Open the Default rule (the catch-all)</text>
+  <text x="380" y="152" text-anchor="middle" font-size="10.5" class="tag">Capture Rules &#9656; Default rule</text>
+  <line x1="380" y1="162" x2="380" y2="178" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- S2 -->
+  <rect x="220" y="180" width="320" height="50" rx="9" class="box"/>
+  <text x="380" y="202" text-anchor="middle" font-size="12.5" class="lead">Set capture level = Full</text>
+  <text x="380" y="220" text-anchor="middle" font-size="10.5" class="tag">Rule &#9656; Capture level  ·  captures payroll end-to-end</text>
+  <line x1="380" y1="230" x2="380" y2="246" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- S3 -->
+  <rect x="220" y="248" width="320" height="50" rx="9" class="box"/>
+  <text x="380" y="270" text-anchor="middle" font-size="12.5" class="lead">Review attributes (events &amp; logs)</text>
+  <text x="380" y="288" text-anchor="middle" font-size="10.5" class="tag">Rule &#9656; Attributes to capture  ·  trim obvious noise</text>
+  <line x1="380" y1="298" x2="380" y2="314" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- S4 (Privacy) -->
+  <rect x="220" y="316" width="320" height="60" rx="9" class="priv"/>
+  <text x="380" y="339" text-anchor="middle" font-size="12.5" class="lead">Add redaction patterns: SSN, bank acct, card</text>
+  <text x="380" y="356" text-anchor="middle" font-size="11" class="sub">order 9-digit before 5-digit</text>
+  <text x="380" y="371" text-anchor="middle" font-size="10.5" class="tag">Privacy &#9656; Redaction Patterns</text>
+  <line x1="380" y1="376" x2="380" y2="392" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- S5 -->
+  <rect x="220" y="394" width="320" height="50" rx="9" class="priv"/>
+  <text x="380" y="416" text-anchor="middle" font-size="12.5" class="lead">Hash username &amp; machine ID</text>
+  <text x="380" y="434" text-anchor="middle" font-size="10.5" class="tag">Privacy &#9656; Hashing</text>
+  <line x1="380" y1="444" x2="380" y2="460" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- S6 -->
+  <rect x="220" y="462" width="320" height="50" rx="9" class="priv"/>
+  <text x="380" y="484" text-anchor="middle" font-size="12.5" class="lead">Set consent text for payroll capture</text>
+  <text x="380" y="502" text-anchor="middle" font-size="10.5" class="tag">Privacy &#9656; User Consent</text>
+  <line x1="380" y1="512" x2="380" y2="528" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- S7 -->
+  <rect x="220" y="530" width="320" height="50" rx="9" class="box"/>
+  <text x="380" y="552" text-anchor="middle" font-size="12.5" class="lead">Set data pool &amp; target table</text>
+  <text x="380" y="570" text-anchor="middle" font-size="10.5" class="tag">Data Connection</text>
+  <line x1="380" y1="580" x2="380" y2="598" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- D preview -->
+  <polygon points="380,598 510,642 380,686 250,642" class="diamond"/>
+  <text x="380" y="638" text-anchor="middle" font-size="11.5" class="lead">Preview: PII redacted</text>
+  <text x="380" y="654" text-anchor="middle" font-size="11.5" class="lead">&amp; data safe?</text>
+  <text x="380" y="670" text-anchor="middle" font-size="10" class="tag">Configuration File &#9656; Preview</text>
+
+  <!-- No -> loop back to S4 -->
+  <line x1="250" y1="642" x2="110" y2="642" stroke="#475569" stroke-width="1.5"/>
+  <line x1="110" y1="642" x2="110" y2="346" stroke="#475569" stroke-width="1.5"/>
+  <line x1="110" y1="346" x2="218" y2="346" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="118" y="500" font-size="11" class="lbl">No — adjust redaction</text>
+
+  <!-- Yes -> end -->
+  <line x1="380" y1="686" x2="380" y2="706" stroke="#475569" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="390" y="700" font-size="11" class="lbl">Yes</text>
+  <ellipse cx="380" cy="750" rx="150" ry="24" class="oval"/>
+  <text x="380" y="748" text-anchor="middle" font-size="12.5" class="lead">Export &amp; deploy to machines</text>
+  <text x="380" y="765" text-anchor="middle" font-size="10.5" class="tag">Configuration File &#9656; Export / Deploy</text>
+</svg>

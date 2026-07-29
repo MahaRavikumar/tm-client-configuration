@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="540" viewBox="0 0 480 540" font-family="Arial, Helvetica, sans-serif">
+  <style>
+    :root { color-scheme: light; }
+    .screen { fill:#ffffff; stroke:#e2e8f0; stroke-width:1.5; }
+    .title { fill:#0f172a; font-weight:bold; }
+    .row { fill:#ffffff; stroke:#cbd5e1; stroke-width:1.3; }
+    .label { fill:#1e293b; }
+    .sublabel { fill:#94a3b8; }
+    .chev { fill:#94a3b8; }
+    .back { fill:#475569; }
+    .frameid { fill:#cbd5e1; font-style:italic; }
+    .cta { fill:#334155; }
+    .ctatext { fill:#ffffff; font-weight:bold; }
+    .crumb { fill:#94a3b8; }
+    .note { fill:#8a94a1; font-style:italic; }
+    .pill { fill:#f1f5f9; stroke:#cbd5e1; stroke-width:1; }
+    .pilltext { fill:#475569; }
+    .sect { fill:#f8fafc; stroke:#cbd5e1; stroke-width:1.3; }
+    .secthdr { fill:#64748b; font-weight:bold; letter-spacing:0.5px; }
+    .sectcap { fill:#94a3b8; font-style:italic; }
+  </style>
+  <rect x="20" y="20" width="440" height="500" rx="14" class="screen"/>
+  <text x="436" y="40" text-anchor="end" font-size="10" class="frameid">F1.N.A · Attributes</text>
+  <text x="44" y="54" font-size="13" class="back">&#8249; Back</text>
+  <text x="44" y="80" font-size="11.5" class="crumb">Capture Rules › New rule ›</text>
+  <text x="44" y="104" font-size="22" class="title">Attributes to capture</text>
+  <line x1="44" y1="120" x2="436" y2="120" stroke="#eef2f6" stroke-width="1.5"/>
+  <text x="44" y="146" font-size="11.5" class="note">Choose which data fields (events &amp; logs) are recorded.</text>
+  <rect x="44" y="446" width="392" height="46" rx="8" class="cta"/>
+  <text x="240" y="475" text-anchor="middle" font-size="14" class="ctatext">&#10003;  This is where I'd do it</text>
+</svg>

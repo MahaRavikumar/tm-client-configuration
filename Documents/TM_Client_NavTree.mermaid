@@ -1,0 +1,37 @@
+flowchart TD
+    ROOT["Task Mining Configuration"]
+
+    ROOT --> R["Capture Rules<br/>(Event Processing Rules)"]
+    ROOT --> P["Privacy"]
+    ROOT --> DC["Data Connection"]
+    ROOT --> CB["Client Behaviour"]
+    ROOT --> UA["User Attributes"]
+    ROOT --> INT["Integrations"]
+    ROOT --> CF["Configuration File"]
+
+    R --> RULE["Rule (repeatable)"]
+    RULE --> R1["Scope / Conditions<br/>(apps, URLs, elements)"]
+    RULE --> R2["Capture level<br/>(Full / Custom / Deny)"]
+    RULE --> R3["Captured data"]
+    RULE --> R4["Screenshots"]
+
+    R3 --> R3a["Events<br/>(which interactions to record)"]
+    R3 --> R3b["Data fields<br/>(attributes logged per event)"]
+
+    P --> P1["Redaction Patterns"]
+    P --> P2["Hashing<br/>(username, machine ID)"]
+    P --> P3["User Consent"]
+
+    DC --> DC1["Platform Upload<br/>(data pool, table, server, image bucket)"]
+    DC --> DC2["Caching"]
+
+    CB --> CB1["Logging<br/>(snippet split, idle, alive, URL retrieval,<br/>Live Event Monitor, UIAA)"]
+    CB --> CB2["Startup Mode"]
+
+    INT --> INT1["Extensions / Web-page Extraction"]
+    INT --> INT2["SAP Integration"]
+
+    CF --> CF1["Import"]
+    CF --> CF2["Export"]
+    CF --> CF3["Preview / Validate"]
+    CF --> CF4["Deploy to machines"]

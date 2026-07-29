@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Task Mining · Client Settings</title>
+<style>
+  /* =========================================================
+     Celonis-product-style palette (matched to reference screens)
+     ========================================================= */
+  :root{
+    --navy:#16223d;          /* primary text / headings          */
+    --ink:#1f2a44;
+    --grey:#5f6b7f;          /* secondary text                   */
+    --grey2:#8a94a6;         /* tertiary / hints                 */
+    --line:#e6e8ee;          /* dividers / card borders          */
+    --line2:#d6dae2;
+    --page:#f7f8fa;          /* app background                   */
+    --card:#ffffff;
+    --subtle:#f3f4f8;        /* info boxes / hovers              */
+    --indigo:#4d40d6;        /* primary action / brand           */
+    --indigo-hover:#3f34b8;
+    --indigo-soft:#ecebfc;   /* active nav background            */
+    --toggle-on:#1f2a4d;     /* dark-navy switch (product style) */
+    --success:#137a52; --success-bg:#e4f5ec;
+    --info:#2a5bd7;  --info-bg:#e8eefc;
+    --danger:#c0392b;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.04);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:var(--font);color:var(--navy);background:var(--page);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit}
+  .app{display:flex;height:100vh;overflow:hidden}
+
+  /* ---------------- Icon rail ---------------- */
+  .rail{width:56px;background:#fff;border-right:1px solid var(--line);
+        display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0;flex:none}
+  .rail .logo{width:30px;height:30px;color:var(--navy);margin-bottom:6px}
+  .rail .ric{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+        color:var(--grey);cursor:pointer}
+  .rail .ric:hover{background:var(--subtle)}
+  .rail .ric.active{background:var(--indigo-soft);color:var(--indigo)}
+  .rail .ric.ai{color:#7c3aed}
+  .rail .spring{flex:1}
+  .rail .avatar{width:30px;height:30px;border-radius:50%;background:var(--indigo);color:#fff;
+        display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+
+  /* ---------------- Project nav ---------------- */
+  .projnav{width:248px;background:#fff;border-right:1px solid var(--line);padding:14px 12px;flex:none;overflow:auto;
+        display:flex;flex-direction:column;transition:width .16s ease}
+  .projnav .grp{font-size:12px;font-weight:700;color:var(--navy);margin:18px 10px 6px;white-space:nowrap}
+  .projnav .navspring{flex:1}
+  .projnav .navfoot{border-top:1px solid var(--line);margin-top:8px;padding-top:8px}
+  .navtoggle{display:flex;align-items:center;gap:11px;width:100%;padding:9px 10px;border:none;background:none;
+        border-radius:8px;color:var(--grey);cursor:pointer;font-size:14px;font-family:inherit;text-align:left;white-space:nowrap}
+  .navtoggle:hover{background:var(--subtle)}
+  .navtoggle svg{width:18px;height:18px;flex:none;color:var(--grey2)}
+  /* Collapsed state — icons only */
+  .projnav.collapsed{width:64px;padding:14px 8px}
+  .projnav.collapsed .navitem,.projnav.collapsed .navtoggle{justify-content:center;gap:0;font-size:0}
+  .projnav.collapsed .grp{visibility:hidden;height:1px;margin:10px 0 0}
+  .projnav.collapsed .navitem.active::before{left:-8px}
+  .navitem{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:8px;color:var(--grey);
+        cursor:default;font-size:14px;position:relative}
+  .navitem svg{width:18px;height:18px;flex:none;color:var(--grey2)}
+  .navitem.active{background:var(--indigo-soft);color:var(--indigo);font-weight:600}
+  .navitem.active svg{color:var(--indigo)}
+  .navitem.active::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:3px;
+        background:var(--indigo);border-radius:0 3px 3px 0}
+
+  /* ---------------- Main column ---------------- */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .crumbbar{padding:12px 28px;border-bottom:1px solid var(--line);background:#fff;flex:none;
+        font-size:13px;color:var(--grey2);display:flex;align-items:center;gap:7px}
+  .crumbbar .sep{color:var(--line2)}
+  .crumbbar b{color:var(--grey);font-weight:500}
+  .crumbbar .here{color:var(--navy);font-weight:600}
+
+  .scroll{overflow:auto;flex:1}
+  .page{max-width:1200px;margin:0 auto;padding:26px 28px 80px}
+  .pagebody{display:flex;gap:28px;align-items:flex-start}
+
+  /* header row (page-level, spans full width above the sub-nav) */
+  .titlerow{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px;
+        padding-bottom:20px;border-bottom:1px solid var(--line)}
+  .titlerow h1{font-size:24px;font-weight:700;margin:0 0 3px;color:var(--navy);letter-spacing:-.2px}
+  .titlerow .subtitle{color:var(--grey);font-size:14px}
+
+  /* settings side-nav (in content) */
+  .settingsnav{width:210px;flex:none;position:sticky;top:0}
+  .settingsnav .snitem{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;
+        color:var(--grey);cursor:pointer;font-size:14px;font-weight:500}
+  .settingsnav .snitem svg{width:17px;height:17px;color:var(--grey2);flex:none}
+  .settingsnav .snitem:hover{background:#fff}
+  .settingsnav .snitem.active{background:var(--indigo-soft);color:var(--indigo);font-weight:600}
+  .settingsnav .snitem.active svg{color:var(--indigo)}
+  .titlerow-actions{display:flex;align-items:center;gap:14px}
+  .navseg .seg-btn{padding:7px 14px;font-size:12.5px;letter-spacing:0;font-weight:600}
+
+  /* secondary-nav as horizontal tabs (layout preview) */
+  .pagebody.tabs{flex-direction:column;gap:0}
+  .pagebody.tabs .settingsnav{width:auto;position:static;display:flex;gap:2px;
+        border-bottom:1px solid var(--line);margin-bottom:26px;overflow-x:auto}
+  .pagebody.tabs .snitem{border-radius:0;padding:11px 14px;border-bottom:2px solid transparent;
+        white-space:nowrap;margin-bottom:-1px}
+  .pagebody.tabs .snitem:hover{background:transparent;color:var(--navy)}
+  .pagebody.tabs .snitem.active{background:transparent;color:var(--indigo);border-bottom-color:var(--indigo)}
+  .pagebody.tabs .content{width:100%}
+
+  .content{flex:1;min-width:0}
+
+  /* buttons */
+  .btn{border:1px solid var(--line2);background:#fff;border-radius:8px;padding:9px 15px;font-size:13.5px;
+        font-weight:600;cursor:pointer;color:var(--navy);display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{background:var(--subtle)}
+  .btn svg{width:16px;height:16px}
+  .btn.primary{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+  .btn.primary:hover{background:var(--indigo-hover)}
+  .btn.primary:disabled{background:#c3c0ec;border-color:#c3c0ec;cursor:not-allowed}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--indigo)}
+  .btn.ghost:hover{background:var(--indigo-soft)}
+  .btn.sm{padding:6px 11px;font-size:13px}
+  .btn.ghost:disabled{color:var(--grey2);background:transparent;cursor:not-allowed;opacity:.55}
+  .btn.ghost:disabled:hover{background:transparent}
+
+  /* cards / sections */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+        margin-bottom:18px;overflow:hidden}
+  .sechead{display:flex;align-items:center;gap:11px;padding:18px 20px 4px}
+  .sechead .sicon{width:34px;height:34px;border-radius:9px;background:var(--subtle);color:var(--indigo);
+        display:flex;align-items:center;justify-content:center;flex:none}
+  .sechead .sicon svg{width:19px;height:19px}
+  .sechead h2{font-size:17px;font-weight:700;margin:0;color:var(--navy)}
+  .sechead .shint{font-size:13px;color:var(--grey);margin-top:1px}
+  .cbody{padding:14px 20px 20px}
+  /* single-card rule editor: sections stacked with dividers */
+  .editcard .esec + .esec{border-top:1px solid var(--line)}
+
+  /* scope condition picker */
+  /* ---- Scope builder: groups + conditions ---- */
+  .grp{border:1px solid var(--line2);border-radius:11px;background:var(--subtle)}
+  .grp-root{background:transparent;border-color:var(--line)}
+  /* nested groups read as a subtle contained block; the deeper level a touch more inset */
+  .grp:not(.grp-root){margin:2px 0}
+  .tree-node .grp:not(.grp-root) .grp:not(.grp-root){background:#eef0f7}
+  .grp-bar{display:flex;align-items:center;gap:10px;padding:9px 11px;border-bottom:1px solid var(--line)}
+  .grp-hint{font-size:12px;color:var(--grey)}
+  .seg{display:inline-flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden;background:#fff}
+  .seg-btn{border:none;background:#fff;padding:6px 13px;font-size:12px;font-weight:700;letter-spacing:.03em;
+        color:var(--grey);cursor:pointer;font-family:inherit}
+  .seg-btn.on{background:var(--indigo);color:#fff}
+  .node-tools{margin-left:auto;display:flex;align-items:center;gap:6px}
+  .tbtn{border:1px solid var(--line2);border-radius:7px;background:#fff;height:30px;min-width:30px;padding:0 8px;
+        font-size:11px;font-weight:700;letter-spacing:.03em;color:var(--grey);cursor:pointer;
+        display:inline-flex;align-items:center;justify-content:center;font-family:inherit}
+  .tbtn:hover{border-color:var(--indigo);color:var(--indigo)}
+  .tbtn.on{background:#e0a24f;border-color:#e0a24f;color:#fff}
+  .tbtn:disabled{opacity:.4;cursor:not-allowed}
+  .tbtn:disabled:hover{border-color:var(--line2);color:var(--grey)}
+  .grp-body{padding:11px 11px 11px 0}
+  .tree-item{display:flex;align-items:flex-start;gap:0}
+  .conn{flex:0 0 66px;text-align:right;padding:14px 10px 0 0;font-size:11px;font-weight:700;
+        letter-spacing:.04em;color:var(--grey2);text-transform:uppercase}
+  .conn-first{color:var(--indigo)}
+  .conn-sel{width:100%;border:1px solid var(--line2);border-radius:7px;background:#fff;height:30px;
+        padding:0 4px 0 8px;font-size:11px;font-weight:700;letter-spacing:.03em;color:var(--indigo);
+        text-transform:uppercase;font-family:inherit;cursor:pointer;text-align:center}
+  .conn-sel:focus{outline:none;border-color:var(--indigo);box-shadow:0 0 0 3px var(--indigo-soft)}
+  .grp-nhead{display:flex;align-items:center;gap:10px;padding:8px 11px;border-bottom:1px solid var(--line)}
+  .grp-nlabel{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--grey2)}
+  .tree-node{flex:1;min-width:0;padding:6px 0}
+  .cond-row{display:flex;align-items:center;gap:8px;padding:9px 11px;background:#fff;
+        border:1px solid var(--line2);border-radius:9px}
+  .cond-attr,.cond-op,.cond-val{border:1px solid var(--line2);border-radius:8px;padding:9px 10px;font-size:14px;
+        font-family:inherit;color:var(--navy);background:#fff;height:38px}
+  .cond-attr{flex:0 0 180px}
+  .cond-op{flex:0 0 158px}
+  .cond-val{flex:1;min-width:0}
+  .cond-attr:focus,.cond-op:focus,.cond-val:focus{outline:none;border-color:var(--indigo);
+        box-shadow:0 0 0 3px var(--indigo-soft)}
+  .cond-row--err .cond-attr,.cond-row--err .cond-op,.cond-row--err .cond-val{border-color:#e0736f}
+  /* multi-select value field: committed values render as chips, typing adds more */
+  .cond-val.ms{height:auto;min-height:38px;display:flex;flex-wrap:wrap;align-items:center;gap:5px;
+        padding:4px 7px;cursor:text}
+  .cond-val.ms:focus-within{border-color:var(--indigo);box-shadow:0 0 0 3px var(--indigo-soft)}
+  .ms-chip{display:inline-flex;align-items:center;gap:5px;background:var(--indigo-soft);color:var(--indigo);
+        border-radius:6px;padding:3px 5px 3px 9px;font-size:13px;font-weight:600;line-height:1.3;max-width:100%}
+  .ms-chip>span,.ms-chip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ms-x{flex:none;border:none;background:none;color:var(--indigo);cursor:pointer;padding:0;display:flex;
+        align-items:center;justify-content:center;opacity:.7}
+  .ms-x:hover{opacity:1}
+  .ms-input{flex:1;min-width:70px;border:none;outline:none;background:none;font-family:inherit;font-size:14px;
+        color:var(--navy);padding:4px 2px;height:28px}
+  /* chip armed for deletion (first Backspace outlines, second removes) — subtle purple ring */
+  .ms-chip.armed{box-shadow:inset 0 0 0 1.5px var(--indigo)}
+  .ms-chip.armed .ms-x{opacity:1}
+  /* split button: primary "Add condition" + caret revealing "Add group" */
+  .splitbtn{display:inline-flex}
+  .splitbtn .btn.sm{border-radius:0}
+  .splitbtn .btn.sm:first-child{border-radius:8px 0 0 8px}
+  .splitbtn .btn.sm.split-caret{border-radius:0 8px 8px 0;border-left:none;
+        padding:0 8px;min-width:32px;justify-content:center;color:var(--grey)}
+  .splitbtn .btn.sm.split-caret:hover{background:var(--subtle);color:var(--indigo)}
+  .cond-del{flex:none;width:30px;height:30px;border:1px solid var(--line2);border-radius:7px;background:#fff;
+        color:var(--grey);cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .cond-del:hover{border-color:#e0736f;color:#d0413c;background:#fdf3f2}
+  .grp-add{display:flex;align-items:center;gap:8px;padding:4px 0 0 66px}
+  .valsug-pop{position:fixed;z-index:1000;background:#fff;border:1px solid var(--line2);border-radius:9px;
+        box-shadow:0 8px 24px rgba(20,22,60,.14);padding:5px;max-height:240px;overflow-y:auto;min-width:170px}
+  .valsug-item{padding:8px 10px;border-radius:6px;font-size:14px;color:var(--navy);cursor:pointer;
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .valsug-item:hover{background:var(--indigo-soft);color:var(--indigo)}
+  .help-ic{flex:none;width:30px;height:30px;border:none;background:transparent;color:var(--grey2);
+        cursor:help;display:flex;align-items:center;justify-content:center;border-radius:7px;padding:0}
+  .help-ic:hover,.help-ic:focus{color:var(--indigo);background:var(--indigo-soft);outline:none}
+  .help-tip{position:fixed;z-index:1001;max-width:280px;background:var(--navy);color:#fff;font-size:12.5px;
+        line-height:1.45;padding:9px 11px;border-radius:8px;box-shadow:0 8px 24px rgba(20,22,60,.22)}
+  .act-menu{position:fixed;z-index:1001;background:#fff;border:1px solid var(--line2);border-radius:9px;
+        box-shadow:0 8px 24px rgba(20,22,60,.16);padding:5px;min-width:180px}
+  .act-item{display:flex;align-items:center;gap:9px;width:100%;border:none;background:#fff;padding:8px 10px;
+        border-radius:6px;font-size:13.5px;font-weight:500;color:var(--navy);cursor:pointer;
+        font-family:inherit;text-align:left}
+  .act-item:hover{background:var(--indigo-soft);color:var(--indigo)}
+  .act-item.on{color:#b7791f}
+  .act-item.on:hover{background:#fdf3e2;color:#b7791f}
+  .act-item.danger{color:#d0413c}
+  .act-item.danger:hover{background:#fdf3f2;color:#d0413c}
+  .act-check{flex:none;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center}
+  .lead{color:var(--grey);font-size:14px;margin:0 0 16px}
+  .subhead{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--navy);
+        margin:22px 0 8px}
+  .infobox{background:var(--subtle);border-radius:9px;padding:13px 15px;font-size:13.5px;color:var(--grey);
+        margin:10px 0}
+  /* captured-detail groups (FR4.3 / FR5.2 / FR5.3) */
+  /* captured-detail groups — flat, progressive disclosure (FR4.3 / FR5.2 / FR5.3) */
+  .cgrp{border-top:1px solid var(--line)}
+  .cgrp:first-of-type{border-top:none}
+  .cghead{display:flex;align-items:center;gap:11px;padding:13px 2px;cursor:pointer;user-select:none}
+  .cghead:hover .cgtitle{color:var(--navy)}
+  .cgchev{flex:none;color:var(--grey2);display:flex;transition:transform .15s}
+  .cgrp.open .cgchev{transform:rotate(90deg)}
+  .cgtitle{flex:1;min-width:0;font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+        color:var(--grey2);display:flex;align-items:center;gap:9px}
+  .pchip{text-transform:none;letter-spacing:0;font-weight:600;font-size:11px;color:#b7791f;background:#fdf3e2;
+        border-radius:6px;padding:2px 8px;white-space:nowrap}
+  .cgsum{text-transform:none;letter-spacing:0;font-weight:600;font-size:12px;color:var(--grey2)}
+  .cgsum.part{color:var(--indigo)}
+  .cgbody{padding:0 0 8px 27px}
+  .cgbody .trow{padding:9px 0}
+  .cgbody .trow:first-of-type{border-top:none}
+  .cgbody .trow .tname{font-size:13px;font-weight:500}
+  .cgbody .trow .tdesc{font-size:12px}
+  .switch.mixed{background:var(--indigo-soft)}
+  .switch.mixed::after{left:9px}
+  /* lightweight checkbox for child fields (lighter than a wall of switches) */
+  .chk{width:20px;height:20px;border-radius:6px;border:1.6px solid #c9ced9;background:#fff;flex:none;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;padding:0;color:#fff;transition:background .12s,border-color .12s}
+  .chk.on{background:var(--indigo);border-color:var(--indigo)}
+  .chk svg{width:13px;height:13px;opacity:0}
+  .chk.on svg{opacity:1}
+  .chk.locked{cursor:not-allowed;opacity:.5}
+  /* "show rarely-used fields" disclosure (FR5.5) */
+  .rarelink{display:inline-flex;align-items:center;gap:7px;margin:12px 0 2px;padding:7px 0;background:none;border:none;
+        cursor:pointer;color:var(--indigo);font-size:13px;font-weight:600;font-family:inherit}
+  .rarelink:hover{text-decoration:underline}
+  .rarelink .rchev{display:flex;transition:transform .15s}
+  .rarelink.open .rchev{transform:rotate(90deg)}
+  .rarecount{text-decoration:none;background:var(--indigo-soft);color:var(--indigo);border-radius:20px;
+        padding:1px 8px;font-size:11.5px;font-weight:700;margin-left:2px}
+
+  /* toggle rows */
+  .trow{display:flex;align-items:center;gap:14px;padding:16px 0;border-top:1px solid var(--line)}
+  .trow:first-of-type{border-top:none}
+  .trow .tmain{flex:1;min-width:0}
+  .trow .tname{font-weight:600;font-size:14.5px;color:var(--navy)}
+  .trow .tdesc{font-size:13px;color:var(--grey);margin-top:2px}
+  .trow.off .tname{color:var(--grey)}
+
+  /* switch */
+  .switch{width:40px;height:22px;border-radius:20px;background:#c9ced9;position:relative;flex:none;
+        cursor:pointer;transition:background .15s;border:none;padding:0}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+        background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+  .switch.on{background:var(--toggle-on)}
+  .switch.on::after{left:20px}
+  .switch.locked{cursor:not-allowed;opacity:.55}
+
+  /* radios (vertical + card) */
+  .radio-line{display:flex;align-items:flex-start;gap:11px;padding:9px 0;cursor:pointer}
+  .radio-line .rc{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--line2);flex:none;
+        margin-top:1px;position:relative;transition:border-color .12s}
+  .radio-line.sel .rc{border-color:var(--indigo)}
+  .radio-line.sel .rc::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--indigo)}
+  .radio-line .rl{font-weight:600;color:var(--navy);font-size:14px}
+  .radio-line .rd{font-size:13px;color:var(--grey);margin-top:2px}
+  .radios .radio-line + .radio-line{border-top:1px solid var(--line)}
+  .radio-line.locked{cursor:default}
+  .radio-line.locked:not(.sel){opacity:.5}
+  .seg-desc{font-size:13px;color:var(--grey);margin-top:10px}
+  /* screenshot mode dropdown (FR5.6) */
+  .shot-sel{width:100%;max-width:320px;height:38px;padding:0 12px;font-size:14px;font-weight:600;color:var(--navy);
+        font-family:inherit;border:1.5px solid var(--line2);border-radius:9px;background:#fff;cursor:pointer;
+        appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat:no-repeat;background-position:right 11px center;padding-right:34px;transition:.12s}
+  .shot-sel:focus{outline:none;border-color:var(--indigo);box-shadow:0 0 0 3px var(--indigo-soft)}
+  .shot-sel:disabled{opacity:.6;cursor:default;background-color:var(--subtle)}
+
+  .levels{display:flex;gap:12px;margin-top:4px}
+  .level{flex:1;border:1.5px solid var(--line);border-radius:11px;padding:14px;cursor:pointer;background:#fff;transition:.12s}
+  .level:hover{border-color:var(--line2)}
+  .level.sel{border-color:var(--indigo);background:#faf9ff;box-shadow:0 0 0 3px rgba(77,64,214,.10)}
+  .level .lhead{display:flex;align-items:center;gap:9px}
+  .level .lrc{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--line2);flex:none;position:relative}
+  .level.sel .lrc{border-color:var(--indigo)}
+  .level.sel .lrc::after{content:"";position:absolute;inset:3.5px;border-radius:50%;background:var(--indigo)}
+  .level .lname{font-weight:700;font-size:14.5px}
+  .level .badge{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;
+        border-radius:5px;padding:2px 7px;margin-left:auto}
+  .level .badge.lock{background:var(--subtle);color:var(--grey)}
+  .level .badge.edit{background:var(--indigo-soft);color:var(--indigo)}
+  .level .lsum{font-size:12.5px;color:var(--grey);margin-top:9px;line-height:1.5}
+  /* macOS-style "pull-out" notch tying Captured details to the selected level card.
+     --notch-left is set per render() from the selected card's measured centre (syncNotch). */
+  .esec.captured{position:relative;--notch-left:50%}
+  .editcard .esec.captured{border-top:1.5px solid rgba(77,64,214,.4)}
+  .esec.captured::after{content:"";position:absolute;top:-8px;left:var(--notch-left);width:14px;height:14px;
+        background:#fff;transform:translateX(-50%) rotate(45deg);border-top:1.5px solid var(--indigo);
+        border-left:1.5px solid var(--indigo);border-top-left-radius:3px;box-shadow:-3px -3px 6px rgba(77,64,214,.08);
+        transition:left .18s cubic-bezier(.4,1.3,.6,1)}
+
+  /* rule list rows */
+  .rulerow{display:flex;align-items:center;gap:14px;padding:15px 20px;border-top:1px solid var(--line);
+        cursor:pointer}
+  .rulerow:hover{background:var(--subtle)}
+  .rulerow .order{width:24px;height:24px;border-radius:7px;background:var(--subtle);color:var(--grey);
+        font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none}
+  .rulerow .ricon{color:var(--grey);flex:none;display:flex}
+  .rulerow .ricon svg{width:19px;height:19px}
+  .rulerow .rname{font-weight:600;font-size:14.5px;color:var(--navy)}
+  .rulerow .rmeta{font-size:13px;color:var(--grey);margin-top:1px}
+  .rulerow .grow{flex:1}
+  .rulerow .chev{color:var(--grey2);display:flex}
+  .pill{border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;white-space:nowrap}
+  .pill.full{background:var(--success-bg);color:var(--success)}
+  .pill.custom{background:var(--info-bg);color:var(--info)}
+  .pill.deny{background:var(--subtle);color:var(--grey)}
+
+  /* rule list — separate cards */
+  .rulesheader{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:16px}
+  .rulesheader .rh-title{font-size:18px;font-weight:700;margin:0;color:var(--navy)}
+  .rulesheader .rh-hint{font-size:13.5px;color:var(--grey);margin-top:3px;max-width:560px;line-height:1.5}
+  .rulecards{display:flex;flex-direction:column;gap:12px}
+  .rulecard{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);
+        border-radius:12px;padding:16px 18px;cursor:pointer;box-shadow:var(--shadow);
+        transition:border-color .13s,box-shadow .13s,transform .13s}
+  .rulecard:hover{border-color:var(--line2);box-shadow:0 6px 16px rgba(16,24,40,.09);transform:translateY(-1px)}
+  .rulecard .rc-order{width:26px;height:26px;border-radius:7px;background:var(--subtle);color:var(--grey);
+        font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none}
+  .rulecard{position:relative}
+  .rulecard .rc-main{flex:1;min-width:0}
+  .rulecard .rc-name{font-weight:600;font-size:15px;color:var(--navy)}
+  .rulecard .rc-name--empty{color:#d0413c;font-style:italic;font-weight:500}
+  .rulecard .rc-warn{display:flex;align-items:center;gap:6px;margin-top:5px;
+        font-size:12.5px;font-weight:600;color:#b7791f}
+  .rulecard .rc-warn svg{flex:none}
+  .rulecard .rc-meta{font-size:13px;color:var(--grey);margin-top:2px}
+  .rulecard .rc-level{margin-top:7px}
+  /* Default rule: subtext sits on the same line as the name, pill below */
+  .rulecard .rc-namerow{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+  .rulecard .rc-namerow .rc-meta{margin-top:0}
+  .rulecard .rc-chev{color:var(--grey2);display:flex}
+  /* trailing actions: delete, then chevron */
+  .rulecard .rc-acts{display:flex;align-items:center;gap:4px;flex:none}
+  .rc-del{border:none;background:none;cursor:pointer;color:var(--grey2);flex:none;
+        width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+  .rc-del:hover{background:#fdf3f2;color:#d0413c}
+  .rc-del svg{width:17px;height:17px}
+  /* keeps the Default rule's text aligned with the draggable cards above it */
+  .rc-grip--none{width:22px;height:22px}
+  /* drag handle */
+  .rc-grip{color:var(--grey2);flex:none;display:flex;align-items:center;cursor:grab;
+        padding:2px;border-radius:5px}
+  .rc-grip:hover{color:var(--grey);background:var(--subtle)}
+  .rulecard[draggable="true"]:active .rc-grip,.rc-grip:active{cursor:grabbing}
+  .rulecard.dragging{opacity:.45}
+  .rulecard.drop-before::before,.rulecard.drop-after::after{content:"";position:absolute;left:0;right:0;
+        height:3px;background:var(--indigo);border-radius:3px}
+  .rulecard.drop-before::before{top:-8px}
+  .rulecard.drop-after::after{bottom:-8px}
+  /* default / fallback rule */
+  .rule-fallback-label{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+        color:var(--grey2);margin:22px 0 10px}
+  .rulecard--default{background:#fbfbfd;border-style:dashed;border-color:var(--line2)}
+  .rulecard--default:hover{transform:none;box-shadow:var(--shadow)}
+
+  /* form fields */
+  .field{margin-bottom:16px;max-width:520px}
+  .field label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px}
+  .field input,.field textarea,.field select{width:100%;border:1px solid var(--line2);border-radius:8px;
+        padding:10px 12px;font-size:14px;font-family:inherit;color:var(--navy);background:#fff}
+  .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--indigo);
+        box-shadow:0 0 0 3px rgba(77,64,214,.12)}
+  .field .hint{font-size:12.5px;color:var(--grey2);margin-top:6px}
+  /* inline field validation (FR1.3 / FR2.2) */
+  .field input.err{border-color:#e0736f;background:#fffbfa}
+  .field input.err:focus{border-color:#d0413c;box-shadow:0 0 0 3px rgba(208,65,60,.14)}
+  .field .errmsg{display:flex;align-items:center;gap:6px;margin-top:7px;
+        font-size:12.5px;font-weight:500;color:#d0413c}
+  .field .errmsg svg{flex:none}
+  .field.inline{display:flex;align-items:center;gap:14px;max-width:none}
+  .field.inline label{margin:0;width:220px}
+  .field.inline input{max-width:160px}
+
+  .note{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--grey);margin-top:14px;
+        background:var(--subtle);border-radius:8px;padding:11px 13px}
+  .note svg{width:17px;height:17px;flex:none;color:var(--info)}
+  .note a{color:var(--indigo);font-weight:600;cursor:pointer;text-decoration:none}
+  .note a:hover{text-decoration:underline}
+  /* advisory (non-blocking) warning — e.g. a Default rule that isn't Full (FR2.5a) */
+  .note.warn{background:#fdf3e2;color:#8a6320;align-items:flex-start}
+  .note.warn svg{color:#b7791f;margin-top:1px}
+  .note.warn b{color:#7a5618}
+
+  /* ---------------- Rule editor modal (FR1.6: Submit stages, Cancel discards) ----------------
+     Near-fullscreen because a rule is the heaviest object in the app (scope tree + ~29 toggles):
+     sticky header + sticky footer, scrolling body only. Overlay sits BELOW the popup menus
+     (z-index 1000/1001) so suggestion/action popovers still layer over the dialog. */
+  .modal-ov{position:fixed;inset:0;z-index:900;background:rgba(22,34,61,.44);
+        display:flex;align-items:center;justify-content:center;padding:26px}
+  .modal-ov[hidden]{display:none}
+  .modal{background:var(--card);border-radius:14px;width:min(1000px,100%);height:min(900px,100%);
+        display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 48px rgba(16,24,40,.24)}
+  .modal-head{display:flex;align-items:flex-start;gap:14px;padding:18px 24px 16px;
+        border-bottom:1px solid var(--line);flex:none}
+  .modal-head h2{margin:0;font-size:17px;font-weight:650;color:var(--navy)}
+  .modal-head .mh-sub{font-size:13px;color:var(--grey);margin-top:2px}
+  .modal-x{margin-left:auto;border:none;background:none;cursor:pointer;color:var(--grey);flex:none;
+        width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+  .modal-x:hover{background:var(--subtle);color:var(--navy)}
+  .modal-body{flex:1;overflow-y:auto;padding:18px 24px 24px}
+  /* the editor keeps its section dividers but stops looking like a card inside a card */
+  .modal-body .editcard{border:none;box-shadow:none;border-radius:0;margin:0}
+  .modal-foot{display:flex;align-items:center;gap:14px;padding:14px 24px;flex:none;
+        border-top:1px solid var(--line);background:#fcfcfd}
+  .modal-foot .mf-hint{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;color:#8a6320}
+  .modal-foot .mf-hint svg{flex:none;color:#b7791f}
+  .modal-acts{margin-left:auto;display:flex;gap:10px;flex:none}
+  /* Confirmation dialog for destructive actions (FR2.6). Above the rule dialog and its
+     popovers (1001) so it can also be raised from inside one; below the toast (1200). */
+  .modal-ov--confirm{z-index:1100}
+  .modal--sm{width:min(440px,100%);height:auto;max-height:100%}
+  .modal--sm .modal-head{border-bottom:none;padding-bottom:0}
+  .modal--sm .modal-body{padding:10px 24px 20px;overflow:visible}
+  .modal--sm .modal-foot{background:transparent;border-top:none;padding-top:0}
+  .btn.danger{background:#d0413c;border-color:#d0413c;color:#fff}
+  .btn.danger:hover{background:#b8332f;border-color:#b8332f}
+
+  /* toast */
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+        background:var(--toggle-on);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;
+        box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:.25s;display:flex;align-items:center;gap:9px}
+  .toast{z-index:1200}          /* above the rule dialog and its popovers */
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  .toast svg{width:18px;height:18px;flex:none}
+  .empty{color:var(--grey2);font-size:13.5px;padding:8px 0}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ============ Icon rail ============ -->
+  <nav class="rail">
+    <svg class="logo" viewBox="0 0 32 32" fill="none"><path d="M16 3C8.8 3 3 8.8 3 16s5.8 13 13 13c4.9 0 9.2-2.7 11.4-6.7l-4.6-2.5A8 8 0 1 1 16 8c2.9 0 5.5 1.6 7 3.9l4.5-2.6A12.98 12.98 0 0 0 16 3Z" fill="currentColor"/></svg>
+    <div class="ric" title="Search">◨</div>
+    <div class="ric" title="Apps">▦</div>
+    <div class="ric" title="Actions">✦</div>
+    <div class="ric" title="Analytics">◇</div>
+    <div class="spring"></div>
+    <div class="ric active" title="Studio">▤</div>
+    <div class="ric" title="Packages">▥</div>
+    <div class="ric ai" title="AI">✦</div>
+    <div class="spring"></div>
+    <div class="ric" title="Help">?</div>
+    <div class="avatar">M</div>
+  </nav>
+
+  <!-- ============ Project nav ============ -->
+  <nav class="projnav collapsed">
+    <div class="navitem">__ICON_home__ Home</div>
+    <div class="navitem active">__ICON_sliders__ Client Settings</div>
+    <div class="navitem">__ICON_users__ Users &amp; Invite</div>
+    <div class="navitem">__ICON_plug__ Project Connection</div>
+    <div class="grp">Data Configuration</div>
+    <div class="navitem">__ICON_calendar__ Run &amp; Schedule</div>
+    <div class="navitem">__ICON_tag__ Labels</div>
+    <div class="navitem">__ICON_events__ Business Events</div>
+    <div class="navitem">__ICON_tasks__ Tasks</div>
+    <div class="navitem">__ICON_discovery__ AI Task Discovery</div>
+    <div class="navspring"></div>
+    <div class="navfoot">
+      <button class="navtoggle" id="navToggle" title="Expand sidebar">__ICON_sidebar__ <span class="lbl">Expand</span></button>
+    </div>
+  </nav>
+
+  <!-- ============ Main ============ -->
+  <div class="main">
+    <div class="crumbbar">
+      <span>Projects</span><span class="sep">›</span>
+      <b>Customer_Ticketing_Team_AI_Task_Discovery</b><span class="sep">›</span>
+      <span class="here">Client Settings</span>
+    </div>
+    <div class="scroll">
+      <div class="page">
+        <div class="titlerow">
+          <div>
+            <h1>Client Settings</h1>
+            <div class="subtitle" id="pageSub">Configure what the Task Mining client captures, and how.</div>
+          </div>
+          <div class="titlerow-actions">
+            <div class="seg navseg" id="navLayoutToggle" title="Preview: secondary-nav layout (prototype only)">
+              <button class="seg-btn" data-nav="side">Sidebar</button>
+              <button class="seg-btn" data-nav="tabs">Tabs</button>
+            </div>
+            <button class="btn primary" id="saveBtn" disabled>Save Client Settings</button>
+          </div>
+        </div>
+        <div class="pagebody" id="pagebody">
+          <aside class="settingsnav" id="settingsnav"></aside>
+          <div class="content">
+            <div id="content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal-ov" id="ruleModal" hidden></div>
+<div class="modal-ov modal-ov--confirm" id="confirmModal" hidden></div>
+
+<script>
+/* =========================================================
+   Icon set (inline SVG, outline style)
+   ========================================================= */
+const I = {
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/>',
+  sliders:'<path d="M4 7h9"/><path d="M17 7h3"/><circle cx="15" cy="7" r="2"/><path d="M4 17h3"/><path d="M11 17h9"/><circle cx="8" cy="17" r="2"/>',
+  users:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.5"/><path d="M17 14.5a6 6 0 0 1 4 5.5"/>',
+  plug:'<path d="M9 3v6"/><path d="M15 3v6"/><path d="M6 9h12v3a6 6 0 0 1-12 0Z"/><path d="M12 18v3"/>',
+  calendar:'<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 3v3M16 3v3"/>',
+  tag:'<path d="M3 12V4h8l9 9-7 7Z"/><circle cx="8" cy="8" r="1.3"/>',
+  events:'<path d="M4 6h10M4 12h16M4 18h10"/><circle cx="18.5" cy="6" r="1.6"/><circle cx="18.5" cy="18" r="1.6"/>',
+  tasks:'<path d="M4 6.5 6 8.5 9.5 5"/><path d="M4 17.5 6 19.5 9.5 16"/><path d="M13 7h7M13 17h7"/>',
+  discovery:'<path d="M5 4v9a5 5 0 0 0 5 5h9"/><path d="M16 15l4 3-4 3"/>',
+  apps:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  shield:'<path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6Z"/><path d="m9 12 2 2 4-4"/>',
+  cloud:'<path d="M7 18a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.4A3.5 3.5 0 0 1 18 18Z"/>',
+  gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+  idcard:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="11" r="2"/><path d="M5.5 16.5a3 3 0 0 1 6 0"/><path d="M14 10h4M14 13.5h4"/>',
+  puzzle:'<path d="M10 4a2 2 0 0 1 4 0c0 .8.7 1.2 1.5 1.2H18a1 1 0 0 1 1 1v2.3c0 .8.4 1.5 1.2 1.5a2 2 0 0 1 0 4c-.8 0-1.2.7-1.2 1.5V19a1 1 0 0 1-1 1h-2.5c-.8 0-1.5.4-1.5 1.2M10 4c0 .8-.7 1.2-1.5 1.2H6a1 1 0 0 0-1 1v2.3C5 9.3 4.6 10 3.8 10a2 2 0 0 0 0 4c.8 0 1.2.7 1.2 1.5V18a1 1 0 0 0 1 1h2.5c.8 0 1.5.4 1.5 1.2a2 2 0 0 0 4 0"/>',
+  rule:'<rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  window:'<rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 9h17"/><circle cx="6.5" cy="7" r=".6"/>',
+  text:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/>',
+  keyboard:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M6 13h.01M17.5 13h.01M9 13h6"/>',
+  click:'<path d="M6 3l1.5 4M3 6l4 1.5M6.5 11 3 12.5 7 14l1.5 4 2-4 4-1Z"/><path d="M12.5 12.5 20 20"/>',
+  clip:'<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4a3 3 0 0 1 6 0"/><path d="M9 11h6M9 15h4"/>',
+  image:'<rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m4 17 5-4 4 3 3-2 4 3"/>',
+  dot:'<circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/>',
+  grip:'<circle cx="9" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="9" cy="18" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="18" r="1.4" fill="currentColor" stroke="none"/>',
+  ring:'<circle cx="12" cy="12" r="5.5"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5h.01"/>',
+  warn:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5V13M12 16.5h.01"/>',
+  check:'<path d="m4 12 5 5L20 6"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  chevR:'<path d="m9 5 7 7-7 7"/>',
+  chevL:'<path d="m15 5-7 7 7 7"/>',
+  chevD:'<path d="m6 9 6 6 6-6"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  wrap:'<path d="M4 7V5a1 1 0 0 1 1-1h2M4 17v2a1 1 0 0 0 1 1h2M20 7V5a1 1 0 0 0-1-1h-2M20 17v2a1 1 0 0 1-1 1h-2"/>',
+  more:'<path d="M6 12h.01M12 12h.01M18 12h.01"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  upload:'<path d="M12 16V5M8 9l4-4 4 4"/><path d="M5 19h14"/>',
+  hash:'<path d="M9 4 7 20M17 4l-2 16M5 9h15M4 15h15"/>',
+  eye:'<path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>',
+  scroll:'<path d="m8 9 4-4 4 4M8 15l4 4 4-4"/>',
+  power:'<path d="M12 4v8"/><path d="M6.5 7a8 8 0 1 0 11 0"/>',
+  sidebar:'<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M9 4.5v15"/>',
+  trash:'<path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/>',
+};
+function svg(name,w){const s=w||18;return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${I[name]||''}</svg>`;}
+
+/* =========================================================
+   Data model  (ported from default-config.ts; full/custom/deny)
+   ========================================================= */
+/* Events & data fields are organised into named groups/families (FR4.3 / FR5.2),
+   never a flat dump. Each item carries `grp`; group order + labels below. */
+const EV_GROUPS = [
+  {key:'nav',      label:'Navigation & window'},
+  {key:'interact', label:'Interaction'},
+  {key:'content',  label:'Content & clipboard', sensitive:true},
+  // Lower-value, high-volume event families — hidden behind a disclosure link, off by default.
+  {key:'scroll',    label:'Scroll',              rare:true},
+  {key:'lifecycle', label:'Session & lifecycle', rare:true},
+];
+const EVENTS = [
+  {key:'winchange',    grp:'nav',      label:'Active window / tab changed', icon:'window'},
+  {key:'appwinchange', grp:'nav',      label:'Application window changed',   icon:'window'},
+  {key:'focuschange',  grp:'nav',      label:'Focus changed',               icon:'eye'},
+  {key:'tabactivate',  grp:'nav',      label:'Activated tab',               icon:'window'},
+  {key:'tabclose',     grp:'nav',      label:'Closed tab',                  icon:'window'},
+  {key:'click',     grp:'interact', label:'Mouse click',                 icon:'click'},
+  {key:'keyboard',  grp:'interact', label:'Keyboard shortcut',           icon:'keyboard'},
+  {key:'typed',     grp:'content',  label:'Text entered (that typing happened)', icon:'text', content:true},
+  {key:'copy',      grp:'content',  label:'Copy to clipboard (that a copy happened)', icon:'clip', content:true},
+  {key:'scroll',    grp:'scroll',    label:'Scrolled',              icon:'scroll'},
+  {key:'scrollend', grp:'scroll',    label:'Scroll ended',          icon:'scroll'},
+  {key:'sessstart', grp:'lifecycle', label:'Session started',       icon:'clock'},
+  {key:'sessend',   grp:'lifecycle', label:'Session ended',         icon:'clock'},
+  {key:'applaunch', grp:'lifecycle', label:'Application launched',   icon:'power'},
+  {key:'appclose',  grp:'lifecycle', label:'Application closed',     icon:'power'},
+  {key:'lockstate', grp:'lifecycle', label:'System locked / unlocked', icon:'ring'},
+];
+const F_GROUPS = [
+  {key:'time',    label:'Timestamps & IDs'},
+  {key:'appctx',  label:'App & window context'},
+  {key:'web',     label:'Web / DOM'},
+  {key:'elem',    label:'Element / interaction'},
+  {key:'content', label:'Content / input', sensitive:true},
+  // Situational families — shown only when their source integration is enabled (FR4.6 / FR5.5).
+  // srcArea = where the master toggle lives, so the hint can point without hardcoding a location.
+  // srcPath = where the master toggle actually lives; srcArea = what to call that place in the hint.
+  {key:'sap',  label:'SAP',                src:'sap',  srcName:'SAP Integration', srcPath:'integrations.sap',    srcArea:'Integrations'},
+  {key:'uiaa', label:'UI automation (UIAA)', src:'uiaa', srcName:'UI Automation', srcPath:'clientBehaviour.uiaa', srcArea:'Client Behaviour'},
+  // Rarely-used, high-volume families — hidden behind a disclosure link (FR5.5).
+  {key:'coords',  label:'Coordinates & geometry', rare:true},
+  {key:'shotdim', label:'Screenshot dimensions',  rare:true},
+];
+const FIELDS = [
+  {key:'timestamp', grp:'time',    label:'Timestamp (local)',          icon:'clock'},
+  {key:'apptitle',  grp:'appctx',  label:'Application / window title',  icon:'window'},
+  {key:'url',       grp:'web',     label:'URL',                         icon:'plug'},
+  {key:'element',   grp:'elem',    label:'Element name',                icon:'text'},
+  {key:'elementid', grp:'elem',    label:'Element ID / class name',     icon:'ring', content:true},
+  {key:'enteredtxt',grp:'content', label:'Entered text',    icon:'text', content:true},
+  {key:'cliptxt',   grp:'content', label:'Clipboard text',  icon:'clip', content:true},
+  {key:'seltxt',    grp:'content', label:'Selected text',   icon:'text', content:true},
+  {key:'saptcode',  grp:'sap',     label:'SAP transaction code',        icon:'hash'},
+  {key:'sapprogram',grp:'sap',     label:'SAP program',                 icon:'hash'},
+  {key:'sapscreen', grp:'sap',     label:'SAP screen number',           icon:'hash'},
+  {key:'sapfield',  grp:'sap',     label:'SAP field value',   icon:'text', content:true},
+  {key:'uiaacontrol',grp:'uiaa',   label:'Control type',                icon:'ring'},
+  {key:'uiaaid',    grp:'uiaa',    label:'Automation ID',               icon:'hash'},
+  {key:'uiaaname',  grp:'uiaa',    label:'Control name',                icon:'text'},
+  {key:'clickxy',   grp:'coords',  label:'Click X / Y coordinates',     icon:'ring'},
+  {key:'elembounds',grp:'coords',  label:'Element bounds (x, y, w, h)', icon:'ring'},
+  {key:'shotsize',  grp:'shotdim', label:'Screenshot width / height',   icon:'image'},
+  {key:'shotscale', grp:'shotdim', label:'Display scale factor',        icon:'image'},
+];
+const RARE_GRPS = new Set(F_GROUPS.filter(g=>g.rare).map(g=>g.key));
+const RARE_EV_GRPS = new Set(EV_GROUPS.filter(g=>g.rare).map(g=>g.key));
+/* Custom default = privacy-safe: interactions on, content + rarely-used + screenshots off */
+function defaultCustom(){
+  const events={}, fields={};
+  EVENTS.forEach(e=>events[e.key]= !e.content && !RARE_EV_GRPS.has(e.grp));
+  FIELDS.forEach(f=>fields[f.key]= !f.content && !RARE_GRPS.has(f.grp));
+  return {events, fields, screenshots:'none'};
+}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+
+const LEVELS={
+  full:{name:'Full',locked:true,summary:'Captures every interaction and its content, plus screenshots.'},
+  custom:{name:'Custom',locked:false,summary:'You choose exactly what is captured. Starts from a privacy-safe set.'},
+  deny:{name:'Deny',locked:true,summary:'Captures nothing for this scope. Used to exclude apps or URLs.'},
+};
+
+/* ---- Scope condition vocabulary (FR3.2 / FR3.3 / FR3.4) ---- */
+// Curated, high-criticality scope attributes. src:'sap' ones are conditional (FR3.4).
+const SCOPE_ATTRS=[
+  {key:'ProcessName',       label:'Process name'},
+  {key:'ApplicationName',   label:'Application name'},
+  {key:'ApplicationTitle',  label:'Application title'},
+  {key:'ActiveWindow',      label:'Active window'},
+  {key:'URL',               label:'URL'},
+  {key:'SAPTransaction',    label:'SAP transaction code', src:'sap'},
+  {key:'SAPProgram',        label:'SAP program',          src:'sap'},
+];
+const SCOPE_OPS=[
+  {key:'EQUALS',       label:'equals',              sym:'='},
+  {key:'NOT_EQUALS',   label:'does not equal',      sym:'≠'},
+  {key:'CONTAINS',     label:'contains',            sym:'contains'},
+  {key:'NOT_CONTAINS', label:'does not contain',    sym:'does not contain'},
+  {key:'STARTS_WITH',  label:'starts with',         sym:'starts with'},
+  {key:'LIKE',         label:'Like',                sym:'like'},
+];
+// Which operators make sense per attribute (identity attrs = exact only; free-text = partial matching).
+const ATTR_OPS={
+  ProcessName:      ['EQUALS','NOT_EQUALS'],
+  ApplicationName:  ['EQUALS','NOT_EQUALS'],
+  ApplicationTitle: ['EQUALS','NOT_EQUALS','CONTAINS','NOT_CONTAINS','LIKE'],
+  ActiveWindow:     ['EQUALS','NOT_EQUALS','CONTAINS','NOT_CONTAINS','LIKE'],
+  URL:              ['EQUALS','NOT_EQUALS','CONTAINS','NOT_CONTAINS','STARTS_WITH','LIKE'],
+  SAPTransaction:   ['EQUALS','NOT_EQUALS'],
+  SAPProgram:       ['EQUALS','NOT_EQUALS'],
+};
+const DEFAULT_OPS=['EQUALS','NOT_EQUALS','LIKE'];
+const opsFor=attr=>{const keys=ATTR_OPS[attr]||DEFAULT_OPS;return SCOPE_OPS.filter(o=>keys.includes(o.key));};
+// Typeahead suggestions per attribute (FR3.1) — hints, not a closed list.
+const VALUE_SUGGEST={
+  ProcessName:['saplogon.exe','chrome.exe','msedge.exe','excel.exe','outlook.exe'],
+  ApplicationName:['SAP Logon','Google Chrome','Microsoft Excel','Microsoft Outlook'],
+  ApplicationTitle:['Payroll','Invoices','Customer Ticketing'],
+  ActiveWindow:['Payroll — Google Chrome','SAP Easy Access'],
+  URL:['*.mybank.com','payroll.acme.com','*.salesforce.com','mail.google.com'],
+  SAPTransaction:['VA01','ME21N','FB60'],
+  SAPProgram:['SAPMV45A','RM06E'],
+};
+/* Guidance shown via the info icon when the value isn't in the suggestion list. */
+const ATTR_HELP={
+  ProcessName:'The app’s executable name. Find it in Windows Task Manager → Details tab (e.g. saplogon.exe, chrome.exe).',
+  ApplicationName:'The friendly app name from the title bar or Task Manager → Processes (e.g. Google Chrome).',
+  ApplicationTitle:'Text shown in the window’s title bar (e.g. “Payroll”). Use * as a wildcard.',
+  ActiveWindow:'The full active-window title — copy it from the window’s title bar. Use * as a wildcard.',
+  URL:'The web address — copy it from the browser address bar. Use * as a wildcard (e.g. *.mybank.com).',
+  SAPTransaction:'The SAP transaction code from the SAP command field (e.g. VA01, ME21N).',
+  SAPProgram:'The SAP program/report name (e.g. SAPMV45A).',
+  _default:'Enter the value to match. Pick from the suggestions, or type your own.',
+};
+/* Attributes available right now (hide SAP unless SAP integration is enabled — FR3.4). */
+function scopeAttrs(){
+  const sap=!!state.working.integrations?.sap?.enabled;
+  return SCOPE_ATTRS.filter(a=>a.src!=='sap'||sap);
+}
+const attrLabel=k=>(SCOPE_ATTRS.find(a=>a.key===k)||{}).label||k;
+const opSym=k=>(SCOPE_OPS.find(o=>o.key===k)||{}).sym||'=';
+
+/* ---- Scope tree model (FR3.5–3.10) ----
+   A scope is a tree: a GROUP node ({type:'group', combinator:'AND'|'OR', negate, children:[]})
+   holding CONDITION nodes ({type:'cond', attr, op, val}) and nested groups. */
+const mkCond=(attr='',op='EQUALS',val=[])=>({type:'cond',attr,op,val:Array.isArray(val)?val:(val?[val]:[])});
+const mkGroup=(combinator='AND',children=[])=>({type:'group',combinator,children});
+/* Values are now multi-select — tolerate legacy string vals from older data. */
+const vlist=c=>Array.isArray(c.val)?c.val:(c.val?[String(c.val)]:[]);
+/* Group depth: root='' → 0, '1' → 1, '1.2' → 2 (nesting capped at 2 — decision this session). */
+const grpDepth=path=>path===''?0:path.split('.').length;
+
+/* Locate a node by dotted path ('' = root, '0' = first child, '0.1' = nested). */
+function nodeAt(root,path){
+  if(path==='') return root;
+  return path.split('.').reduce((n,i)=>n.children[+i],root);
+}
+/* Parent + index for a non-root node, for delete / wrap-in-place. */
+function parentAt(root,path){
+  const parts=path.split('.'); const idx=+parts.pop();
+  return {parent: parts.length?nodeAt(root,parts.join('.')):root, idx};
+}
+/* Plain-language scope expression (used on the rule list). */
+function nodeText(n){
+  if(n.type==='cond'){
+    const vals=vlist(n);
+    const v = vals.length? vals.join(', ') : '…';
+    return `${n.attr||'…'} ${opSym(n.op)} ${v}`;
+  }
+  const inner=n.children.map(nodeText).join(` ${n.combinator} `);
+  return n.children.length>1?`(${inner})`:inner;
+}
+function scopeText(r){
+  const s=r.scope; if(!s||!s.children.length) return '';
+  return s.children.map(nodeText).join(` ${s.combinator} `);
+}
+/* Compact scope line for the rule list. */
+function scopeMeta(r){
+  // States only *when* the Default applies (coverage). What it captures is the level's job —
+  // shown by the pill and, when it isn't Full, the rc-warn line (FR2.5a).
+  if(r.isDefault) return 'Applies when no other rule matches';
+  return scopeText(r)||'No scope set';
+}
+/* A condition is complete only when all parts are filled (FR3.11). */
+function condComplete(c){
+  if(!c.attr||!c.op) return false;
+  return vlist(c).length>0;
+}
+/* A node is valid when it (and everything under it) is complete; groups need ≥1 child. */
+function nodeValid(n){
+  return n.type==='cond' ? condComplete(n) : (n.children.length>0 && n.children.every(nodeValid));
+}
+/* A rule's scope is valid when it has ≥1 condition and all are complete (FR3.11). */
+function scopeValid(r){const s=r.scope;return !!s && s.children.length>0 && nodeValid(s);}
+
+/* ---- Rule-name validation (FR2.2): required, and unique case-insensitively ---- */
+const normName = s => String(s||'').trim().toLowerCase();
+/* Hard validity — blocks Save. Returns '' when the name is fine. */
+function nameError(r){
+  const n=String(r.name||'').trim();
+  if(!n) return 'Rule name is required.';
+  const clash=state.working.captureRules.rules.some(o=>o!==r && normName(o.name)===normName(n));
+  if(clash) return 'A rule with this name already exists. Names are not case-sensitive.';
+  return '';
+}
+/* What to show inline: the "required" message waits for the first blur (so a fresh, untouched
+   field isn't shouted at); a duplicate name is flagged live, since it's specific and actionable. */
+function nameErrorShown(r){
+  const err=nameError(r);
+  if(!err) return '';
+  return (!String(r.name||'').trim() && !nameTouched) ? '' : err;
+}
+
+/* Whole form is savable only when every created rule has a valid name and scope (FR1.3 / FR2.2 / FR3.11). */
+function formInvalidReason(){
+  const rules=state.working.captureRules.rules.filter(r=>!r.isDefault);
+  if(rules.some(r=>nameError(r)))  return 'Fix rule name to save';
+  if(rules.some(r=>!scopeValid(r))) return 'Fix scope errors to save';
+  return '';
+}
+function formValid(){ return !formInvalidReason(); }
+
+/* The full, editable configuration document */
+const initialConfig = () => ({
+  captureRules:{ rules:[
+    {id:'r1', name:'SAP GUI', scope:mkGroup('AND',[mkCond('ProcessName','EQUALS',['saplogon.exe'])]), level:'full',   isDefault:false, custom:defaultCustom()},
+    {id:'r2', name:'Payroll web app', scope:mkGroup('AND',[mkCond('URL','EQUALS',['payroll.acme.com'])]), level:'custom', isDefault:false, custom:defaultCustom()},
+    {id:'r3', name:'Online banking portal', scope:mkGroup('AND',[mkCond('URL','LIKE',['*.mybank.com'])]), level:'deny', isDefault:false, custom:defaultCustom()},
+    {id:'default', name:'Default rule', scope:null, level:'full', isDefault:true, custom:defaultCustom()},
+  ]},
+  privacy:{
+    redaction:{ presets:[
+      {key:'email',label:'Email address',enabled:true},
+      {key:'ssn',label:'Social security number',enabled:true},
+      {key:'credit-card',label:'Credit card number',enabled:true},
+      {key:'windows-username',label:'Windows username',enabled:false},
+      {key:'machine-name',label:'Machine name',enabled:false},
+    ], customRules:[]},
+    hashing:{hashIdentity:true, algorithm:'sha-256', salt:''},
+    consent:{requireConsent:false, consentMessage:'This application captures activity data to help improve your workflows.', blockUntilGranted:false},
+  },
+  dataConnection:{connectionName:'Primary connection', endpointUrl:'', imageBucket:'', retentionDays:90},
+  // UIAA lives here, not under Integrations — it's a recording capability (FR10.2 / FR10.3).
+  clientBehaviour:{idleTimeoutMinutes:5, uploadIntervalSeconds:30, startOnLaunch:true, allowUserPause:true,
+    uiaa:{enabled:false, excludeApps:''}},
+  userAttributes:{attributes:[
+    {key:'department',label:'Department',enabled:true},
+    {key:'role',label:'Role',enabled:true},
+    {key:'location',label:'Location',enabled:false},
+    {key:'cost-center',label:'Cost center',enabled:false},
+  ]},
+  integrations:{
+    sap:{enabled:false, systemId:'', client:''},
+    extensions:[
+      {key:'chrome',label:'Chrome extension',enabled:true},
+      {key:'edge',label:'Edge extension',enabled:false},
+    ],
+  },
+});
+
+const AREAS=[
+  {id:'capture-rules',   label:'Capture Rules',   icon:'rule'},
+  {id:'privacy',         label:'Privacy',         icon:'shield'},
+  {id:'data-connection', label:'Data Connection', icon:'cloud'},
+  {id:'client-behaviour',label:'Client Behaviour',icon:'gear'},
+  {id:'user-attributes', label:'User Attributes', icon:'idcard'},
+  {id:'integrations',    label:'Integrations',    icon:'puzzle'},
+];
+
+/* =========================================================
+   State
+   ========================================================= */
+const state = {
+  area:'capture-rules',
+  navLayout:'side',      // 'side' | 'tabs' — prototype layout preview
+  editingId:null,        // rule currently open in the modal
+  modalOpen:false,       // rules are created/edited in a dialog (FR1.6), not a sub-page
+  isNewRule:false,       // Cancel removes a new rule outright; on an existing one it reverts
+  snapshot:null,         // deep copy taken on open, restored by Cancel
+  saved: initialConfig(),
+  working: initialConfig(),
+};
+const isDirty = () => JSON.stringify(state.saved)!==JSON.stringify(state.working);
+
+/* =========================================================
+   Small DOM helpers
+   ========================================================= */
+const $=(s,r=document)=>r.querySelector(s);
+const sw=(on,cls='',data='')=>`<button class="switch ${on?'on':''} ${cls}" ${data}></button>`;
+const chk=(on,cls='',data='')=>`<button class="chk ${on?'on':''} ${cls}" ${data}>${svg('check',13)}</button>`;
+/* Which captured-detail groups are expanded (UI-only, session-scoped). Keyed 'ev:nav', 'f:elem', … */
+const capOpen=new Set();
+/* Which sections have their rarely-used families revealed (FR5.5). Keyed by kind: 'f' / 'ev'. */
+const capShowRare=new Set();
+/* Has the rule-name field been blurred yet? Gates the "required" message (FR2.2). */
+let nameTouched=false;
+
+/* =========================================================
+   Render
+   ========================================================= */
+function render(){
+  if(typeof hideSug==='function') hideSug();
+  // settings nav
+  $('#settingsnav').innerHTML = AREAS.map(a=>
+    `<div class="snitem ${a.id===state.area?'active':''}" data-area="${a.id}">${svg(a.icon,17)}<span>${a.label}</span></div>`
+  ).join('');
+  // secondary-nav layout preview (sidebar vs tabs)
+  $('#pagebody').classList.toggle('tabs', state.navLayout==='tabs');
+  $('#navLayoutToggle').querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('on', b.dataset.nav===state.navLayout));
+  // save button
+  saveState();
+  // subtitle
+  const map={'capture-rules':'Decide what the client captures, and where.',
+    'privacy':'Global privacy controls applied across all rules.',
+    'data-connection':'Where captured data is sent and how it is buffered.',
+    'client-behaviour':'How the desktop client runs and reports.',
+    'user-attributes':'Custom attributes that enrich captured data.',
+    'integrations':'Optional data sources that add fields to rules when enabled.'};
+  $('#pageSub').textContent=map[state.area]||'';
+  // content
+  const c=$('#content');
+  if(state.area==='capture-rules') c.innerHTML = rulesList();
+  else c.innerHTML = areaHTML(state.area);
+  renderRuleModal();   // the rule editor lives in a dialog over the list (FR1.6)
+  syncNotch();  // align the Captured-details pull-out notch under the selected level card
+}
+/* Point the Captured-details notch at the selected level card's exact centre (cards aren't equal width). */
+function syncNotch(){
+  const cap=document.querySelector('.esec.captured'), sel=document.querySelector('.level.sel');
+  if(!cap||!sel) return;
+  const capR=cap.getBoundingClientRect(), selR=sel.getBoundingClientRect();
+  cap.style.setProperty('--notch-left', ((selR.left+selR.width/2)-capR.left)+'px');
+}
+window.addEventListener('resize',()=>{ if(typeof syncNotch==='function') syncNotch(); });
+
+/* =========================================================
+   Rule editor modal (FR1.6)
+   Submit stages the rule into the working config and closes; Cancel discards.
+   Because Submit is gated on validity, an invalid rule can never reach the list —
+   which is what removes the old dead end (an unnamed rule you couldn't delete).
+   ========================================================= */
+/* Why Submit is blocked, or '' when the rule is ready to stage. */
+function ruleModalWhy(r){
+  if(!r || r.isDefault) return '';           // the Default rule has no name and no scope
+  if(nameError(r))       return nameError(r);
+  if(!scopeValid(r))     return 'Add at least one complete scope condition.';
+  return '';
+}
+function renderRuleModal(){
+  const box=$('#ruleModal');
+  const r=state.modalOpen?editing():null;
+  if(!r){ box.hidden=true; box.innerHTML=''; return; }
+  const why=ruleModalWhy(r);
+  box.hidden=false;
+  box.innerHTML=`
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rmTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="rmTitle">${state.isNewRule?'Create rule':(r.isDefault?'Default rule':'Edit rule')}</h2>
+          <div class="mh-sub">${r.isDefault
+            ? 'No scope — it applies to whatever no other rule matches.'
+            : 'Set where this rule applies and what it captures.'}</div>
+        </div>
+        <button class="modal-x" data-mcancel="1" aria-label="Cancel">${svg('x',18)}</button>
+      </div>
+      <div class="modal-body">${ruleEditorBody(r)}</div>
+      <div class="modal-foot">
+        ${why?`<div class="mf-hint">${svg('warn',15)}<span>${esc(why)}</span></div>`:''}
+        <div class="modal-acts">
+          <button class="btn" data-mcancel="1">Cancel</button>
+          <button class="btn primary" data-msubmit="1"${why?' disabled':''} title="${why?esc(why):'Stage this rule'}">Submit</button>
+        </div>
+      </div>
+    </div>`;
+  syncNotch();
+}
+function openRuleModal(id,isNew){
+  state.editingId=id;
+  state.isNewRule=!!isNew;
+  state.snapshot=clone(state.working.captureRules.rules.find(x=>x.id===id));
+  state.modalOpen=true;
+  nameTouched=false;
+  render();
+  const inp=$('#f-name'); if(inp) inp.focus();      // land in the name field (FR2.2)
+}
+function closeRuleModal(commit){
+  const rules=state.working.captureRules.rules;
+  const i=rules.findIndex(x=>x.id===state.editingId);
+  if(!commit && i>=0){
+    // A new rule was never really created; an existing one reverts to how it was opened.
+    if(state.isNewRule) rules.splice(i,1);
+    else if(state.snapshot) rules[i]=state.snapshot;
+  }
+  state.modalOpen=false; state.isNewRule=false; state.snapshot=null; state.editingId=null;
+  nameTouched=false;
+  if(typeof hideSug==='function') hideSug();
+  if(typeof hideActMenu==='function') hideActMenu();
+  if(typeof hideAddMenu==='function') hideAddMenu();
+  render();
+}
+/* =========================================================
+   Confirmation dialog — for destructive actions that cannot be walked back
+   from the UI (FR2.6). Deliberately a question asked *before* the act, rather
+   than a toast with Undo after it.
+   ========================================================= */
+let confirmAction=null;
+function openConfirm(opts){
+  confirmAction=opts.onConfirm||null;
+  const box=$('#confirmModal');
+  box.hidden=false;
+  box.innerHTML=`
+    <div class="modal modal--sm" role="dialog" aria-modal="true" aria-labelledby="cfTitle">
+      <div class="modal-head"><div><h2 id="cfTitle">${esc(opts.title)}</h2></div></div>
+      <div class="modal-body"><p class="lead" style="margin:0">${opts.body||''}</p></div>
+      <div class="modal-foot"><div class="modal-acts">
+        <button class="btn" data-cfcancel="1">Cancel</button>
+        <button class="btn danger" data-cfok="1">${esc(opts.confirmLabel||'Delete')}</button>
+      </div></div>
+    </div>`;
+  const ok=$('#confirmModal [data-cfok]'); if(ok) ok.focus();
+}
+function closeConfirm(){ confirmAction=null; const box=$('#confirmModal'); box.hidden=true; box.innerHTML=''; }
+/* Escape dismisses the confirmation before anything else — it is the topmost layer. */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && !$('#confirmModal').hidden){ e.stopImmediatePropagation(); closeConfirm(); }
+},true);
+
+/* Escape cancels the dialog — but only once any popover inside it has been dismissed.
+   Clicking the overlay deliberately does NOT close: too easy to lose a part-built rule. */
+const popoverOpen = () => [valPop,actMenu,addMenu].some(p=>p&&!p.hidden);
+document.addEventListener('keydown',e=>{
+  if(!state.modalOpen) return;
+  if(e.key==='Escape'){
+    if(popoverOpen()) return;      // let the popover's own handler take it
+    closeRuleModal(false); return;
+  }
+  if(e.key==='Tab'){               // keep focus inside the dialog
+    const dlg=$('#ruleModal .modal'); if(!dlg) return;
+    const list=[...dlg.querySelectorAll('button:not([disabled]),input,select,[tabindex]:not([tabindex="-1"])')]
+      .filter(el=>el.offsetParent!==null);
+    if(!list.length) return;
+    const first=list[0], last=list[list.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  }
+});
+
+/* ---------- Capture Rules: list (separate rule cards) ---------- */
+function ruleCard(r,draggable){
+  const lv=LEVELS[r.level];
+  return `<div class="rulecard${draggable?'':' rulecard--default'}" data-open="${r.id}" ${draggable?'draggable="true"':''}>
+    ${draggable
+      ? `<div class="rc-grip" title="Drag to reorder" data-grip="1">${svg('grip',18)}</div>`
+      : `<div class="rc-grip rc-grip--none" aria-hidden="true"></div>`}
+    <div class="rc-main">
+      ${r.isDefault
+        // Default rule: name and its explanation read as one line, level pill beneath.
+        ? `<div class="rc-namerow"><div class="rc-name">${esc(r.name)}</div>
+             <div class="rc-meta">${esc(scopeMeta(r))}</div></div>`
+        : `<div class="rc-name${String(r.name||'').trim()?'':' rc-name--empty'}">${esc(String(r.name||'').trim()||'Unnamed rule')}</div>`}
+      <div class="rc-level"><span class="pill ${r.level}">${lv.name}</span></div>
+      ${r.isDefault&&defaultWarnText(r.level)?`<div class="rc-warn">${svg('warn',14)}<span>Unmatched activity is ${r.level==='deny'?'not captured':'only partly captured'}</span></div>`:''}
+    </div>
+    <div class="rc-acts">
+      ${r.isDefault ? '' /* the Default rule cannot be deleted (FR2.5 / FR2.7) */
+        : `<button class="rc-del" data-delrule="${r.id}" title="Delete rule"
+             aria-label="Delete rule ${esc(String(r.name||'').trim()||'Unnamed rule')}">${svg('trash',17)}</button>`}
+      <div class="rc-chev">${svg('chevR',18)}</div>
+    </div>
+  </div>`;
+}
+function rulesList(){
+  const rules=state.working.captureRules.rules;
+  const ordered=rules.filter(r=>!r.isDefault);
+  const def=rules.find(r=>r.isDefault);
+  return `<div class="rulesheader">
+      <div><h2 class="rh-title">Capture Rules</h2></div>
+      <button class="btn" data-new="1">${svg('plus',16)} Create new rule</button>
+    </div>
+    <p class="lead" style="margin:0 0 16px">Rules are evaluated top-down — the first match wins. Drag a rule by its handle to change priority. The Default rule always applies last, when no other rule matches.</p>
+    <div class="rulecards" id="rulecards">${ordered.map(r=>ruleCard(r,true)).join('')}</div>
+    ${def?`<div class="rule-fallback-label">Fallback</div>
+      <div class="rulecards">${ruleCard(def,false)}</div>`:''}`;
+}
+
+/* ---------- Capture Rules: editor (rendered inside the modal, FR1.6) ---------- */
+function ruleEditorBody(r){
+  if(!r) return '';
+
+  // Rule name — first row inside the card, no section header (default rule has a fixed name)
+  const nameErr = r.isDefault ? '' : nameErrorShown(r);
+  const nameRow = r.isDefault ? '' : `
+    <div class="esec"><div class="cbody">
+      <div class="field" style="margin-bottom:0"><label for="f-name">Rule name</label>
+        <input id="f-name" class="${nameErr?'err':''}" value="${esc(r.name)}" placeholder="e.g. Payroll web app"
+          autocomplete="off" aria-invalid="${nameErr?'true':'false'}" aria-describedby="f-name-err">
+        <div class="errmsg" id="f-name-err" role="alert" style="${nameErr?'':'display:none'}">
+          ${svg('warn',14)}<span>${esc(nameErr)}</span></div>
+      </div>
+    </div></div>`;
+
+  // Scope section (or Default-rule info)
+  const scopeSec = r.isDefault ? `
+    <div class="esec"><div class="sechead"><div class="sicon">${svg('window')}</div><div><h2>Default rule</h2></div></div>
+      <div class="cbody"><p class="lead" style="margin:0">The Default rule is the final fallback — it has no scope, only a capture level, and it applies to any activity no other rule matches. Currently set to <b>${LEVELS[r.level].name}</b>, ${defaultCaptureText(r.level)}</p></div></div>`
+  : `<div class="esec"><div class="sechead"><div class="sicon">${svg('window')}</div>
+        <div><h2>Scope</h2><div class="shint">Where this rule applies. Combine conditions with AND/OR and group them.</div></div></div>
+      <div class="cbody">${scopeEditor(r)}</div></div>`;
+
+  return `<div class="card editcard">
+    ${nameRow}
+    ${scopeSec}
+
+    <div class="esec"><div class="sechead"><div class="sicon">${svg('sliders')}</div>
+        <div><h2>Capture level</h2><div class="shint">Full and Deny are locked; Custom lets you choose per field.</div></div></div>
+      <div class="cbody">
+        <div class="levels">${['full','custom','deny'].map(k=>{
+          const lv=LEVELS[k],sel=r.level===k;
+          return `<div class="level ${sel?'sel':''}" data-level="${k}">
+            <div class="lhead"><span class="lrc"></span><span class="lname">${lv.name}</span>
+              <span class="badge ${lv.locked?'lock':'edit'}">${lv.locked?'Locked':'Editable'}</span></div>
+            <div class="lsum">${lv.summary}</div></div>`;
+        }).join('')}</div>
+        ${r.isDefault&&defaultWarnText(r.level)?`<div class="note warn" role="status">${svg('warn',17)}
+          <span><b>This rule is the fallback for everything else.</b> ${defaultWarnText(r.level)}</span></div>`:''}
+      </div></div>
+
+    <div class="esec captured">
+      <div class="sechead"><div class="sicon">${svg('apps')}</div>
+        <div><h2>Captured details</h2><div class="shint">${detailHint(r.level)}</div></div></div>
+      <div class="cbody">
+        <div class="subhead">Events · which interactions to record</div>
+        ${detailGroups(r,EV_GROUPS,EVENTS,'ev')}
+        <div class="subhead">Data fields · logged for each event</div>
+        ${detailGroups(r,F_GROUPS,FIELDS,'f')}
+      </div></div>
+
+    <div class="esec"><div class="sechead"><div class="sicon">${svg('image')}</div>
+        <div><h2>Screenshots</h2><div class="shint">${screenshotHint(r.level)}</div></div></div>
+      <div class="cbody">
+        <select class="shot-sel" ${r.level==='custom'?'data-shotsel':'disabled'}>${SHOT_MODES.map(m=>
+          `<option value="${m.key}" ${screenshotMode(r)===m.key?'selected':''}>${m.label}</option>`
+        ).join('')}</select>
+        <div class="seg-desc">${(SHOT_MODES.find(m=>m.key===screenshotMode(r))||{}).desc||''}</div>
+        ${screenshotMode(r)!=='none'?`<div class="note">${svg('info',17)}<span>Screenshots are stored in the configured Image Service storage bucket — capture won't start until one is set up.</span></div>`:''}
+      </div></div>
+  </div>`;
+}
+/* ---------- Scope: condition + group builder (FR3.1–3.11) ---------- */
+function scopeEditor(r){
+  if(!r.scope) r.scope=mkGroup('AND',[mkCond()]);
+  // Advanced actions (NOT, grouping) unlock only once ≥1 condition is complete (FR3.1 progressive disclosure).
+  const ready=scopeHasComplete(r.scope);
+  return `<div class="scopetree">${renderGroup(r.scope,'',true,ready)}</div>`;
+}
+const scopeHasComplete=n=>n.type==='cond'?condComplete(n):n.children.some(scopeHasComplete);
+const LOCK_MSG='Complete a condition first';
+// Path whose LAST value chip is "armed" for deletion (first Backspace arms, second deletes).
+let armedPath=null;
+function clearArmed(){ if(armedPath===null) return; armedPath=null;
+  document.querySelectorAll('.ms-chip.armed').forEach(el=>el.classList.remove('armed')); }
+function renderGroup(g,path,isRoot,ready){
+  // Pattern C: no top group bar. First row reads "Where"; each later row carries an
+  // inline And/Or connector. The combinator is group-level (decision #29) — changing any
+  // connector re-renders and updates them all in lockstep.
+  const kids=g.children.map((child,i)=>{
+    const cpath = path===''?String(i):path+'.'+i;
+    const conn = i===0
+      ? `<div class="conn conn-first">${isRoot?'Where':'Where'}</div>`
+      : `<div class="conn"><select class="conn-sel" data-combsel="${path}" title="How these conditions combine">
+           <option value="AND"${g.combinator==='AND'?' selected':''}>And</option>
+           <option value="OR"${g.combinator==='OR'?' selected':''}>Or</option>
+         </select></div>`;
+    const body = child.type==='cond' ? renderCond(child,cpath,ready) : renderGroup(child,cpath,false,ready);
+    return `<div class="tree-item">${conn}<div class="tree-node">${body}</div></div>`;
+  }).join('');
+  // Nested group: slim header carries only its label + delete (NOT removed — use "does not equal").
+  const nestedHead = isRoot ? '' : `<div class="grp-nhead">
+      <span class="grp-nlabel">Group</span>
+      <div class="node-tools">
+        <button class="cond-del" data-del="${path}" title="Remove group">${svg('trash',15)}</button>
+      </div>
+    </div>`;
+  // "Add group" allowed while this group is shallower than the 2-level cap.
+  const canAddGroup = grpDepth(path) < 2;
+  return `<div class="grp${isRoot?' grp-root':''}" data-path="${path}">
+    ${nestedHead}
+    <div class="grp-body">
+      ${kids}
+      <div class="grp-add">
+        <div class="splitbtn">
+          <button class="btn sm" data-addcond="${path}">${svg('plus',15)} Add condition</button>
+          ${canAddGroup?`<button class="btn sm split-caret" data-addmenu="${path}" aria-label="More add options" title="${ready?'More':LOCK_MSG}"${ready?'':' disabled'}>${svg('chevD',15)}</button>`:''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function renderCond(c,path,ready){
+  const attrs=scopeAttrs();
+  const vals=vlist(c);
+  return `<div class="cond-row${condComplete(c)?'':' cond-row--err'}" data-path="${path}">
+    <select class="cond-attr" data-cattr="${path}">
+      <option value=""${!c.attr?' selected':''} disabled>Attribute…</option>
+      ${attrs.map(a=>`<option value="${a.key}"${c.attr===a.key?' selected':''}>${a.label}</option>`).join('')}
+    </select>
+    <select class="cond-op" data-cop="${path}">
+      ${opsFor(c.attr).map(o=>`<option value="${o.key}"${c.op===o.key?' selected':''}>${o.label}</option>`).join('')}
+    </select>
+    <div class="cond-val ms" data-msbox="${path}">
+      ${vals.map((v,vi)=>`<span class="ms-chip${(armedPath===path&&vi===vals.length-1)?' armed':''}">${esc(v)}<button class="ms-x" data-mschip="${path}" data-msval="${esc(v)}" aria-label="Remove ${esc(v)}">${svg('x',13)}</button></span>`).join('')}
+      <input class="ms-input" data-cval="${path}" value=""
+         placeholder="${vals.length?'Add another…':'value'}" autocomplete="off" role="combobox" aria-autocomplete="list">
+    </div>
+    <button class="help-ic" tabindex="0" aria-label="How to find this value" data-help="${esc(ATTR_HELP[c.attr]||ATTR_HELP._default)}">${svg('info',16)}</button>
+    <div class="node-tools">
+      <button class="tbtn amenu-btn" data-actmenu="${path}" aria-label="More actions" title="More actions">${svg('more',18)}</button>
+    </div>
+  </div>`;
+}
+/* Re-sync inline errors + advanced-action lock + Save state without a full re-render (keeps input focus). */
+function refreshScope(){
+  const r=editing(); if(!r||!r.scope) return;
+  document.querySelectorAll('.cond-row[data-path]').forEach(row=>{
+    const c=nodeAt(r.scope,row.dataset.path);
+    if(c&&c.type==='cond') row.classList.toggle('cond-row--err',!condComplete(c));
+  });
+  // The Add-group caret unlocks once a condition is complete; the row "more actions" (⋮) stays
+  // always enabled so Delete is reachable even on an incomplete row.
+  const ready=scopeHasComplete(r.scope);
+  document.querySelectorAll('.scopetree [data-addmenu]').forEach(b=>{
+    b.disabled=!ready;
+    b.title=ready?'More':LOCK_MSG;
+  });
+  saveState();
+}
+
+function detailHint(l){return l==='full'?'Full captures everything below — these are locked on.'
+  :l==='deny'?'Deny captures nothing — everything below is off.'
+  :'Custom starts privacy-safe: interactions on, content off. Adjust as needed.';}
+function screenshotHint(l){return l==='full'?'Locked to All desktops at Full.'
+  :l==='deny'?'Locked to None at Deny.'
+  :'Choose how much is captured. None by default in Custom.';}
+
+/* The Default rule guarantees *coverage* (it always matches) — what it *captures* is the Admin's
+   choice of level. Both strings below therefore track the selected level, never assume Full. */
+/* FR1.5 — subtext describing what the Default rule currently captures. */
+function defaultCaptureText(l){
+  return l==='full' ? 'it captures everything — every interaction, its content, and screenshots.'
+    : l==='deny'    ? 'it captures nothing at all.'
+    : 'it captures only what is selected below.';
+}
+/* FR2.5a — advisory warning when the Default is not Full. Never blocks Save. */
+function defaultWarnText(l){
+  return l==='full' ? ''
+    : l==='deny'    ? 'Activity that matches no other rule will not be captured at all — only the scopes covered by your other rules are recorded.'
+    : 'Activity that matches no other rule is captured only in part — anything switched off below is not recorded.';
+}
+
+function famState(r,items,kind){
+  const ons=items.map(it=>fieldOn(r,it,kind));
+  return {all:ons.every(Boolean), any:ons.some(Boolean)};
+}
+/* Render one section as named groups. Each group is a collapsed row (chevron + title +
+   live state summary + master switch); expanding reveals per-field checkboxes (FR5.2 / FR5.3).
+   Rarely-used families are held back behind a "Show rarely-used fields" disclosure (FR5.5). */
+function detailGroups(r,groups,items,kind){
+  const editable = r.level==='custom';
+  const oneGroup = g => {
+    const gi=items.filter(it=>it.grp===g.key);
+    if(!gi.length) return '';
+    const fs=famState(r,gi,kind);
+    const famCls=fs.all?'on':(fs.any?'mixed':'');
+    const gid=kind+':'+g.key, open=capOpen.has(gid);
+    const onCount=gi.filter(it=>fieldOn(r,it,kind)).length;
+    const sum=fs.all?'All on':(fs.any?`${onCount} of ${gi.length}`:'Off');
+    const sumCls=fs.all?'':(fs.any?'part':'off');
+    const fam=`<button class="switch ${famCls} ${editable?'':'locked'}" ${editable?`data-fam="${gid}" aria-label="Toggle all in ${g.label}"`:''}></button>`;
+    return `<div class="cgrp ${open?'open':''}">
+      <div class="cghead" data-grp="${gid}" role="button" aria-expanded="${open}" tabindex="0">
+        <span class="cgchev">${svg('chevR',15)}</span>
+        <div class="cgtitle">${g.label}${g.sensitive?' <span class="pchip">Privacy-sensitive</span>':''}</div>
+        <span class="cgsum ${sumCls}">${sum}</span>
+        ${fam}
+      </div>
+      ${open?`<div class="cgbody">${gi.map(it=>detailRow(r,it,kind)).join('')}</div>`:''}
+    </div>`;
+  };
+  const has = g => items.some(it=>it.grp===g.key);
+  // Resolve the group's master toggle from its declared path — sources don't all live in one area.
+  const srcOn = g => { const box=(g.srcPath||'').split('.').reduce((o,k)=>o&&o[k], state.working);
+    return !!(box && box.enabled); };
+  const normal = groups.filter(g=>!g.rare && !g.src && has(g));
+  const cond   = groups.filter(g=> g.src && has(g));
+  const rare   = groups.filter(g=> g.rare && has(g));
+  let html = normal.map(oneGroup).join('');
+  // Situational families: render the group when its source is on, else a read-only hint (FR5.5).
+  // Deliberately NOT a link — the rule editor is a dialog (FR1.6), so navigating out of it would
+  // either strand the dialog or discard a part-built rule.
+  cond.forEach(g=>{
+    html += srcOn(g)
+      ? oneGroup(g)
+      : `<div class="note">${svg('info',17)}<span>${g.label} fields appear here once <b>${g.srcName}</b> is enabled in <b>${g.srcArea||'Integrations'}</b>.</span></div>`;
+  });
+  if(rare.length){
+    const shown = capShowRare.has(kind);
+    const n = rare.reduce((a,g)=>a+items.filter(it=>it.grp===g.key).length,0);
+    const rareLabel = kind==='ev' ? 'less valuable events' : 'rarely-used fields';
+    html += `<button class="rarelink ${shown?'open':''}" data-showrare="${kind}">
+      <span class="rchev">${svg('chevR',14)}</span>${shown?'Hide':'Show'} ${rareLabel}${shown?'':`<span class="rarecount">${n}</span>`}</button>`;
+    if(shown) html += rare.map(oneGroup).join('');
+  }
+  return html;
+}
+function detailRow(r,item,kind){
+  const on = fieldOn(r,item,kind);
+  const editable = r.level==='custom';
+  const noteTxt = (item.content && editable && !on) ? 'off — content not stored' : '';
+  return `<div class="trow ${on?'':'off'}">
+    <div class="tmain"><div class="tname">${item.label}</div>
+      ${noteTxt?`<div class="tdesc">${noteTxt}</div>`:(item.content?'<div class="tdesc">Content field</div>':'')}</div>
+    ${chk(on, editable?'':'locked', editable?`data-toggle="${kind}:${item.key}"`:'')}
+  </div>`;
+}
+function fieldOn(r,item,kind){
+  if(r.level==='full')return true; if(r.level==='deny')return false;
+  return kind==='ev'? !!r.custom.events[item.key] : !!r.custom.fields[item.key];
+}
+/* Screenshot capture is a rule-level mode, not a simple on/off (FR5.6). */
+const SHOT_MODES=[
+  {key:'none',    label:'None',           desc:'No screenshots captured.'},
+  {key:'window',  label:'Active window',  desc:'Only the focused application window.'},
+  {key:'desktop', label:'Active desktop', desc:'The full monitor the active window is on.'},
+  {key:'all',     label:'All desktops',   desc:'Every connected monitor.'},
+];
+function screenshotMode(r){
+  if(r.level==='full')return 'all';
+  if(r.level==='deny')return 'none';
+  const m=r.custom.screenshots;
+  return m===true?'window':(m||'none');   // tolerate legacy boolean state
+}
+
+/* ---------- Other areas ---------- */
+function areaHTML(area){
+  const w=state.working;
+  if(area==='privacy'){
+    return `<div class="card"><div class="sechead"><div class="sicon">${svg('eye')}</div>
+        <div style="flex:1"><h2>Data redaction</h2><div class="shint">Patterns removed before data leaves the machine.</div></div>
+        <button class="btn sm">${svg('plus',16)} Add pattern</button></div>
+      <div class="cbody">${w.privacy.redaction.presets.map((p,i)=>toggleRow('shield',p.label,'',p.enabled,`p-redact:${i}`)).join('')}</div></div>
+
+      <div class="card"><div class="sechead"><div class="sicon">${svg('hash')}</div><div><h2>Hashing</h2></div></div>
+      <div class="cbody">
+        ${toggleRow('hash','Hash identity fields','Anonymise usernames &amp; machine IDs globally instead of redacting them.',w.privacy.hashing.hashIdentity,'p-hash')}
+        <div class="field" style="margin-top:16px"><label>Algorithm</label>
+          <select id="p-alg"><option value="sha-256" ${w.privacy.hashing.algorithm==='sha-256'?'selected':''}>SHA-256</option>
+          <option value="sha-512" ${w.privacy.hashing.algorithm==='sha-512'?'selected':''}>SHA-512</option></select></div>
+      </div></div>
+
+      <div class="card"><div class="sechead"><div class="sicon">${svg('shield')}</div><div><h2>User consent</h2></div></div>
+      <div class="cbody">
+        ${toggleRow('shield','Require consent before capture starts','',w.privacy.consent.requireConsent,'p-consent')}
+        ${toggleRow('shield','Block capture until consent is granted','',w.privacy.consent.blockUntilGranted,'p-block')}
+        <div class="field" style="margin-top:16px"><label>Consent message</label>
+          <textarea id="p-msg" rows="2">${esc(w.privacy.consent.consentMessage)}</textarea></div>
+      </div></div>`;
+  }
+  if(area==='data-connection'){
+    const d=w.dataConnection;
+    return `<div class="card"><div class="sechead"><div class="sicon">${svg('cloud')}</div>
+        <div><h2>Platform upload</h2><div class="shint">Where captured data is sent.</div></div></div>
+      <div class="cbody">
+        <div class="field"><label>Connection name</label><input id="d-name" value="${esc(d.connectionName)}"></div>
+        <div class="field"><label>Ingestion endpoint URL</label><input id="d-endpoint" value="${esc(d.endpointUrl)}" placeholder="https://eu-1.celonis.cloud/ingest"></div>
+        <div class="field"><label>Image bucket (screenshots)</label><input id="d-bucket" value="${esc(d.imageBucket)}" placeholder="tm-screenshots"></div>
+      </div></div>
+      <div class="card"><div class="sechead"><div class="sicon">${svg('clock')}</div><div><h2>Retention &amp; caching</h2></div></div>
+      <div class="cbody">
+        <div class="field inline"><label>Retention window (days)</label><input id="d-retention" type="number" min="1" value="${d.retentionDays}"></div>
+      </div></div>`;
+  }
+  if(area==='client-behaviour'){
+    const b=w.clientBehaviour;
+    return `<div class="card"><div class="sechead"><div class="sicon">${svg('gear')}</div>
+        <div><h2>Recording behaviour</h2></div></div>
+      <div class="cbody">
+        <div class="field inline"><label>Idle timeout (minutes)</label><input id="b-idle" type="number" min="0" value="${b.idleTimeoutMinutes}"></div>
+        <div class="field inline"><label>Upload interval (seconds)</label><input id="b-interval" type="number" min="1" value="${b.uploadIntervalSeconds}"></div>
+      </div></div>
+
+      <div class="card"><div class="sechead"><div class="sicon">${svg('puzzle')}</div>
+        <div><h2>UI Automation (UIAA)</h2><div class="shint">Reads the accessibility layer of desktop apps, so events name the actual control the user touched.</div></div></div>
+      <div class="cbody">
+        <div class="note">${svg('info',17)}<span>Without UIAA, desktop clicks are recorded against window titles only. With it on, they carry the control type, automation ID and control name — which is what makes desktop steps distinguishable in analysis. It adds the <b>UI automation (UIAA)</b> field family to capture rules.</span></div>
+        ${toggleRow('puzzle','Enable UI Automation','',b.uiaa.enabled,'b-uiaa')}
+        ${b.uiaa.enabled?`<div class="field" style="margin-top:16px"><label for="b-uiaa-ex">Applications to exclude from UIAA</label>
+          <input id="b-uiaa-ex" value="${esc(b.uiaa.excludeApps)}" placeholder="e.g. outlook.exe, teams.exe" autocomplete="off">
+          <div class="hint">Comma-separated process names. Use for apps where the accessibility layer is slow or noisy.</div></div>`:''}
+      </div></div>
+      <div class="card"><div class="sechead"><div class="sicon">${svg('upload')}</div><div><h2>Startup &amp; control</h2></div></div>
+      <div class="cbody">
+        ${toggleRow('gear','Start capturing on client launch','',b.startOnLaunch,'b-start')}
+        ${toggleRow('gear','Allow the user to pause / resume capture','',b.allowUserPause,'b-pause')}
+      </div></div>`;
+  }
+  if(area==='user-attributes'){
+    return `<div class="card"><div class="sechead"><div class="sicon">${svg('idcard')}</div>
+        <div style="flex:1"><h2>User attributes</h2><div class="shint">Enabled attributes become available to capture rules.</div></div>
+        <button class="btn sm">${svg('plus',16)} Add attribute</button></div>
+      <div class="cbody">${w.userAttributes.attributes.map((a,i)=>toggleRow('idcard',a.label,'',a.enabled,`u-attr:${i}`)).join('')}</div></div>`;
+  }
+  if(area==='integrations'){
+    const sap=w.integrations.sap;
+    return `<div class="card"><div class="sechead"><div class="sicon">${svg('puzzle')}</div>
+        <div style="flex:1"><h2>SAP Integration</h2><div class="shint">Adds 24 SAP transaction fields to capture rules when enabled.</div></div></div>
+      <div class="cbody">
+        ${toggleRow('puzzle','Enable SAP Integration','',sap.enabled,'i-sap')}
+        ${sap.enabled?`<div class="field" style="margin-top:16px"><label>SAP System ID</label><input id="i-sid" value="${esc(sap.systemId)}" placeholder="PRD"></div>
+          <div class="field"><label>Client</label><input id="i-client" value="${esc(sap.client)}" placeholder="100"></div>`:''}
+      </div></div>
+      <div class="card"><div class="sechead"><div class="sicon">${svg('puzzle')}</div><div><h2>Browser extensions</h2></div></div>
+      <div class="cbody">${w.integrations.extensions.map((e,i)=>toggleRow('puzzle',e.label,'',e.enabled,`i-ext:${i}`)).join('')}</div></div>`;
+  }
+  return '';
+}
+function toggleRow(icon,name,desc,on,key){
+  return `<div class="trow ${on?'':'off'}">
+    <div class="ticon">${svg(icon,18)}</div>
+    <div class="tmain"><div class="tname">${name}</div>${desc?`<div class="tdesc">${desc}</div>`:''}</div>
+    ${sw(on,'',`data-set="${key}"`)}</div>`;
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* =========================================================
+   Events
+   ========================================================= */
+function editing(){return state.working.captureRules.rules.find(x=>x.id===state.editingId);}
+
+document.addEventListener('click',e=>{
+  const t=e.target, near=a=>t.closest(`[${a}]`);
+
+  const nav=near('data-nav');
+  if(nav){state.navLayout=nav.dataset.nav;render();return;}
+
+  // Modal actions first — while a rule dialog is open it owns the interaction.
+  if(near('data-mcancel')){ closeRuleModal(false); return; }
+  const msubmit=near('data-msubmit');
+  if(msubmit){ if(!msubmit.disabled) closeRuleModal(true); return; }
+
+  // Area navigation is impossible while a rule dialog is open (the nav sits under the overlay).
+  // Guarded anyway: switching area behind an open dialog would strand it over the wrong screen.
+  const area=near('data-area');
+  if(area){ if(state.modalOpen) return; state.area=area.dataset.area;render();return;}
+
+  const goto=near('data-goto');
+  if(goto){ if(state.modalOpen) return; state.area=goto.dataset.goto;render();return;}
+
+  // Confirmation dialog owns the interaction while it is up.
+  if(near('data-cfcancel')){ closeConfirm(); return; }
+  if(near('data-cfok')){ const fn=confirmAction; closeConfirm(); if(fn) fn(); return; }
+
+  // Delete a rule: ask first (FR2.6). Checked before data-open so hitting the bin
+  // doesn't also open the rule behind the confirmation.
+  const delrule=near('data-delrule');
+  if(delrule){
+    const rules=state.working.captureRules.rules;
+    const idx=rules.findIndex(x=>x.id===delrule.dataset.delrule);
+    if(idx<0 || rules[idx].isDefault) return;          // the Default rule is not deletable
+    const label=String(rules[idx].name||'').trim()||'this unnamed rule';
+    openConfirm({
+      title:'Delete this rule?',
+      body:`<b>${esc(label)}</b> will be removed from Capture Rules, along with its scope and captured-data settings. The change takes effect when you Save.`,
+      confirmLabel:'Delete rule',
+      onConfirm(){
+        const i=state.working.captureRules.rules.findIndex(x=>x.id===delrule.dataset.delrule);
+        if(i>=0) state.working.captureRules.rules.splice(i,1);
+        render();
+      }
+    });
+    return;
+  }
+
+  const open=near('data-open');
+  if(open){ openRuleModal(open.dataset.open,false); return; }
+
+  if(near('data-new')){
+    const rules=state.working.captureRules.rules;
+    const id='rule-'+Date.now();
+    // Name starts empty and required — the Admin must name the rule (FR2.2).
+    // Staged into the list immediately, but Cancel removes it again (FR1.6).
+    rules.splice(rules.length-1,0,{id,name:'',scope:mkGroup('AND',[mkCond()]),level:'custom',isDefault:false,custom:defaultCustom()});
+    openRuleModal(id,true);
+    return;
+  }
+
+  // Scope tree operations (FR3.5–3.9)
+  const addcond=near('data-addcond');
+  if(addcond){const g=nodeAt(editing().scope,addcond.dataset.addcond);g.children.push(mkCond());render();return;}
+  const addmenu=near('data-addmenu');
+  if(addmenu){ if(!addmenu.disabled){ (addPath===addmenu.dataset.addmenu && !addMenu.hidden) ? hideAddMenu() : showAddMenu(addmenu); } return; }
+  const addgrp=near('data-addgrp');
+  if(addgrp){const g=nodeAt(editing().scope,addgrp.dataset.addgrp);g.children.push(mkGroup('AND',[mkCond()]));hideAddMenu();render();return;}
+  const comb=near('data-comb');
+  if(comb){nodeAt(editing().scope,comb.dataset.comb).combinator=comb.dataset.combVal;render();return;}
+  const mschip=near('data-mschip');
+  if(mschip){const c=nodeAt(editing().scope,mschip.dataset.mschip);
+    if(c)c.val=vlist(c).filter(v=>v!==mschip.dataset.msval);render();return;}
+  const amenu=near('data-actmenu');
+  if(amenu){ if(!amenu.disabled){ (actPath===amenu.dataset.actmenu && !actMenu.hidden) ? hideActMenu() : showActMenu(amenu); } return; }
+  const wrap=near('data-wrap');
+  if(wrap){const {parent,idx}=parentAt(editing().scope,wrap.dataset.wrap);
+    parent.children[idx]=mkGroup('AND',[parent.children[idx]]);hideActMenu();render();return;}
+  const del=near('data-del');
+  if(del){const {parent,idx}=parentAt(editing().scope,del.dataset.del);
+    parent.children.splice(idx,1);
+    if(!parent.children.length&&parent===editing().scope) parent.children.push(mkCond());
+    hideActMenu();render();return;}
+
+  const lvl=near('data-level');
+  if(lvl){editing().level=lvl.dataset.level;render();return;}
+
+  const tog=near('data-toggle');
+  if(tog){const [kind,key]=tog.dataset.toggle.split(':');const r=editing();
+    if(kind==='ev')r.custom.events[key]=!r.custom.events[key];else r.custom.fields[key]=!r.custom.fields[key];
+    render();return;}
+
+  const fam=near('data-fam');
+  if(fam){const [kind,gkey]=fam.dataset.fam.split(':');const r=editing();
+    const items=(kind==='ev'?EVENTS:FIELDS).filter(it=>it.grp===gkey);
+    const allOn=items.every(it=>fieldOn(r,it,kind));
+    const tgt=kind==='ev'?r.custom.events:r.custom.fields;
+    items.forEach(it=>tgt[it.key]=!allOn);
+    render();return;}
+
+  const grpTog=near('data-grp');
+  if(grpTog){const id=grpTog.dataset.grp; capOpen.has(id)?capOpen.delete(id):capOpen.add(id); render();return;}
+
+  const rare=near('data-showrare');
+  if(rare){const k=rare.dataset.showrare; capShowRare.has(k)?capShowRare.delete(k):capShowRare.add(k); render();return;}
+
+  const set=near('data-set');
+  if(set){toggleSetting(set.dataset.set);render();return;}
+});
+
+/* ---------- Toast, optionally with an Undo action (FR2.6) ---------- */
+let toastTimer=null;
+function showToast(msg){
+  const el=$('#toast');
+  el.innerHTML = `${svg('check',18)}<span>${esc(msg)}</span>`;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'), 1900);
+}
+
+$('#saveBtn').addEventListener('click',()=>{
+  state.saved=clone(state.working);
+  render();
+  showToast('Client settings saved');
+});
+
+/* text/select/number inputs -> write into working config */
+document.addEventListener('input',e=>{
+  const t=e.target, id=t.id, v=t.value, w=state.working;
+  const r=editing();
+  const num=n=>{const x=parseInt(v,10);return isNaN(x)?n:x;};
+
+  // Scope condition editing (data-attribute driven, dotted tree paths)
+  // The multi-select input holds only the in-progress text — committed values live as chips (added on Enter / pick).
+  if(t.matches('.ms-input')){ clearArmed(); showSug(t); return; }
+  if(t.matches('[data-cattr]')){ if(r&&r.scope){const c=nodeAt(r.scope,t.dataset.cattr);
+    if(c){c.attr=v; const ok=opsFor(v).map(o=>o.key); if(!ok.includes(c.op)) c.op=ok[0];}} render(); return; }
+  if(t.matches('[data-cop]')){ if(r&&r.scope){const c=nodeAt(r.scope,t.dataset.cop);if(c)c.op=v;} render(); return; }
+  if(t.matches('[data-combsel]')){ if(r&&r.scope){const g=nodeAt(r.scope,t.dataset.combsel);if(g)g.combinator=v;} render(); return; }
+  if(t.matches('[data-shotsel]')){ if(r)r.custom.screenshots=v; render(); return; }
+
+  switch(id){
+    case 'f-name': if(r)r.name=v; refreshName(); break;
+    case 'p-alg': w.privacy.hashing.algorithm=v; markDirty(); break;
+    case 'p-msg': w.privacy.consent.consentMessage=v; markDirty(); break;
+    case 'd-name': w.dataConnection.connectionName=v; markDirty(); break;
+    case 'd-endpoint': w.dataConnection.endpointUrl=v; markDirty(); break;
+    case 'd-bucket': w.dataConnection.imageBucket=v; markDirty(); break;
+    case 'd-retention': w.dataConnection.retentionDays=num(90); markDirty(); break;
+    case 'b-idle': w.clientBehaviour.idleTimeoutMinutes=num(5); markDirty(); break;
+    case 'b-interval': w.clientBehaviour.uploadIntervalSeconds=num(30); markDirty(); break;
+    case 'b-uiaa-ex': w.clientBehaviour.uiaa.excludeApps=v; markDirty(); break;
+    case 'i-sid': w.integrations.sap.systemId=v; markDirty(); break;
+    case 'i-client': w.integrations.sap.client=v; markDirty(); break;
+  }
+});
+/* Blur on the rule name marks it "touched" so the required-field message can appear (FR2.2). */
+document.addEventListener('focusout',e=>{
+  if(e.target && e.target.id==='f-name'){ nameTouched=true; refreshName(); }
+});
+/* Patch the rule-name field's inline error in place — no re-render, so focus/caret survive. */
+function refreshName(){
+  const r=editing(), inp=$('#f-name');
+  if(r&&inp){
+    const err=nameErrorShown(r);
+    inp.classList.toggle('err',!!err);
+    inp.setAttribute('aria-invalid',err?'true':'false');
+    const box=$('#f-name-err');
+    if(box){ box.querySelector('span').textContent=err; box.style.display=err?'flex':'none'; }
+  }
+  refreshModalFoot();
+  saveState();
+}
+/* Keep the dialog's Submit button + reason in step while typing, without re-rendering. */
+function refreshModalFoot(){
+  if(!state.modalOpen) return;
+  const r=editing(), foot=$('#ruleModal .modal-foot'), btn=$('#ruleModal [data-msubmit]');
+  if(!r||!foot||!btn) return;
+  const why=ruleModalWhy(r);
+  btn.disabled=!!why;
+  btn.title=why||'Stage this rule';
+  let hint=foot.querySelector('.mf-hint');
+  if(why){
+    if(!hint){ hint=document.createElement('div'); hint.className='mf-hint'; foot.insertBefore(hint,foot.firstChild); }
+    hint.innerHTML=`${svg('warn',15)}<span>${esc(why)}</span>`;
+  }else if(hint){ hint.remove(); }
+}
+/* Save button reflects both unsaved changes AND validity (FR1.3 / FR2.2 / FR3.11). */
+function saveState(){
+  const dirty=isDirty(), why=formInvalidReason(), b=$('#saveBtn');
+  b.disabled=!dirty||!!why;
+  b.textContent = why || (dirty ? 'Save Client Settings' : 'All changes saved');
+}
+/* update Save state on text input (don't re-render & lose focus) */
+function markDirty(){saveState();}
+
+function toggleSetting(key){
+  const [grp,idx]=key.split(':');const w=state.working;
+  switch(grp){
+    case 'p-redact': w.privacy.redaction.presets[+idx].enabled^=1; break;
+    case 'p-hash': w.privacy.hashing.hashIdentity=!w.privacy.hashing.hashIdentity; break;
+    case 'p-consent': w.privacy.consent.requireConsent=!w.privacy.consent.requireConsent; break;
+    case 'p-block': w.privacy.consent.blockUntilGranted=!w.privacy.consent.blockUntilGranted; break;
+    case 'b-start': w.clientBehaviour.startOnLaunch=!w.clientBehaviour.startOnLaunch; break;
+    case 'b-pause': w.clientBehaviour.allowUserPause=!w.clientBehaviour.allowUserPause; break;
+    case 'u-attr': w.userAttributes.attributes[+idx].enabled=!w.userAttributes.attributes[+idx].enabled; break;
+    case 'i-sap': w.integrations.sap.enabled=!w.integrations.sap.enabled; break;
+    case 'b-uiaa': w.clientBehaviour.uiaa.enabled=!w.clientBehaviour.uiaa.enabled; break;
+    case 'i-ext': w.integrations.extensions[+idx].enabled=!w.integrations.extensions[+idx].enabled; break;
+  }
+}
+
+/* ---------- Drag & drop reordering (non-default rules) ---------- */
+let dragId=null;
+function clearDropMarks(){document.querySelectorAll('.rulecard.drop-before,.rulecard.drop-after')
+  .forEach(c=>c.classList.remove('drop-before','drop-after'));}
+
+document.addEventListener('dragstart',e=>{
+  const card=e.target.closest?e.target.closest('.rulecard[draggable="true"]'):null;
+  if(!card)return;
+  dragId=card.dataset.open;
+  card.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+  try{e.dataTransfer.setData('text/plain',dragId);}catch(_){}
+});
+document.addEventListener('dragend',()=>{
+  document.querySelectorAll('.rulecard.dragging').forEach(c=>c.classList.remove('dragging'));
+  clearDropMarks();dragId=null;
+});
+document.addEventListener('dragover',e=>{
+  if(dragId===null)return;
+  const card=e.target.closest?e.target.closest('.rulecard[draggable="true"]'):null;
+  if(!card)return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  if(card.dataset.open===dragId){clearDropMarks();return;}
+  const rect=card.getBoundingClientRect();
+  const before=(e.clientY-rect.top)<rect.height/2;
+  clearDropMarks();
+  card.classList.add(before?'drop-before':'drop-after');
+});
+document.addEventListener('drop',e=>{
+  if(dragId===null)return;
+  const card=e.target.closest?e.target.closest('.rulecard[draggable="true"]'):null;
+  if(!card){clearDropMarks();dragId=null;return;}
+  e.preventDefault();
+  const before=card.classList.contains('drop-before');
+  reorderRule(dragId,card.dataset.open,before);
+  dragId=null;
+  render();
+});
+function reorderRule(fromId,targetId,before){
+  if(fromId===targetId)return;
+  const rules=state.working.captureRules.rules;
+  const from=rules.findIndex(r=>r.id===fromId);
+  if(from<0)return;
+  const [moved]=rules.splice(from,1);
+  let to=rules.findIndex(r=>r.id===targetId);
+  if(to<0){rules.splice(from,0,moved);return;}
+  if(!before)to+=1;
+  rules.splice(to,0,moved);
+  // Default rule must always stay last.
+  const di=rules.findIndex(r=>r.isDefault);
+  if(di>=0&&di!==rules.length-1){const [d]=rules.splice(di,1);rules.push(d);}
+}
+
+/* Inject nav icons that were placeholdered in the static HTML */
+document.querySelectorAll('.navitem').forEach(n=>{
+  n.innerHTML=n.innerHTML
+    .replace('__ICON_home__',svg('home'))
+    .replace('__ICON_sliders__',svg('sliders'))
+    .replace('__ICON_users__',svg('users'))
+    .replace('__ICON_plug__',svg('plug'))
+    .replace('__ICON_calendar__',svg('calendar'))
+    .replace('__ICON_tag__',svg('tag'))
+    .replace('__ICON_events__',svg('events'))
+    .replace('__ICON_tasks__',svg('tasks'))
+    .replace('__ICON_discovery__',svg('discovery'));
+});
+$('#navToggle').innerHTML=$('#navToggle').innerHTML.replace('__ICON_sidebar__',svg('sidebar'));
+
+// Collapse / expand the project nav
+$('#navToggle').addEventListener('click',()=>{
+  const nav=document.querySelector('.projnav');
+  const collapsed=nav.classList.toggle('collapsed');
+  const btn=$('#navToggle');
+  btn.title=collapsed?'Expand sidebar':'Collapse sidebar';
+  const lbl=btn.querySelector('.lbl');
+  if(lbl) lbl.textContent=collapsed?'Expand':'Collapse';
+});
+
+/* ---------- Custom value suggestion dropdown (single-select; replaces native <datalist>) ---------- */
+const valPop=document.createElement('div');
+valPop.className='valsug-pop'; valPop.hidden=true; document.body.appendChild(valPop);
+let sugInput=null;
+function hideSug(){ valPop.hidden=true; sugInput=null; }
+function positionSug(input){
+  const r=input.getBoundingClientRect();
+  valPop.style.left=r.left+'px';
+  valPop.style.top=(r.bottom+4)+'px';
+  valPop.style.width=r.width+'px';
+}
+function showSug(input){
+  const rule=editing(); if(!rule||!rule.scope){hideSug();return;}
+  const c=nodeAt(rule.scope,input.dataset.cval); if(!c){hideSug();return;}
+  const chosen=vlist(c);
+  const all=(VALUE_SUGGEST[c.attr]||[]).filter(s=>!chosen.includes(s)); if(!all.length){hideSug();return;}
+  const seg=input.value.trim().toLowerCase();
+  const list=all.filter(s=>s.toLowerCase().includes(seg));
+  if(!list.length){hideSug();return;}
+  sugInput=input;
+  valPop.innerHTML=list.map(s=>`<div class="valsug-item" data-sug="${esc(s)}">${esc(s)}</div>`).join('');
+  positionSug(input);
+  valPop.hidden=false;
+}
+// Commit a value as a chip, then re-render and keep focus in the same row's input for rapid multi-entry.
+function addValueToCond(path,val){
+  val=String(val||'').trim(); if(!val) return;
+  armedPath=null;
+  const rule=editing(); if(!rule||!rule.scope) return;
+  const c=nodeAt(rule.scope,path); if(!c) return;
+  const cur=vlist(c);
+  if(!cur.includes(val)) c.val=[...cur,val];
+  hideSug(); render();
+  const inp=document.querySelector('.ms-input[data-cval="'+CSS.escape(path)+'"]');
+  if(inp){ inp.focus(); showSug(inp); }
+}
+// pick one suggestion (mousedown so it fires before the input's blur)
+valPop.addEventListener('mousedown',e=>{
+  const item=e.target.closest('.valsug-item'); if(!item||!sugInput) return;
+  e.preventDefault();
+  addValueToCond(sugInput.dataset.cval,item.dataset.sug);
+});
+document.addEventListener('focusin',e=>{ if(e.target.matches&&e.target.matches('.ms-input')){
+  if(armedPath!==null && e.target.dataset.cval!==armedPath) clearArmed();
+  showSug(e.target); } });
+document.addEventListener('focusout',e=>{ if(e.target.matches&&e.target.matches('.ms-input')) setTimeout(hideSug,120); });
+// Enter commits the typed value as a chip; Backspace on an empty input removes the last chip.
+document.addEventListener('keydown',e=>{
+  if(e.target.matches&&e.target.matches('.ms-input')){
+    if(e.key==='Enter'){ e.preventDefault(); addValueToCond(e.target.dataset.cval,e.target.value); return; }
+    if(e.key==='Backspace' && e.target.value===''){
+      const path=e.target.dataset.cval;
+      const rule=editing(); const c=rule&&rule.scope&&nodeAt(rule.scope,path);
+      const cur=c?vlist(c):[];
+      if(!cur.length) return;
+      e.preventDefault();
+      if(armedPath===path){ c.val=cur.slice(0,-1); armedPath=null; }  // second press: delete armed chip
+      else { armedPath=path; }                                        // first press: arm the last chip
+      hideSug(); render();
+      const inp=document.querySelector('.ms-input[data-cval="'+CSS.escape(path)+'"]'); if(inp)inp.focus();
+      return;
+    }
+  }
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideSug(); });
+document.addEventListener('scroll',hideSug,true);
+window.addEventListener('resize',hideSug);
+
+/* ---------- "How to find this value" help tooltip (per attribute) ---------- */
+const helpTip=document.createElement('div');
+helpTip.className='help-tip'; helpTip.hidden=true; document.body.appendChild(helpTip);
+function showHelp(icon){
+  helpTip.textContent=icon.dataset.help||'';
+  helpTip.hidden=false;
+  const r=icon.getBoundingClientRect(), tr=helpTip.getBoundingClientRect();
+  let left=r.right-tr.width; if(left<8) left=8;
+  helpTip.style.left=left+'px';
+  helpTip.style.top=(r.bottom+6)+'px';
+}
+function hideHelp(){ helpTip.hidden=true; }
+document.addEventListener('mouseover',e=>{const ic=e.target.closest&&e.target.closest('.help-ic'); if(ic) showHelp(ic);});
+document.addEventListener('mouseout',e=>{const ic=e.target.closest&&e.target.closest('.help-ic'); if(ic) hideHelp();});
+document.addEventListener('focusin',e=>{const ic=e.target.closest&&e.target.closest('.help-ic'); if(ic) showHelp(ic);});
+document.addEventListener('focusout',e=>{const ic=e.target.closest&&e.target.closest('.help-ic'); if(ic) hideHelp();});
+document.addEventListener('scroll',hideHelp,true);
+
+/* ---------- Condition "more actions" menu (Wrap-in-group) ---------- */
+const actMenu=document.createElement('div');
+actMenu.className='act-menu'; actMenu.hidden=true; document.body.appendChild(actMenu);
+let actPath=null;
+function hideActMenu(){ actMenu.hidden=true; actPath=null; }
+function showActMenu(btn){
+  const rule=editing(); if(!rule||!rule.scope){ hideActMenu(); return; }
+  const path=btn.dataset.actmenu;
+  const c=nodeAt(rule.scope,path); if(!c){ hideActMenu(); return; }
+  actPath=path;
+  // Wrap only when it keeps nesting within the 2-level cap and a condition is complete.
+  const canWrap = path.split('.').length<=2 && scopeHasComplete(rule.scope);
+  let items='';
+  if(canWrap) items+=`<button class="act-item" data-wrap="${path}">`
+    +`<span class="act-check">${svg('wrap',15)}</span>Wrap in group</button>`;
+  items+=`<button class="act-item danger" data-del="${path}">`
+    +`<span class="act-check">${svg('trash',15)}</span>Delete condition</button>`;
+  actMenu.innerHTML=items;
+  actMenu.hidden=false;
+  const r=btn.getBoundingClientRect(), mr=actMenu.getBoundingClientRect();
+  let left=r.right-mr.width; if(left<8) left=8;
+  actMenu.style.left=left+'px';
+  actMenu.style.top=(r.bottom+5)+'px';
+}
+// close on outside click, Escape, or scroll (menu items themselves are handled by the main click handler)
+document.addEventListener('mousedown',e=>{
+  if(actMenu.hidden) return;
+  if(actMenu.contains(e.target)) return;
+  if(e.target.closest&&e.target.closest('[data-actmenu]')) return;
+  hideActMenu();
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideActMenu(); });
+document.addEventListener('scroll',hideActMenu,true);
+window.addEventListener('resize',hideActMenu);
+
+/* ---------- Split-button "add" menu (Add group, behind the caret) ---------- */
+const addMenu=document.createElement('div');
+addMenu.className='act-menu'; addMenu.hidden=true; document.body.appendChild(addMenu);
+let addPath=null;
+function hideAddMenu(){ addMenu.hidden=true; addPath=null; }
+function showAddMenu(btn){
+  const path=btn.dataset.addmenu; addPath=path;
+  addMenu.innerHTML=`<button class="act-item" data-addgrp="${path}">`
+    +`<span class="act-check">${svg('wrap',15)}</span>Add group</button>`;
+  addMenu.hidden=false;
+  const r=btn.getBoundingClientRect(), mr=addMenu.getBoundingClientRect();
+  let left=r.right-mr.width; if(left<8) left=8;
+  addMenu.style.left=left+'px';
+  addMenu.style.top=(r.bottom+5)+'px';
+}
+document.addEventListener('mousedown',e=>{
+  if(addMenu.hidden) return;
+  if(addMenu.contains(e.target)) return;
+  if(e.target.closest&&e.target.closest('[data-addmenu]')) return;
+  hideAddMenu();
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideAddMenu(); });
+document.addEventListener('scroll',hideAddMenu,true);
+window.addEventListener('resize',hideAddMenu);
+
+/* Normalize any legacy scope data: string vals → arrays, drop removed `negate` flag. */
+(function normalizeScopes(){
+  const walk=n=>{ if(!n) return;
+    if('negate' in n) delete n.negate;
+    if(n.type==='cond') n.val=vlist(n);
+    else if(n.children) n.children.forEach(walk);
+  };
+  (state.working.captureRules?.rules||[]).forEach(r=>walk(r.scope));
+})();
+
+render();
+</script>
+</body>
+</html>
