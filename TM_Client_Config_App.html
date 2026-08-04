@@ -83,9 +83,13 @@
   .pagebody{display:flex;gap:28px;align-items:flex-start}
 
   /* header row (page-level, spans full width above the sub-nav) */
-  .titlerow{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px;
+  .titlerow{display:flex;align-items:flex-start;justify-content:space-between;gap:20px 20px;
+        flex-wrap:wrap;margin-bottom:22px;
         padding-bottom:20px;border-bottom:1px solid var(--line)}
   .titlerow h1{font-size:24px;font-weight:700;margin:0 0 3px;color:var(--navy);letter-spacing:-.2px}
+  /* rollout state sits with the thing it describes, not with the actions. Title and pill must
+     never split across lines — if the header runs out of room the ACTION cluster wraps instead. */
+  .titleline{display:flex;align-items:center;gap:12px;flex-wrap:nowrap}
   .titlerow .subtitle{color:var(--grey);font-size:14px}
 
   /* settings side-nav (in content) */
@@ -121,6 +125,33 @@
   .btn.primary:disabled{background:#c3c0ec;border-color:#c3c0ec;cursor:not-allowed}
   .btn.ghost{border-color:transparent;background:transparent;color:var(--indigo)}
   .btn.ghost:hover{background:var(--indigo-soft)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn:disabled:hover{background:#fff}
+
+  /* rollout state of the project — draft vs live (FR1.7) */
+  .rollout{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;
+        padding:5px 11px;border-radius:20px;white-space:nowrap}
+  .rollout .rdot{width:7px;height:7px;border-radius:50%;flex:none;background:currentColor}
+  .rollout.never{background:var(--subtle);color:var(--grey)}
+  .rollout.pending{background:#fdf3e2;color:#b7791f}
+  .rollout.live{background:var(--success-bg);color:var(--success)}
+
+  /* header "More actions" (⋯) menu — FR1.4 */
+  .iconbtn{border:1px solid var(--line2);background:#fff;border-radius:8px;cursor:pointer;
+        width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;
+        color:var(--grey);flex:none}
+  .iconbtn:hover{background:var(--subtle);color:var(--navy)}
+  .more-menu{position:fixed;z-index:1050;background:#fff;border:1px solid var(--line2);border-radius:10px;
+        box-shadow:0 10px 28px rgba(16,24,40,.16);padding:6px;min-width:250px}
+  .more-menu[hidden]{display:none}
+  .more-item{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;
+        cursor:pointer;font-family:inherit;font-size:13.5px;color:var(--navy);text-align:left;
+        padding:9px 10px;border-radius:7px}
+  .more-item:hover{background:var(--subtle)}
+  .more-item svg{width:17px;height:17px;flex:none;color:var(--grey)}
+  .more-item .mi-sub{display:block;font-size:12px;color:var(--grey2);font-weight:400;margin-top:1px}
+  .more-sep{height:1px;background:var(--line);margin:5px 4px}
+  .more-note{font-size:11.5px;color:var(--grey2);padding:6px 10px 4px;line-height:1.4}
   .btn.sm{padding:6px 11px;font-size:13px}
   .btn.ghost:disabled{color:var(--grey2);background:transparent;cursor:not-allowed;opacity:.55}
   .btn.ghost:disabled:hover{background:transparent}
@@ -137,6 +168,21 @@
   .cbody{padding:14px 20px 20px}
   /* single-card rule editor: sections stacked with dividers */
   .editcard .esec + .esec{border-top:1px solid var(--line)}
+
+  /* Deny: one statement instead of a screenful of locked-off controls (FR4.5).
+     Not blank space — a blank region in a dialog reads as broken or half-loaded. */
+  .nocapture{display:flex;align-items:flex-start;gap:13px;padding:22px 20px 26px}
+  .nocapture .nc-ic{width:38px;height:38px;border-radius:10px;flex:none;
+        background:var(--subtle);color:var(--grey);display:flex;align-items:center;justify-content:center}
+  .nocapture h4{margin:0 0 5px;font-size:14.5px;font-weight:650;color:var(--navy)}
+  .nocapture p{margin:0;font-size:13.5px;color:var(--grey);line-height:1.55;max-width:56ch}
+
+  /* read-only plain-language read-back of the scope expression */
+  .scopesum{margin-top:12px;border:1px solid var(--line);border-radius:10px;
+        background:var(--subtle);padding:11px 13px}
+  .ss-label{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+        color:var(--grey2);margin-bottom:5px}
+  .ss-text{font-size:13.5px;color:var(--ink);line-height:1.55;word-break:break-word}
 
   /* scope condition picker */
   /* ---- Scope builder: groups + conditions ---- */
@@ -409,6 +455,58 @@
   .field .errmsg{display:flex;align-items:center;gap:6px;margin-top:7px;
         font-size:12.5px;font-weight:500;color:#d0413c}
   .field .errmsg svg{flex:none}
+  /* ---- User attributes (US11) ---- */
+  .uarow{display:flex;align-items:flex-start;gap:12px;padding:14px;background:#fff;
+        border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+  .uarow .uamain{flex:1;min-width:0}
+  .uahead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .uahead .ualabel{font-weight:600;font-size:14px;color:var(--navy)}
+  .uachips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .uachip{background:var(--subtle);color:var(--ink);border-radius:6px;padding:3px 9px;font-size:12.5px}
+  /* reusable chip input, same look as the scope value field */
+  .chipbox{display:flex;flex-wrap:wrap;align-items:center;gap:5px;min-height:40px;padding:4px 7px;
+        border:1px solid var(--line2);border-radius:8px;background:#fff;cursor:text}
+  .chipbox:focus-within{border-color:var(--indigo);box-shadow:0 0 0 3px var(--indigo-soft)}
+  .chipbox.err{border-color:#e0736f}
+  /* The chip input must sit flush inside the box, exactly as it does in the scope builder.
+     Specificity has to beat `.field input`, which would otherwise give it its own border. */
+  .field .chipbox .ms-input{width:auto;flex:1;min-width:120px;border:none;border-radius:0;
+        background:none;box-shadow:none;padding:5px 3px}
+  .field .chipbox .ms-input:focus{border:none;box-shadow:none;outline:none}
+  .chk-row{display:flex;align-items:center;gap:10px;cursor:pointer;padding:2px 0}
+  .chk-row .chk{flex:none}
+  .chk-row span{font-size:13.5px;color:var(--navy)}
+
+  /* ---- Web page data extraction rules (US12) ---- */
+  .exrow{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;background:#fff;
+        border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+  .exrow .exmain{flex:1;min-width:0}
+  .exrow .exkey{font-weight:600;font-size:14px;color:var(--navy)}
+  .exrow .exmeta{font-size:12.5px;color:var(--grey);margin-top:4px;word-break:break-all;line-height:1.6}
+  .exrow .exmeta b{color:var(--grey2);font-weight:600}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;
+        background:var(--subtle);padding:1px 5px;border-radius:4px;color:var(--ink)}
+  .exacts{display:flex;align-items:center;gap:2px;flex:none}
+  /* shared empty state — icon, what's missing, what happens because of it, one way out */
+  .empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;
+        padding:34px 24px;border:1px dashed var(--line2);border-radius:12px;background:#fcfcfd}
+  .empty-state .es-icon{width:46px;height:46px;border-radius:12px;background:var(--indigo-soft);
+        color:var(--indigo);display:flex;align-items:center;justify-content:center;margin-bottom:13px}
+  .empty-state .es-title{font-size:15px;font-weight:650;color:var(--navy);margin-bottom:5px}
+  .empty-state .es-body{font-size:13.5px;color:var(--grey);max-width:420px;line-height:1.6}
+  .field textarea.mono-in{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+        font-size:12.5px;min-height:78px;resize:vertical;line-height:1.5}
+  .pathhelp{font-size:12.5px;color:var(--grey);margin-top:7px;line-height:1.65}
+  .pathhelp .ph-eg{display:block;margin-top:3px}
+
+  /* numeric setting: label + info icon above, narrow input with a unit beside it */
+  .field.num{max-width:none;margin-bottom:20px}
+  .field.num .lblrow{display:flex;align-items:center;gap:1px;margin-bottom:6px}
+  .field.num .lblrow label{margin:0}
+  .field.num .lblrow .help-ic{width:26px;height:26px}
+  .field.num .numrow{display:flex;align-items:center;gap:9px}
+  .field.num input{width:130px}
+  .field.num .unit{font-size:13px;color:var(--grey);font-weight:500}
   .field.inline{display:flex;align-items:center;gap:14px;max-width:none}
   .field.inline label{margin:0;width:220px}
   .field.inline input{max-width:160px}
@@ -450,6 +548,9 @@
   /* Confirmation dialog for destructive actions (FR2.6). Above the rule dialog and its
      popovers (1001) so it can also be raised from inside one; below the toast (1200). */
   .modal-ov--confirm{z-index:1100}
+  /* small form dialog — a sub-item is a conventional centred dialog, not near-fullscreen (#40) */
+  .modal--form{width:min(560px,100%);height:auto;max-height:100%}
+  .modal--form .modal-body{overflow-y:auto}
   .modal--sm{width:min(440px,100%);height:auto;max-height:100%}
   .modal--sm .modal-head{border-bottom:none;padding-bottom:0}
   .modal--sm .modal-body{padding:10px 24px 20px;overflow:visible}
@@ -514,7 +615,10 @@
       <div class="page">
         <div class="titlerow">
           <div>
-            <h1>Client Settings</h1>
+            <div class="titleline">
+              <h1>Client Settings</h1>
+              <span class="rollout" id="rolloutPill"></span>
+            </div>
             <div class="subtitle" id="pageSub">Configure what the Task Mining client captures, and how.</div>
           </div>
           <div class="titlerow-actions">
@@ -522,7 +626,9 @@
               <button class="seg-btn" data-nav="side">Sidebar</button>
               <button class="seg-btn" data-nav="tabs">Tabs</button>
             </div>
-            <button class="btn primary" id="saveBtn" disabled>Save Client Settings</button>
+            <button class="iconbtn" id="moreBtn" aria-label="More actions" title="More actions"></button>
+            <button class="btn" id="saveBtn" disabled>Save draft</button>
+            <button class="btn primary" id="applyBtn" disabled>Apply to all users</button>
           </div>
         </div>
         <div class="pagebody" id="pagebody">
@@ -538,6 +644,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal-ov" id="ruleModal" hidden></div>
+<div class="modal-ov" id="uaModal" hidden></div>
+<div class="modal-ov" id="extractModal" hidden></div>
 <div class="modal-ov modal-ov--confirm" id="confirmModal" hidden></div>
 
 <script>
@@ -584,6 +692,7 @@ const I = {
   upload:'<path d="M12 16V5M8 9l4-4 4 4"/><path d="M5 19h14"/>',
   hash:'<path d="M9 4 7 20M17 4l-2 16M5 9h15M4 15h15"/>',
   eye:'<path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>',
+  eyeoff:'<path d="M3 3l18 18"/><path d="M10.6 6.2A9.4 9.4 0 0 1 12 6c6.5 0 10 6 10 6a17.6 17.6 0 0 1-2.4 3.1M6.5 8.4C3.8 10 2 12 2 12s3.5 6 10 6a9.7 9.7 0 0 0 3.6-.7"/>',
   scroll:'<path d="m8 9 4-4 4 4M8 15l4 4 4-4"/>',
   power:'<path d="M12 4v8"/><path d="M6.5 7a8 8 0 1 0 11 0"/>',
   sidebar:'<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M9 4.5v15"/>',
@@ -769,6 +878,33 @@ function scopeText(r){
   const s=r.scope; if(!s||!s.children.length) return '';
   return s.children.map(nodeText).join(` ${s.combinator} `);
 }
+/* ---- Read-only "in plain language" read-back of the scope, shown in the editor ----
+   Uses the same attribute labels as the dropdowns (not the raw keys) and explicit
+   parentheses, so grouping/precedence is unambiguous — the one thing the stacked tree
+   layout can only imply. Deliberately not editable: an editable expression would mean a
+   parser, syntax errors and two-way sync, i.e. teaching Admins a query language. */
+function nodeProse(n){
+  if(n.type==='cond'){
+    const vals=vlist(n);
+    return `${attrLabel(n.attr)||'…'} ${opSym(n.op)} ${vals.length?vals.join(', '):'…'}`;
+  }
+  const inner=n.children.map(nodeProse).join(` ${n.combinator} `);
+  return n.children.length>1?`(${inner})`:inner;
+}
+function scopeProse(r){
+  const s=r.scope; if(!s||!s.children.length) return '';
+  return s.children.map(nodeProse).join(` ${s.combinator} `);   // no outer parens at root
+}
+/* Only worth showing once there is something to disambiguate — a lone condition would
+   just restate the row directly above it. */
+function scopeIsComplex(r){
+  const s=r.scope; if(!s) return false;
+  let conds=0;
+  const walk=n=>{ if(n.type==='cond'){conds++;return;} n.children.forEach(walk); };
+  walk(s);
+  return conds>1;   // one condition has no precedence to disambiguate, grouped or not
+}
+
 /* Compact scope line for the rule list. */
 function scopeMeta(r){
   // States only *when* the Default applies (coverage). What it captures is the level's job —
@@ -807,10 +943,57 @@ function nameErrorShown(r){
 }
 
 /* Whole form is savable only when every created rule has a valid name and scope (FR1.3 / FR2.2 / FR3.11). */
+/* ---- SAP retrieval-setting validation (FR13.2 / FR13.4) ----
+   Bounds are the prototype's working assumption and want Engineering confirmation; the point
+   under test is that a bad value is caught inline and blocks Save, not the exact ceilings. */
+const SAP_NUMS={
+  retryAttempts:     {label:'Number of Retry Attempts',     min:0,   max:10},
+  retryWaitMs:       {label:'Waiting Time for Retry',       min:100, max:60000},
+  monitorIntervalMs: {label:'SAP Process Monitor Interval', min:50,  max:60000},
+};
+function sapNumErr(key){
+  const d=SAP_NUMS[key]; if(!d) return '';
+  const v=state.working.integrations.sap[key];
+  if(v===''||v===null||v===undefined||Number.isNaN(v)) return 'Enter a value.';
+  if(!Number.isInteger(v)) return 'Whole numbers only.';
+  if(v<d.min||v>d.max)     return `Must be between ${d.min} and ${d.max}.`;
+  return '';
+}
+/* Hidden settings can't block Save — they only apply while SAP retrieval is on (FR13.2). */
+function sapInvalid(){
+  if(!state.working.integrations.sap.enabled) return '';
+  return Object.keys(SAP_NUMS).map(sapNumErr).find(Boolean)||'';
+}
+/* ---- Web page data extraction rules (FR12.3 / FR12.4) ----
+   Validated inside the dialog, so an invalid extraction can never reach the list — the same
+   guarantee FR1.6 gives capture rules. Nothing here can therefore block the global Save. */
+const exList = () => state.working.integrations.extensions.extractions;
+function exKeyErr(d){
+  const k=String(d.key||'').trim();
+  if(!k) return 'Enter a key — the name this value is stored under.';
+  if(/\s/.test(k)) return 'No spaces — use letters, numbers or underscores.';
+  // Duplicate keys would overwrite each other in the captured data.
+  if(exList().some(x=>x.id!==d.id && String(x.key||'').trim().toLowerCase()===k.toLowerCase()))
+    return 'Another extraction already uses this key.';
+  return '';
+}
+function exUrlErr(d){
+  const u=String(d.url||'').trim();
+  if(!u) return 'Enter the address of the page this rule applies to.';
+  if(!/^https?:\/\//i.test(u)) return 'Start with http:// or https://';
+  try{ new URL(u.replace(/\*/g,'x')); }catch(e){ return "This doesn't look like a valid address."; }
+  return '';
+}
+function exPathErr(d){
+  return String(d.path||'').trim() ? '' : 'Enter the path to the element you want to read.';
+}
+function exFirstErr(d){ return exKeyErr(d)||exUrlErr(d)||exPathErr(d); }
+
 function formInvalidReason(){
   const rules=state.working.captureRules.rules.filter(r=>!r.isDefault);
   if(rules.some(r=>nameError(r)))  return 'Fix rule name to save';
   if(rules.some(r=>!scopeValid(r))) return 'Fix scope errors to save';
+  if(sapInvalid())                  return 'Fix SAP settings to save';
   return '';
 }
 function formValid(){ return !formInvalidReason(); }
@@ -838,18 +1021,22 @@ const initialConfig = () => ({
   // UIAA lives here, not under Integrations — it's a recording capability (FR10.2 / FR10.3).
   clientBehaviour:{idleTimeoutMinutes:5, uploadIntervalSeconds:30, startOnLaunch:true, allowUserPause:true,
     uiaa:{enabled:false, excludeApps:''}},
+  /* FR11.3/FR11.4: each attribute is a Label + a list of Values the end user picks from, and may
+     be mandatory. `slot` is the fixed Custom1–Custom5 column the answer lands in (FR11.5 caps at 5). */
   userAttributes:{attributes:[
-    {key:'department',label:'Department',enabled:true},
-    {key:'role',label:'Role',enabled:true},
-    {key:'location',label:'Location',enabled:false},
-    {key:'cost-center',label:'Cost center',enabled:false},
+    {id:'ua1', label:'Team', values:['HR-Payroll','Talent Acquisition','Finance'], mandatory:true},
+    {id:'ua2', label:'Site', values:['Munich','New York','Bangalore'], mandatory:false},
   ]},
   integrations:{
-    sap:{enabled:false, systemId:'', client:''},
-    extensions:[
-      {key:'chrome',label:'Chrome extension',enabled:true},
-      {key:'edge',label:'Edge extension',enabled:false},
-    ],
+    // Fields per FR13.1–FR13.3 and the product's own SAP Integration page. Pre-filled defaults
+    // match the shipping client (4 / 1000 ms / 100 ms); native dialogs off by default.
+    sap:{enabled:false, retryAttempts:4, retryWaitMs:1000, monitorIntervalMs:100, nativeDialogs:false},
+    /* FR12.1: one master toggle, not per-browser rows. On by default — the extensions are part
+       of a standard rollout. FR12.3: each extraction is Key + URL + Path. */
+    extensions:{ enabled:true, extractions:[
+      {id:'x1', key:'invoice_id',    url:'https://erp.acme.com/invoices/*', path:'#invoice-header .invoice-number'},
+      {id:'x2', key:'customer_name', url:'https://crm.acme.com/*',          path:'//div[@id="customer"]/span[1]'},
+    ]},
   },
 });
 
@@ -872,10 +1059,26 @@ const state = {
   modalOpen:false,       // rules are created/edited in a dialog (FR1.6), not a sub-page
   isNewRule:false,       // Cancel removes a new rule outright; on an existing one it reverts
   snapshot:null,         // deep copy taken on open, restored by Cancel
+  // Three tiers, because Save and Apply are separate actions (FR1.3 / FR1.7):
+  //   working = live edits · saved = the persisted draft · applied = what clients actually run.
+  // A draft can be saved freely; only Apply pushes it to every user, behind a confirmation.
+  // `applied:null` = never applied, i.e. a project still being set up.
   saved: initialConfig(),
   working: initialConfig(),
+  applied: null,
 };
 const isDirty = () => JSON.stringify(state.saved)!==JSON.stringify(state.working);
+/* Is the saved draft different from what users are actually running? */
+const hasUnapplied = () => JSON.stringify(state.saved)!==JSON.stringify(state.applied);
+/* Rollout state of the project, for the header indicator. */
+function rolloutState(){
+  // "Not applied" wins over "Draft" while nothing has ever gone live — the project is still
+  // being set up, and nothing is capturing yet. Once something IS live, a newer saved draft
+  // reads as "Draft"; the older config keeps running until Apply (said plainly in that dialog).
+  if(!state.applied) return {key:'never',   label:'Not applied'};
+  if(hasUnapplied()) return {key:'pending', label:'Draft'};
+  return {key:'live', label:'Live for all users'};
+}
 
 /* =========================================================
    Small DOM helpers
@@ -917,6 +1120,8 @@ function render(){
   if(state.area==='capture-rules') c.innerHTML = rulesList();
   else c.innerHTML = areaHTML(state.area);
   renderRuleModal();   // the rule editor lives in a dialog over the list (FR1.6)
+  renderExtract();     // …as does the extraction editor (US12)
+  renderUA();          // …and the user-attribute editor (US11)
   syncNotch();  // align the Captured-details pull-out notch under the selected level card
 }
 /* Point the Captured-details notch at the selected level card's exact centre (cards aren't equal width). */
@@ -1009,15 +1214,19 @@ function openConfirm(opts){
       <div class="modal-body"><p class="lead" style="margin:0">${opts.body||''}</p></div>
       <div class="modal-foot"><div class="modal-acts">
         <button class="btn" data-cfcancel="1">Cancel</button>
-        <button class="btn danger" data-cfok="1">${esc(opts.confirmLabel||'Delete')}</button>
+        <button class="btn ${opts.tone==='primary'?'primary':'danger'}" data-cfok="1">${esc(opts.confirmLabel||'Delete')}</button>
       </div></div>
     </div>`;
   const ok=$('#confirmModal [data-cfok]'); if(ok) ok.focus();
 }
 function closeConfirm(){ confirmAction=null; const box=$('#confirmModal'); box.hidden=true; box.innerHTML=''; }
-/* Escape dismisses the confirmation before anything else — it is the topmost layer. */
+/* Escape dismisses the confirmation before anything else — it is the topmost layer, then the
+   extraction dialog, then the rule dialog. */
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape' && !$('#confirmModal').hidden){ e.stopImmediatePropagation(); closeConfirm(); }
+  if(e.key!=='Escape') return;
+  if(!$('#confirmModal').hidden){ e.stopImmediatePropagation(); closeConfirm(); return; }
+  if(exDraft){ e.stopImmediatePropagation(); closeExtract(); return; }
+  if(uaDraft){ e.stopImmediatePropagation(); closeUA(); return; }
 },true);
 
 /* Escape cancels the dialog — but only once any popover inside it has been dismissed.
@@ -1120,25 +1329,40 @@ function ruleEditorBody(r){
           <span><b>This rule is the fallback for everything else.</b> ${defaultWarnText(r.level)}</span></div>`:''}
       </div></div>
 
-    <div class="esec captured">
-      <div class="sechead"><div class="sicon">${svg('apps')}</div>
-        <div><h2>Captured details</h2><div class="shint">${detailHint(r.level)}</div></div></div>
-      <div class="cbody">
-        <div class="subhead">Events · which interactions to record</div>
-        ${detailGroups(r,EV_GROUPS,EVENTS,'ev')}
-        <div class="subhead">Data fields · logged for each event</div>
-        ${detailGroups(r,F_GROUPS,FIELDS,'f')}
-      </div></div>
+    ${r.level==='deny'
+      /* Deny needs no field inventory and no screenshot control — both would be locked to
+         "off"/"none", i.e. ~1.7 screens of dead UI restating one word. One statement instead.
+         Keeps the .captured class so the level-card notch still points at the Deny card. */
+      ? `<div class="esec captured"><div class="cbody">
+          <div class="nocapture">
+            <div class="nc-ic">${svg('eyeoff',20)}</div>
+            <div>
+              <h4>Nothing is captured for this scope</h4>
+              <p>No events are recorded, no data fields are logged and no screenshots are taken
+                 for any activity this rule matches. Choose <b>Full</b> or <b>Custom</b> above to
+                 capture something.</p>
+            </div>
+          </div>
+        </div></div>`
+      : `<div class="esec captured">
+          <div class="sechead"><div class="sicon">${svg('apps')}</div>
+            <div><h2>Captured details</h2><div class="shint">${detailHint(r.level)}</div></div></div>
+          <div class="cbody">
+            <div class="subhead">Events · which interactions to record</div>
+            ${detailGroups(r,EV_GROUPS,EVENTS,'ev')}
+            <div class="subhead">Data fields · logged for each event</div>
+            ${detailGroups(r,F_GROUPS,FIELDS,'f')}
+          </div></div>
 
-    <div class="esec"><div class="sechead"><div class="sicon">${svg('image')}</div>
-        <div><h2>Screenshots</h2><div class="shint">${screenshotHint(r.level)}</div></div></div>
-      <div class="cbody">
-        <select class="shot-sel" ${r.level==='custom'?'data-shotsel':'disabled'}>${SHOT_MODES.map(m=>
-          `<option value="${m.key}" ${screenshotMode(r)===m.key?'selected':''}>${m.label}</option>`
-        ).join('')}</select>
-        <div class="seg-desc">${(SHOT_MODES.find(m=>m.key===screenshotMode(r))||{}).desc||''}</div>
-        ${screenshotMode(r)!=='none'?`<div class="note">${svg('info',17)}<span>Screenshots are stored in the configured Image Service storage bucket — capture won't start until one is set up.</span></div>`:''}
-      </div></div>
+        <div class="esec"><div class="sechead"><div class="sicon">${svg('image')}</div>
+            <div><h2>Screenshots</h2><div class="shint">${screenshotHint(r.level)}</div></div></div>
+          <div class="cbody">
+            <select class="shot-sel" ${r.level==='custom'?'data-shotsel':'disabled'}>${SHOT_MODES.map(m=>
+              `<option value="${m.key}" ${screenshotMode(r)===m.key?'selected':''}>${m.label}</option>`
+            ).join('')}</select>
+            <div class="seg-desc">${(SHOT_MODES.find(m=>m.key===screenshotMode(r))||{}).desc||''}</div>
+            ${screenshotMode(r)!=='none'?`<div class="note">${svg('info',17)}<span>Screenshots are stored in the configured Image Service storage bucket — capture won't start until one is set up.</span></div>`:''}
+          </div></div>`}
   </div>`;
 }
 /* ---------- Scope: condition + group builder (FR3.1–3.11) ---------- */
@@ -1146,7 +1370,10 @@ function scopeEditor(r){
   if(!r.scope) r.scope=mkGroup('AND',[mkCond()]);
   // Advanced actions (NOT, grouping) unlock only once ≥1 condition is complete (FR3.1 progressive disclosure).
   const ready=scopeHasComplete(r.scope);
-  return `<div class="scopetree">${renderGroup(r.scope,'',true,ready)}</div>`;
+  const prose = scopeIsComplex(r) ? scopeProse(r) : '';
+  return `<div class="scopetree">${renderGroup(r.scope,'',true,ready)}</div>
+    ${prose?`<div class="scopesum"><div class="ss-label">In plain language</div>
+      <div class="ss-text">${esc(prose)}</div></div>`:''}`;
 }
 const scopeHasComplete=n=>n.type==='cond'?condComplete(n):n.children.some(scopeHasComplete);
 const LOCK_MSG='Complete a condition first';
@@ -1399,24 +1626,330 @@ function areaHTML(area){
       </div></div>`;
   }
   if(area==='user-attributes'){
+    const list=uaList(), atCap=list.length>=UA_MAX;
     return `<div class="card"><div class="sechead"><div class="sicon">${svg('idcard')}</div>
-        <div style="flex:1"><h2>User attributes</h2><div class="shint">Enabled attributes become available to capture rules.</div></div>
-        <button class="btn sm">${svg('plus',16)} Add attribute</button></div>
-      <div class="cbody">${w.userAttributes.attributes.map((a,i)=>toggleRow('idcard',a.label,'',a.enabled,`u-attr:${i}`)).join('')}</div></div>`;
+        <div style="flex:1"><h2>User attributes</h2>
+          <div class="shint">Users answer these before recording starts, so every event in that session is tagged with their answer. <b>Maximum ${UA_MAX} attributes.</b></div></div>
+        <button class="btn sm" data-uaadd="1"${atCap?' disabled title="Remove one to add another"':''}>${svg('plus',16)} Create custom attribute</button></div>
+      <div class="cbody">
+        ${list.length ? list.map(uaRow).join('')
+          : emptyState('idcard','No user attributes yet',
+              'Users go straight into recording without being asked anything. Add an attribute to tag every session with context — the team they sit in, or the site they work from.')}
+        ${atCap?`<div class="note">${svg('info',17)}<span>You've used all ${UA_MAX} attributes. Delete one to create another.</span></div>`:''}
+      </div></div>`;
   }
   if(area==='integrations'){
     const sap=w.integrations.sap;
     return `<div class="card"><div class="sechead"><div class="sicon">${svg('puzzle')}</div>
-        <div style="flex:1"><h2>SAP Integration</h2><div class="shint">Adds 24 SAP transaction fields to capture rules when enabled.</div></div></div>
+        <div style="flex:1"><h2>SAP Integration</h2><div class="shint">Reads SAP GUI context, so events name the transaction and screen the user was actually on.</div></div></div>
       <div class="cbody">
-        ${toggleRow('puzzle','Enable SAP Integration','',sap.enabled,'i-sap')}
-        ${sap.enabled?`<div class="field" style="margin-top:16px"><label>SAP System ID</label><input id="i-sid" value="${esc(sap.systemId)}" placeholder="PRD"></div>
-          <div class="field"><label>Client</label><input id="i-client" value="${esc(sap.client)}" placeholder="100"></div>`:''}
+        ${toggleRow('puzzle','Retrieve SAP Data','Enabling this adds the SAP fields — transaction code, program, screen number and field values — to your capture rules.',sap.enabled,'i-sap')}
+        ${sap.enabled?`
+          <div class="note">${svg('info',17)}<span><b>SAP GUI Scripting must be turned on in SAP</b> for any SAP data to come through. Without it this setting has no effect.</span></div>
+          <div class="subhead" style="margin-top:24px">Retrieval settings</div>
+          ${sapNumField('i-sap-retries','retryAttempts','','How many times Task Mining tries again when it cannot connect to SAP GUI.')}
+          ${sapNumField('i-sap-wait','retryWaitMs','ms','How long Task Mining waits before trying to connect to SAP GUI again.')}
+          ${sapNumField('i-sap-monitor','monitorIntervalMs','ms','How often Task Mining checks whether SAP GUI is running.')}
+          ${toggleRow('window','Dynamically Enable Native Windows Dialogs for SAP GUI Scripting','Only turn this on if your users record and run SAP GUI scripts while Task Mining is capturing — it changes the way SAP GUI behaves.',sap.nativeDialogs,'i-sap-native')}`:''}
       </div></div>
-      <div class="card"><div class="sechead"><div class="sicon">${svg('puzzle')}</div><div><h2>Browser extensions</h2></div></div>
-      <div class="cbody">${w.integrations.extensions.map((e,i)=>toggleRow('puzzle',e.label,'',e.enabled,`i-ext:${i}`)).join('')}</div></div>`;
+      <div class="card"><div class="sechead"><div class="sicon">${svg('puzzle')}</div>
+        <div style="flex:1"><h2>Browser extensions</h2><div class="shint">Captures browser activity through the Chrome and Edge extensions, including values read from specific pages.</div></div></div>
+      <div class="cbody">
+        ${toggleRow('puzzle','Receive Data From All Extensions','Enabling this lets the client accept data from the Chrome and Edge extensions, and adds the web fields — URL, page extractions, DOM path — to your capture rules.',w.integrations.extensions.enabled,'i-extmaster')}
+        ${w.integrations.extensions.enabled?extractionsSection():''}
+      </div></div>`;
   }
   return '';
+}
+/* =========================================================
+   User attributes (US11) — questions the client asks before recording starts
+   ========================================================= */
+const UA_MAX=5;
+const uaList = () => state.working.userAttributes.attributes;
+/* The captured column takes the attribute's own name — there are no fixed Custom1–Custom5 slots,
+   so nothing internal needs surfacing to the Admin. */
+function uaLabelErr(d){
+  const l=String(d.label||'').trim();
+  if(!l) return 'Enter a label — this is the question users see.';
+  if(uaList().some(a=>a.id!==d.id && String(a.label||'').trim().toLowerCase()===l.toLowerCase()))
+    return 'Another attribute already uses this label.';
+  return '';
+}
+function uaValuesErr(d){
+  return (d.values||[]).length ? '' : 'Add at least one value for users to choose from.';
+}
+function uaFirstErr(d){ return uaLabelErr(d)||uaValuesErr(d); }
+
+function uaRow(a){
+  return `<div class="uarow">
+    <div class="uamain">
+      <div class="uahead">
+        <span class="ualabel">${esc(a.label)}</span>
+        ${a.mandatory?'<span class="pchip">Required of users</span>':''}
+      </div>
+      <div class="uachips">${(a.values||[]).map(v=>`<span class="uachip">${esc(v)}</span>`).join('')}</div>
+    </div>
+    <div class="exacts">
+      <button class="rc-del" data-uaedit="${a.id}" title="Edit attribute" aria-label="Edit ${esc(a.label)}">${svg('rule',17)}</button>
+      <button class="rc-del" data-uadel="${a.id}" title="Delete attribute" aria-label="Delete ${esc(a.label)}">${svg('trash',17)}</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- Attribute dialog (FR1.6 pattern) ---------- */
+let uaDraft=null, uaIsNew=false;
+const uaTouched=new Set();
+function openUA(id){
+  const found=id?uaList().find(a=>a.id===id):null;
+  uaIsNew=!found;
+  if(!found && uaList().length>=UA_MAX) return;   // cap reached (FR11.5)
+  uaDraft=found?clone(found):{id:'ua-'+Date.now(), label:'', values:[], mandatory:false};
+  uaTouched.clear();
+  renderUA();
+  const l=$('#ua-label'); if(l) l.focus();
+}
+function closeUA(){ uaDraft=null; uaIsNew=false; uaTouched.clear(); renderUA(); }
+function submitUA(){
+  if(!uaDraft || uaFirstErr(uaDraft)) return;
+  const d={...uaDraft, label:uaDraft.label.trim()};
+  const i=uaList().findIndex(a=>a.id===d.id);
+  if(i>=0) uaList()[i]=d; else uaList().push(d);
+  uaDraft=null; uaIsNew=false; uaTouched.clear();
+  render();
+}
+function uaShown(field,err){ return (uaTouched.has(field)||(field==='label'?String(uaDraft.label||'').trim():(uaDraft.values||[]).length)) ? err : ''; }
+function renderUA(){
+  const box=$('#uaModal');
+  if(!uaDraft){ box.hidden=true; box.innerHTML=''; return; }
+  const d=uaDraft;
+  const eL=uaShown('label',uaLabelErr(d)), eV=uaShown('values',uaValuesErr(d));
+  const blocked=uaFirstErr(d);
+  box.hidden=false;
+  box.innerHTML=`
+    <div class="modal modal--form" role="dialog" aria-modal="true" aria-labelledby="uaTitle">
+      <div class="modal-head"><div>
+        <h2 id="uaTitle">${uaIsNew?'Create custom attribute':'Edit custom attribute'}</h2>
+        <div class="mh-sub">Users answer this before recording starts. The label becomes the column their answer is stored in.</div>
+      </div><button class="modal-x" data-uacancel="1" aria-label="Cancel">${svg('x',18)}</button></div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="ua-label">Label</label>
+          <input id="ua-label" class="${eL?'err':''}" value="${esc(d.label)}" placeholder="e.g. Team"
+            autocomplete="off" aria-invalid="${eL?'true':'false'}" aria-describedby="ua-label-err">
+          <div class="hint">The question users see, e.g. <b>Team</b> or <b>Site</b>.</div>
+          <div class="errmsg" id="ua-label-err" role="alert" style="${eL?'':'display:none'}">${svg('warn',14)}<span>${esc(eL)}</span></div>
+        </div>
+        <div class="field">
+          <label for="ua-val">Values</label>
+          <div class="chipbox ${eV?'err':''}" data-uabox="1">
+            ${(d.values||[]).map(v=>`<span class="ms-chip">${esc(v)}<button class="ms-x" data-uavdel="${esc(v)}" aria-label="Remove ${esc(v)}">${svg('x',13)}</button></span>`).join('')}
+            <input class="ms-input" id="ua-val" placeholder="${(d.values||[]).length?'Add another…':'Type a value and press Enter'}" autocomplete="off">
+          </div>
+          <div class="hint">The options users pick from. Press <b>Enter</b> after each one.</div>
+          <div class="errmsg" id="ua-val-err" role="alert" style="${eV?'':'display:none'}">${svg('warn',14)}<span>${esc(eV)}</span></div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="chk-row" data-uamand="1" role="checkbox" aria-checked="${d.mandatory}" tabindex="0">
+            ${chk(d.mandatory,'','')}<span>Make this field mandatory for users</span>
+          </div>
+          <div class="hint" style="margin-top:7px">${d.mandatory
+            ? 'Users cannot start recording until they answer.'
+            : 'Users can skip this and start recording without answering.'}</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        ${blocked?`<div class="mf-hint">${svg('warn',15)}<span>${esc(blocked)}</span></div>`:''}
+        <div class="modal-acts">
+          <button class="btn" data-uacancel="1">Cancel</button>
+          <button class="btn primary" data-uasubmit="1"${blocked?' disabled':''}>Submit</button>
+        </div>
+      </div>
+    </div>`;
+}
+/* Commit a typed value as a chip. */
+function uaAddValue(raw){
+  const v=String(raw||'').trim();
+  if(!v || !uaDraft) return;
+  if(!uaDraft.values.some(x=>x.toLowerCase()===v.toLowerCase())) uaDraft.values.push(v);
+  renderUA();
+  const inp=$('#ua-val'); if(inp) inp.focus();
+}
+function refreshUALabel(){
+  if(!uaDraft) return;
+  const err=uaShown('label',uaLabelErr(uaDraft)), inp=$('#ua-label');
+  if(inp){
+    inp.classList.toggle('err',!!err);
+    inp.setAttribute('aria-invalid',err?'true':'false');
+    const box=$('#ua-label-err');
+    if(box){ box.querySelector('span').textContent=err; box.style.display=err?'flex':'none'; }
+  }
+  const blocked=uaFirstErr(uaDraft), btn=$('#uaModal [data-uasubmit]'), foot=$('#uaModal .modal-foot');
+  if(btn) btn.disabled=!!blocked;
+  if(foot){
+    let hint=foot.querySelector('.mf-hint');
+    if(blocked){
+      if(!hint){ hint=document.createElement('div'); hint.className='mf-hint'; foot.insertBefore(hint,foot.firstChild); }
+      hint.innerHTML=`${svg('warn',15)}<span>${esc(blocked)}</span>`;
+    }else if(hint) hint.remove();
+  }
+}
+
+/* Shared empty state. Says what is missing, what that means in practice, and offers the one
+   action that resolves it — so an empty list never reads as a loading failure. */
+/* No call to action here on purpose — the section header already carries the create button,
+   and repeating it gives the same action two places to live. */
+function emptyState(icon,title,body){
+  return `<div class="empty-state">
+    <div class="es-icon">${svg(icon,22)}</div>
+    <div class="es-title">${title}</div>
+    <div class="es-body">${body}</div>
+  </div>`;
+}
+
+/* ---------- Web page data extractions: list + empty state (FR12.2) ---------- */
+function extractionsSection(){
+  const rows=exList();
+  return `<div class="subhead" style="margin-top:26px;display:flex;align-items:center;gap:8px">
+      <span style="flex:1">Web page data extractions</span>
+      <button class="help-ic" tabindex="0" aria-label="About web page data extractions"
+        data-help="Reads a value off a specific web page and stores it against the event — for example the invoice number on an ERP screen, so events can be tied back to the document the user was working on.">${svg('info',15)}</button>
+      <button class="btn sm" data-exadd="1">${svg('plus',15)} Add rule</button>
+    </div>
+    <div class="shint" style="margin:-4px 0 12px">Applies to the Google Chrome and Microsoft Edge extensions.</div>
+    ${rows.length ? rows.map(exRow).join('')
+      : emptyState('window','No extractions yet',
+          'Browser activity is still captured. Add a rule only when you need a specific value read off a page, such as an invoice number.')}`;
+}
+function exRow(d){
+  return `<div class="exrow">
+    <div class="exmain">
+      <div class="exkey">${esc(d.key)}</div>
+      <div class="exmeta"><b>URL</b> <span class="mono">${esc(d.url)}</span><br>
+        <b>Path</b> <span class="mono">${esc(d.path)}</span></div>
+    </div>
+    <div class="exacts">
+      <button class="rc-del" data-exedit="${d.id}" title="Edit rule" aria-label="Edit extraction ${esc(d.key)}">${svg('rule',17)}</button>
+      <button class="rc-del" data-exdel="${d.id}" title="Delete rule" aria-label="Delete extraction ${esc(d.key)}">${svg('trash',17)}</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- Extraction dialog (FR1.6 pattern, small centred variant) ---------- */
+let exDraft=null, exIsNew=false;
+const exTouched=new Set();
+function openExtract(id){
+  const found=id?exList().find(x=>x.id===id):null;
+  exIsNew=!found;
+  exDraft=found?clone(found):{id:'x-'+Date.now(),key:'',url:'',path:''};
+  exTouched.clear();
+  renderExtract();
+  const k=$('#x-key'); if(k) k.focus();
+}
+function closeExtract(){ exDraft=null; exIsNew=false; exTouched.clear(); renderExtract(); }
+function submitExtract(){
+  if(!exDraft || exFirstErr(exDraft)) return;
+  const d={...exDraft, key:exDraft.key.trim(), url:exDraft.url.trim(), path:exDraft.path.trim()};
+  const i=exList().findIndex(x=>x.id===d.id);
+  if(i>=0) exList()[i]=d; else exList().push(d);
+  exDraft=null; exIsNew=false; exTouched.clear();
+  render();
+}
+/* Show a field's error only once it has been left, so a fresh dialog isn't pre-flagged (FR2.2 pattern). */
+function exShown(field,err){ return (exTouched.has(field)||String(exDraft[field]||'').trim()) ? err : ''; }
+function renderExtract(){
+  const box=$('#extractModal');
+  if(!exDraft){ box.hidden=true; box.innerHTML=''; return; }
+  const d=exDraft;
+  const eK=exShown('key',exKeyErr(d)), eU=exShown('url',exUrlErr(d)), eP=exShown('path',exPathErr(d));
+  const blocked=exFirstErr(d);
+  const fld=(id,label,val,err,extra,hint)=>`
+    <div class="field">
+      <label for="${id}">${label}</label>
+      ${extra==='textarea'
+        ? `<textarea id="${id}" class="mono-in ${err?'err':''}" rows="4" spellcheck="false"
+             aria-invalid="${err?'true':'false'}" aria-describedby="${id}-err">${esc(val)}</textarea>`
+        : `<input id="${id}" class="${err?'err':''}" value="${esc(val)}" autocomplete="off" spellcheck="false"
+             aria-invalid="${err?'true':'false'}" aria-describedby="${id}-err">`}
+      ${hint||''}
+      <div class="errmsg" id="${id}-err" role="alert" style="${err?'':'display:none'}">${svg('warn',14)}<span>${esc(err)}</span></div>
+    </div>`;
+  box.hidden=false;
+  box.innerHTML=`
+    <div class="modal modal--form" role="dialog" aria-modal="true" aria-labelledby="exTitle">
+      <div class="modal-head"><div>
+        <h2 id="exTitle">${exIsNew?'Add extraction rule':'Edit extraction rule'}</h2>
+        <div class="mh-sub">Read one value off a page and store it against the event.</div>
+      </div><button class="modal-x" data-excancel="1" aria-label="Cancel">${svg('x',18)}</button></div>
+      <div class="modal-body">
+        ${fld('x-key','Key',d.key,eK,'', '<div class="hint">The name this value is stored under, e.g. <span class="mono">invoice_id</span>.</div>')}
+        ${fld('x-url','URL',d.url,eU,'', '<div class="hint">The page this rule applies to. Use <span class="mono">*</span> as a wildcard, e.g. <span class="mono">https://erp.acme.com/invoices/*</span>.</div>')}
+        ${fld('x-path','Path',d.path,eP,'textarea',
+          `<div class="pathhelp">The element on the page to read from — a CSS selector or an XPath.
+             <span class="ph-eg">CSS: <span class="mono">#invoice-header .invoice-number</span></span>
+             <span class="ph-eg">XPath: <span class="mono">//div[@id="customer"]/span[1]</span></span>
+             <span class="ph-eg">In Chrome or Edge: right-click the value → <b>Inspect</b> → right-click the highlighted element → <b>Copy</b> → <b>Copy selector</b>.</span></div>`)}
+      </div>
+      <div class="modal-foot">
+        ${blocked?`<div class="mf-hint">${svg('warn',15)}<span>${esc(blocked)}</span></div>`:''}
+        <div class="modal-acts">
+          <button class="btn" data-excancel="1">Cancel</button>
+          <button class="btn primary" data-exsubmit="1"${blocked?' disabled':''}>Submit</button>
+        </div>
+      </div>
+    </div>`;
+}
+/* Patch errors + Submit in place while typing, so the caret survives. */
+function refreshExtract(){
+  if(!exDraft) return;
+  const map={'x-key':['key',exKeyErr],'x-url':['url',exUrlErr],'x-path':['path',exPathErr]};
+  Object.keys(map).forEach(id=>{
+    const [field,fn]=map[id], el=$('#'+id); if(!el) return;
+    const err=exShown(field,fn(exDraft));
+    el.classList.toggle('err',!!err);
+    el.setAttribute('aria-invalid',err?'true':'false');
+    const box=$('#'+id+'-err');
+    if(box){ box.querySelector('span').textContent=err; box.style.display=err?'flex':'none'; }
+  });
+  const blocked=exFirstErr(exDraft);
+  const btn=$('#extractModal [data-exsubmit]'), foot=$('#extractModal .modal-foot');
+  if(btn) btn.disabled=!!blocked;
+  if(foot){
+    let hint=foot.querySelector('.mf-hint');
+    if(blocked){
+      if(!hint){ hint=document.createElement('div'); hint.className='mf-hint'; foot.insertBefore(hint,foot.firstChild); }
+      hint.innerHTML=`${svg('warn',15)}<span>${esc(blocked)}</span>`;
+    }else if(hint) hint.remove();
+  }
+}
+
+/* One SAP retrieval setting: label + info icon, narrow number input + unit, inline error.
+   Errors render in place and block Save (FR13.4), matching the rule-name pattern. */
+function sapNumField(id,key,unit,help){
+  const d=SAP_NUMS[key], v=state.working.integrations.sap[key], err=sapNumErr(key);
+  return `<div class="field num">
+    <div class="lblrow"><label for="${id}">${d.label}</label>
+      <button class="help-ic" tabindex="0" aria-label="About ${esc(d.label)}" data-help="${esc(help)}">${svg('info',15)}</button></div>
+    <div class="numrow">
+      <input id="${id}" type="number" inputmode="numeric" autocomplete="off"
+        min="${d.min}" max="${d.max}" value="${v===''||v===null||v===undefined?'':v}"
+        class="${err?'err':''}" aria-invalid="${err?'true':'false'}" aria-describedby="${id}-err">
+      ${unit?`<span class="unit">${unit}</span>`:''}
+    </div>
+    <div class="errmsg" id="${id}-err" role="alert" style="${err?'':'display:none'}">
+      ${svg('warn',14)}<span>${esc(err)}</span></div>
+  </div>`;
+}
+/* Patch one SAP field's error in place — no re-render, so the caret survives typing. */
+function refreshSapField(id,key){
+  const inp=$('#'+id);
+  if(inp){
+    const err=sapNumErr(key);
+    inp.classList.toggle('err',!!err);
+    inp.setAttribute('aria-invalid',err?'true':'false');
+    const box=$('#'+id+'-err');
+    if(box){ box.querySelector('span').textContent=err; box.style.display=err?'flex':'none'; }
+  }
+  saveState();
 }
 function toggleRow(icon,name,desc,on,key){
   return `<div class="trow ${on?'':'off'}">
@@ -1453,6 +1986,61 @@ document.addEventListener('click',e=>{
   // Confirmation dialog owns the interaction while it is up.
   if(near('data-cfcancel')){ closeConfirm(); return; }
   if(near('data-cfok')){ const fn=confirmAction; closeConfirm(); if(fn) fn(); return; }
+
+  // User-attribute dialog (US11)
+  if(near('data-uacancel')){ closeUA(); return; }
+  const uasub=near('data-uasubmit');
+  if(uasub){ if(!uasub.disabled) submitUA(); return; }
+  if(near('data-uaadd')){ const b=near('data-uaadd'); if(!b.disabled) openUA(null); return; }
+  const uaed=near('data-uaedit');
+  if(uaed){ openUA(uaed.dataset.uaedit); return; }
+  if(near('data-uamand')){ if(uaDraft){ uaDraft.mandatory=!uaDraft.mandatory; renderUA(); } return; }
+  const uavd=near('data-uavdel');
+  if(uavd){ if(uaDraft){ uaDraft.values=uaDraft.values.filter(v=>v!==uavd.dataset.uavdel); renderUA(); } return; }
+  if(near('data-uabox') && uaDraft){ const i=$('#ua-val'); if(i) i.focus(); return; }
+  const uadel=near('data-uadel');
+  if(uadel){
+    const a=uaList().find(x=>x.id===uadel.dataset.uadel); if(!a) return;
+    openConfirm({
+      title:'Delete this attribute?',
+      body:`Users will no longer be asked for <b>${esc(a.label)}</b> before recording. Existing captured data keeps whatever was already recorded. The change takes effect when you Save.`,
+      confirmLabel:'Delete attribute',
+      onConfirm(){
+        const i=uaList().findIndex(x=>x.id===uadel.dataset.uadel);
+        if(i>=0) uaList().splice(i,1);
+        render();
+      }
+    });
+    return;
+  }
+
+  // Extraction dialog (US12) — owns the interaction while open.
+  if(near('data-excancel')){ closeExtract(); return; }
+  const exsub=near('data-exsubmit');
+  if(exsub){ if(!exsub.disabled) submitExtract(); return; }
+  if(near('data-exadd')){ openExtract(null); return; }
+  const exed=near('data-exedit');
+  if(exed){ openExtract(exed.dataset.exedit); return; }
+  const exdel=near('data-exdel');
+  if(exdel){
+    const d=exList().find(x=>x.id===exdel.dataset.exdel); if(!d) return;
+    openConfirm({
+      title:'Delete this extraction rule?',
+      body:`<b>${esc(d.key)}</b> will no longer be read from pages matching <span class="mono">${esc(d.url)}</span>. The change takes effect when you Save.`,
+      confirmLabel:'Delete rule',
+      onConfirm(){
+        const i=exList().findIndex(x=>x.id===exdel.dataset.exdel);
+        if(i>=0) exList().splice(i,1);
+        render();
+      }
+    });
+    return;
+  }
+
+  // Header "More actions" (FR1.4)
+  if(t.closest('#moreBtn')){ moreMenu.hidden ? showMoreMenu($('#moreBtn')) : hideMoreMenu(); return; }
+  if(near('data-dlconfig')){ hideMoreMenu(); downloadConfig(); return; }
+  if(!t.closest('.more-menu')) hideMoreMenu();
 
   // Delete a rule: ask first (FR2.6). Checked before data-open so hitting the bin
   // doesn't also open the rule behind the confirmation.
@@ -1550,8 +2138,63 @@ function showToast(msg){
 $('#saveBtn').addEventListener('click',()=>{
   state.saved=clone(state.working);
   render();
-  showToast('Client settings saved');
+  showToast('Draft saved — not yet applied');
 });
+
+/* Apply pushes the saved draft to every user. Approval happens outside this app (the Admin
+   downloads the config file and circulates it), so the app cannot verify sign-off — the
+   confirmation is an attestation that makes the moment deliberate, not a check (FR1.7). */
+$('#applyBtn').addEventListener('click',()=>{
+  if($('#applyBtn').disabled) return;
+  openConfirm({
+    title:'Apply these settings to all users?',
+    body:'These settings take effect for <b>every user in this project</b> straight away, replacing whatever is running now.<br><br>Only continue if this configuration has been <b>reviewed and approved</b>.',
+    confirmLabel:'Apply to all users',
+    tone:'primary',
+    onConfirm(){
+      state.applied=clone(state.saved);
+      render();
+      showToast('Settings applied to all users');
+    }
+  });
+});
+
+/* ---------- Header "More actions" menu (FR1.4) ---------- */
+const moreMenu=document.createElement('div');
+moreMenu.className='more-menu'; moreMenu.hidden=true; document.body.appendChild(moreMenu);
+function showMoreMenu(btn){
+  moreMenu.innerHTML=`
+    <button class="more-item" data-dlconfig="1">${svg('upload',17)}
+      <span>Download configuration file<span class="mi-sub">Share this with your approvers for review</span></span></button>
+    <div class="more-sep"></div>
+    <div class="more-note">Import / export of the encoded config file is not available in this prototype.</div>`;
+  moreMenu.hidden=false;
+  const r=btn.getBoundingClientRect(), m=moreMenu.getBoundingClientRect();
+  moreMenu.style.top = (r.bottom+6)+'px';
+  moreMenu.style.left = Math.max(8, Math.min(r.right-m.width, window.innerWidth-m.width-8))+'px';
+}
+function hideMoreMenu(){ moreMenu.hidden=true; }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideMoreMenu(); });
+document.addEventListener('scroll',hideMoreMenu,true);
+
+/* Timestamped config file, matching the format the current client produces. */
+function configFileName(){
+  const d=new Date(), p=n=>String(n).padStart(2,'0');
+  const date=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  const time=`${p(d.getHours())}_${p(d.getMinutes())}_${p(d.getSeconds())}`;
+  return `generated_from_basic_settings_${date} ${time}.recconf`;
+}
+/* Downloads the SAVED draft — the thing that gets reviewed — as readable JSON, so an approver
+   who has never seen this product can actually read it. */
+function downloadConfig(){
+  const body=JSON.stringify(state.saved,null,2);
+  const url=URL.createObjectURL(new Blob([body],{type:'application/json'}));
+  const a=document.createElement('a');
+  a.href=url; a.download=configFileName();
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  showToast('Configuration file downloaded');
+}
 
 /* text/select/number inputs -> write into working config */
 document.addEventListener('input',e=>{
@@ -1568,6 +2211,14 @@ document.addEventListener('input',e=>{
   if(t.matches('[data-combsel]')){ if(r&&r.scope){const g=nodeAt(r.scope,t.dataset.combsel);if(g)g.combinator=v;} render(); return; }
   if(t.matches('[data-shotsel]')){ if(r)r.custom.screenshots=v; render(); return; }
 
+  if(uaDraft && id==='ua-label'){ uaDraft.label=v; refreshUALabel(); return; }
+
+  // Extraction dialog fields write into the draft, never straight into the config (FR1.6).
+  if(exDraft && (id==='x-key'||id==='x-url'||id==='x-path')){
+    exDraft[{'x-key':'key','x-url':'url','x-path':'path'}[id]]=v;
+    refreshExtract(); return;
+  }
+
   switch(id){
     case 'f-name': if(r)r.name=v; refreshName(); break;
     case 'p-alg': w.privacy.hashing.algorithm=v; markDirty(); break;
@@ -1579,13 +2230,31 @@ document.addEventListener('input',e=>{
     case 'b-idle': w.clientBehaviour.idleTimeoutMinutes=num(5); markDirty(); break;
     case 'b-interval': w.clientBehaviour.uploadIntervalSeconds=num(30); markDirty(); break;
     case 'b-uiaa-ex': w.clientBehaviour.uiaa.excludeApps=v; markDirty(); break;
-    case 'i-sid': w.integrations.sap.systemId=v; markDirty(); break;
-    case 'i-client': w.integrations.sap.client=v; markDirty(); break;
+    // Keep '' (rather than coercing to 0) so a cleared field reads as "Enter a value", not as zero.
+    case 'i-sap-retries': w.integrations.sap.retryAttempts     = v===''?'':Number(v); refreshSapField('i-sap-retries','retryAttempts'); break;
+    case 'i-sap-wait':    w.integrations.sap.retryWaitMs       = v===''?'':Number(v); refreshSapField('i-sap-wait','retryWaitMs'); break;
+    case 'i-sap-monitor': w.integrations.sap.monitorIntervalMs = v===''?'':Number(v); refreshSapField('i-sap-monitor','monitorIntervalMs'); break;
   }
 });
 /* Blur on the rule name marks it "touched" so the required-field message can appear (FR2.2). */
 document.addEventListener('focusout',e=>{
   if(e.target && e.target.id==='f-name'){ nameTouched=true; refreshName(); }
+  // Extraction fields flag "required" only after being left, not on a freshly opened dialog.
+  const exf={'x-key':'key','x-url':'url','x-path':'path'}[e.target && e.target.id];
+  if(exf && exDraft){ exTouched.add(exf); refreshExtract(); }
+  if(uaDraft && e.target){
+    if(e.target.id==='ua-label'){ uaTouched.add('label'); refreshUALabel(); }
+    // Commit whatever was typed but not entered, so a value isn't silently lost on blur.
+    if(e.target.id==='ua-val'){ uaTouched.add('values'); const t=e.target.value; if(t.trim()) uaAddValue(t); else renderUA(); }
+  }
+});
+/* Enter commits a value chip; Backspace on an empty input removes the last one. */
+document.addEventListener('keydown',e=>{
+  if(!uaDraft || !e.target || e.target.id!=='ua-val') return;
+  if(e.key==='Enter'){ e.preventDefault(); uaAddValue(e.target.value); e.target.value=''; }
+  else if(e.key==='Backspace' && e.target.value===''){
+    if(uaDraft.values.length){ e.preventDefault(); uaDraft.values.pop(); renderUA(); const i=$('#ua-val'); if(i) i.focus(); }
+  }
 });
 /* Patch the rule-name field's inline error in place — no re-render, so focus/caret survive. */
 function refreshName(){
@@ -1614,11 +2283,27 @@ function refreshModalFoot(){
     hint.innerHTML=`${svg('warn',15)}<span>${esc(why)}</span>`;
   }else if(hint){ hint.remove(); }
 }
-/* Save button reflects both unsaved changes AND validity (FR1.3 / FR2.2 / FR3.11). */
+/* Header actions. Save persists a draft; Apply is what reaches users (FR1.3 / FR1.7).
+   Validity gates BOTH — a draft is never allowed to be invalid (FR2.2 / FR3.11). */
 function saveState(){
-  const dirty=isDirty(), why=formInvalidReason(), b=$('#saveBtn');
-  b.disabled=!dirty||!!why;
-  b.textContent = why || (dirty ? 'Save Client Settings' : 'All changes saved');
+  const dirty=isDirty(), why=formInvalidReason();
+  const b=$('#saveBtn'), a=$('#applyBtn'), pill=$('#rolloutPill');
+
+  b.disabled = !dirty || !!why;
+  b.textContent = why ? why : (dirty ? 'Save draft' : 'Draft saved');
+
+  // Apply always acts on the SAVED draft — the thing that was sent for approval — so it stays
+  // disabled while there are unsaved edits rather than silently applying something unreviewed.
+  const applyWhy = why ? why
+    : dirty ? 'Save your draft first'
+    : !hasUnapplied() ? 'No changes to apply'
+    : '';
+  a.disabled = !!applyWhy;
+  a.title = applyWhy || 'Push the saved draft to every user in this project';
+
+  const rs=rolloutState();
+  pill.className = 'rollout '+rs.key;
+  pill.innerHTML = `<span class="rdot"></span>${rs.label}`;
 }
 /* update Save state on text input (don't re-render & lose focus) */
 function markDirty(){saveState();}
@@ -1632,10 +2317,10 @@ function toggleSetting(key){
     case 'p-block': w.privacy.consent.blockUntilGranted=!w.privacy.consent.blockUntilGranted; break;
     case 'b-start': w.clientBehaviour.startOnLaunch=!w.clientBehaviour.startOnLaunch; break;
     case 'b-pause': w.clientBehaviour.allowUserPause=!w.clientBehaviour.allowUserPause; break;
-    case 'u-attr': w.userAttributes.attributes[+idx].enabled=!w.userAttributes.attributes[+idx].enabled; break;
     case 'i-sap': w.integrations.sap.enabled=!w.integrations.sap.enabled; break;
+    case 'i-sap-native': w.integrations.sap.nativeDialogs=!w.integrations.sap.nativeDialogs; break;
     case 'b-uiaa': w.clientBehaviour.uiaa.enabled=!w.clientBehaviour.uiaa.enabled; break;
-    case 'i-ext': w.integrations.extensions[+idx].enabled=!w.integrations.extensions[+idx].enabled; break;
+    case 'i-extmaster': w.integrations.extensions.enabled=!w.integrations.extensions.enabled; break;
   }
 }
 
@@ -1874,6 +2559,7 @@ window.addEventListener('resize',hideAddMenu);
   (state.working.captureRules?.rules||[]).forEach(r=>walk(r.scope));
 })();
 
+$('#moreBtn').innerHTML = svg('more',18);
 render();
 </script>
 </body>

@@ -1,19 +1,21 @@
 # Task Mining Client Configuration — Functional Requirements
 
 **Format:** each entry starts with a **user story** (the Admin's intention) followed by the **functional requirements** — the capabilities the screen must have to achieve that intention.
-**Status:** v3, in progress. User Stories 1–14 defined (all six config areas + config-file actions); gap/contradiction review applied. v3 reconciles Capture Rules with the built prototype: Default-rule level now editable — guarantee restated as **coverage, not capture**, plus a non-blocking warning when it is not Full (FR2.5, FR2.5a; knock-on fix to FR1.5), rule-name validation specified in full including the empty-on-create behaviour (FR2.2), attribute is a drop-down (FR3.1), operator set expanded and attribute-aware (FR3.2), EventType and TargetElementName dropped as scope attributes (FR3.3), IN via multi-select value (FR3.8), negation removed (FR3.7). Every create/edit flow now uses one **modal dialog** pattern with validity-gated Submit and revert-on-Cancel, the capture rule included (FR1.6). Deleting now **confirms instead of offering Undo** (FR2.6), and the rule-list card is stripped back to name + level badge + delete (FR2.3). Rationale and supersession history for all of the above is logged as decisions #31–#42 in `TM_Client_IA_Decision_Record.md`.
+**Status:** v3, in progress. User Stories 1–15 defined (all six config areas, config-file actions, and approval-gated rollout); gap/contradiction review applied. **New in v3: US15 — Save and Apply are decoupled**, so saving a draft no longer affects users; applying is a separate, attested action, with approval itself handled outside the product (decision #45). FR1.3 and FR1.4 updated accordingly, and US14's encoded import/export is **parked pending Product confirmation**. **Deny no longer shows the field inventory or screenshot control** — one statement replaces ~1.7 screens of locked-off toggles (FR4.3, FR4.5; decision #46). v3 reconciles Capture Rules with the built prototype: Default-rule level now editable — guarantee restated as **coverage, not capture**, plus a non-blocking warning when it is not Full (FR2.5, FR2.5a; knock-on fix to FR1.5), rule-name validation specified in full including the empty-on-create behaviour (FR2.2), attribute is a drop-down (FR3.1), operator set expanded and attribute-aware (FR3.2), EventType and TargetElementName dropped as scope attributes (FR3.3), IN via multi-select value (FR3.8), negation removed (FR3.7). Every create/edit flow now uses one **modal dialog** pattern with validity-gated Submit and revert-on-Cancel, the capture rule included (FR1.6). Deleting now **confirms instead of offering Undo** (FR2.6), and the rule-list card is stripped back to name + level badge + delete (FR2.3). **FR3.10 (plain-language scope summary on the rule card) has been removed** — a nested scope does not summarise legibly in a card-width line; the ID is retired rather than reused, so FR3.x numbering skips it. Its intent returns as **FR3.12**, a read-only read-back inside the rule editor where nesting can be shown with explicit parentheses. FR3.1 no longer speaks of "progressively exposing an advanced builder" (there is only one builder, which grows), FR3.6 records the **2-level nesting cap**, and FR3.3/FR3.4 are flagged as **still to be validated with Product**. A new rule opens with **Custom pre-selected** rather than no level chosen (FR4.1), and FR3.9 and FR3.13 now specify the per-node action menus and the per-attribute value help that the prototype already implements. Rationale and supersession history for all of the above is logged as decisions #31–#44 in `TM_Client_IA_Decision_Record.md`.
 **IDs:** FRs are numbered per story (FR1.x, FR2.x…) for unique reference.
 
 ---
 
 ## User Story 1
+
 **As an Admin, I want to configure client settings for a new project.**
 
 **Functional requirements:**
+
 - **FR1.1** Present the **6 config areas** and let the Admin move between them via a **left sub-nav**: Capture Rules, Privacy, Data Connection, Client Behaviour, User Attributes, Integrations. **Privacy** and **Integrations** are container areas whose sub-screens are presented as **tabs** — Privacy: Redaction · Hashing · Consent; Integrations: SAP · Extensions.
 - **FR1.2** No landing page — the Admin lands directly on the **Capture Rules** area.
-- **FR1.3** Persistent page header with a primary **Save** action (Save is **global**, across all areas) and an unsaved-changes state. There is **no autosave** — changes persist only on explicit Save. *(Open: confirm autosave feasibility with Engineering; going without it for now.)* Each area provides **inline validation** for fields that require it, blocking Save while a required field is invalid.
-- **FR1.4** A **More actions** menu next to Save holds additional actions, including **import / export**. (No separate Configuration File tab.)
+- **FR1.3** Persistent page header carrying **two distinct global actions** — **Save draft** and **Apply to all users** — plus a **rollout state indicator** beside the page title. Both actions are **global** across all six areas. **Saving does not affect users**; only Apply does (see **US15**). There is **no autosave** — changes persist only on explicit Save. *(Open: confirm autosave feasibility with Engineering; going without it for now.)* Each area provides **inline validation** for fields that require it, **blocking Save while any required field is invalid** — a saved draft is therefore never invalid. *(Changed from v2, where a single **Save** both persisted and applied the configuration; superseded by decision #45.)*
+- **FR1.4** A **More actions** menu in the header holds secondary actions. (No separate Configuration File tab.) It currently holds **Download configuration file** (FR15.5). Import / export of the encoded config file (US14) is **parked pending Product confirmation** and is not offered meanwhile.
 - **FR1.5** Display the **Default rule** with a subtext that plainly states **what its currently selected capture level captures** — and that it applies to any activity no other rule matches. Since it ships as Full, that subtext describes what Full captures out of the box, but it must **track the selected level** rather than assume Full (see FR2.5). *(Changed from v2, which hardcoded "what Full captures" when the Default's level was locked.)*
 - **FR1.6** **Modal (dialog) behaviour — the single pattern for every create/edit flow.** All **collection items** are created and edited in a dialog: **capture rule** (US2–US5), **redaction pattern** (US6), **user attribute** (US11), **web-page extraction rule** (US12). They use **Submit** and **Cancel** — the primary button is labelled **Submit**, not "OK".
   - **Submit** **stages** the change into the working (unsaved) state and closes the dialog; it is only persisted by the global **Save** (FR1.3). **Submit is disabled until the item passes inline validation** (for a capture rule that means a valid name *and* at least one complete scope condition — FR2.2, FR3.11).
@@ -27,9 +29,11 @@
 ---
 
 ## User Story 2
+
 **As an Admin, I want to create a new rule to define the scope and what data to be captured.**
 
 **Functional requirements:**
+
 - **FR2.1** A clear action button to **create a new rule**.
 - **FR2.2** The Admin enters a **rule name** when creating a rule. The name is **required** and **not case-sensitive**; **duplicate names are not allowed** (case-insensitive check, compared on the trimmed value and applied against *all* rules including the Default). Show the error **inline**, and **block Save** while any rule name is invalid (per FR1.3).
   - **A new rule starts with an empty name**, not a placeholder value like "New rule", and **focus lands in the name field** on create. A prefilled name would defeat the required-field flow entirely (the field is never blank, so the error never fires) and would let two quick creations collide as duplicates. A rule left unnamed is shown in the rule list as *"Unnamed rule"* in an error style so it stays findable while Save is blocked.
@@ -49,62 +53,110 @@
 ---
 
 ## User Story 3
+
 **As an Admin, I want to define a rule's scope so that the rule applies only to the applications, URLs, and contexts I target.**
 
 **Functional requirements:**
-- **FR3.1** **Simple-first.** Start with a simple picker to name the application(s) and/or URL(s) the rule targets. The **attribute is chosen from a drop-down select** (the curated list in FR3.3); the **value uses typeahead** (with suggestions + free typing). Progressively expose the advanced condition builder only when the Admin needs more than a plain match. *(Changed from v2: the attribute was previously specified as typeahead; it is now a drop-down select, since the attribute list is short and curated.)*
+
+- **FR3.1** **Simple-first.** Start with a simple picker to name the application(s) and/or URL(s) the rule targets. The **attribute is chosen from a drop-down select** (the curated list in FR3.3); the **value uses typeahead** (with suggestions + free typing). From there the Admin can **progressively add further conditions and groups** to build up an advanced scope definition — one condition is enough for the common case, and the compound structure is reached by adding to it rather than by switching into a separate mode. *(Changed from v2 twice: the attribute was previously specified as typeahead and is now a drop-down select, since the list is short and curated; and the "progressively expose the advanced condition builder" wording is dropped — there is no separate basic/advanced builder to reveal, only one builder that grows as conditions and groups are added.)*
 - **FR3.2** A condition is expressed as **[attribute] [operator] [value(s)]**. Supported operators: **equals**, **does not equal**, **contains**, **does not contain**, **starts with**, and **Like** (wildcard / pattern match, e.g. `*.mybank.com`). The operator list is **attribute-aware** — only the operators that make sense for the selected attribute are shown (e.g. ProcessName offers equals / does not equal; URL and ApplicationTitle also offer contains, starts with, Like). The **value field is multi-select**, so one row can match several values — this subsumes the separate IN operator (see FR3.8). *(Reconciled with build: v2 listed only EQUALS / NOT EQUALS / LIKE; the shipped set adds contains, does not contain, and starts with, and is attribute-aware.)*
-- **FR3.3** Curate the attribute list to the **High-criticality, scope-relevant attributes** from the Conditions inventory — the ones you'd actually target a rule by: **ProcessName, ApplicationName, ApplicationTitle, ActiveWindow, URL** (plus the conditional SAP attributes per FR3.4). Do not expose timestamps, IDs, or user-identity attributes here — they aren't scoping dimensions. *(Changed from v2, which also listed **EventType** and **TargetElementName**. Both are removed: a scope answers "**where** does this rule apply", and those two describe **what happened inside** a matched context — that belongs to the capture level (US4/US5), not to scoping. Keeping them invited rules that mixed the two axes.)*
-- **FR3.4** **Conditional attributes.** SAP, UIAA, and browser-extension attributes appear in the picker **only when their source is enabled**; hide them otherwise so non-SAP / non-extension customers aren't shown irrelevant fields.
+- **FR3.3** Curate the attribute list to the **High-criticality, scope-relevant attributes** from the Conditions inventory — the ones you'd actually target a rule by: **ProcessName, ApplicationName, ApplicationTitle, ActiveWindow, URL** (plus the conditional SAP attributes per FR3.4). Do not expose timestamps, IDs, or user-identity attributes here — they aren't scoping dimensions. **The exact attribute list is still to be validated with Product** — it was curated from the Conditions inventory by criticality, not confirmed against how Admins actually target rules in the field. *(Changed from v2, which also listed **EventType** and **TargetElementName**. Both are removed: a scope answers "**where** does this rule apply", and those two describe **what happened inside** a matched context — that belongs to the capture level (US4/US5), not to scoping. Keeping them invited rules that mixed the two axes.)*
+- **FR3.4** **Conditional attributes.** SAP, UIAA, and browser-extension attributes appear in the picker **only when their source is enabled**; hide them otherwise so non-SAP / non-extension customers aren't shown irrelevant fields. **Which attributes each source contributes, and whether hiding rather than disabling them is right, is still to be validated with Product** — hiding keeps the list clean but makes the capability undiscoverable to an Admin who doesn't already know the integration exists.
 - **FR3.5** **Add comparison** — add a single condition row.
-- **FR3.6** **Add group** — group conditions with an **AND / OR** combinator; groups are **nestable** to build compound expressions.
+- **FR3.6** **Add group** — group conditions with an **AND / OR** combinator. Groups are **nestable, but capped at 2 levels below the root** — so the deepest expressible structure is `A OR (B AND (C OR D))`. "Add group" is offered only while that depth allows it, and "Wrap in group" only when the result would stay within the cap. *(Changed from v2's unqualified "nestable": unlimited nesting produces trees that are hard to read and hard to trust for a non-engineer Admin, while 2 levels covers the realistic targeting cases. Supersedes the earlier one-level cap of decision #26; see decision #33.)*
 - **FR3.7** *(Removed — negation is not supported.)* Earlier versions specified an **Add negation (NOT)** action to wrap a condition or group and invert it. This has been **removed from the design**. Inversion is expressed directly through the **negative operators** (does not equal, does not contain) combined with the **multi-select value** (FR3.2), which covers the practical cases without a NOT wrapper. *(Change from v2: the "Add negation (NOT)" action, and the per-group NOT toggle, are gone. Trade-off: group-level negation such as `NOT (A AND B)` must now be hand-expanded to `(NOT A) OR (NOT B)`.)*
 - **FR3.8** **Match a list of values (IN).** An attribute can be matched against **any value in a list**. This is realised through the **multi-select value field** (FR3.2), not a distinct IN operator/button: equals + multiple values = match any (OR-ed EQUALS); does not equal + multiple values = exclude all. *(Reconciled with build: IN is expressed via the multi-select value, not a separate operator.)*
-- **FR3.9** Each node (condition or group) can be **deleted** individually and **wrapped into a group** in place.
-- **FR3.10** Show a **plain-language summary** of the scope expression (e.g. "ProcessName = Chrome AND URL LIKE *.gmail.com") so the Admin can read back what the rule targets without parsing the tree.
+- **FR3.9** **Per-node actions — the contents of the "more actions" (`⋮`) menu vary by node type and nesting depth.** Every condition and every non-root group carries its own `⋮` menu; what it offers is **not** the same everywhere, and developers should treat the matrix below as the specification rather than assuming one shared menu:
+
+  | Node           | Where it sits                             | `⋮` menu offers                                   |
+  | -------------- | ----------------------------------------- | ------------------------------------------------- |
+  | **Condition**  | at root level (depth 0)                   | **Wrap in group** · **Delete condition**          |
+  | **Condition**  | inside a group (depth 1)                  | **Wrap in group** · **Delete condition**          |
+  | **Condition**  | inside a nested group (depth 2 — the cap) | **Delete condition** only                         |
+  | **Group**      | depth 1                                   | **Delete group** only                             |
+  | **Group**      | depth 2 (the cap)                         | **Delete group** only                             |
+  | **Root group** | —                                         | *no menu* — the root cannot be deleted or wrapped |
+
+  Rules that produce the matrix, so the behaviour is derivable rather than memorised:
+  - **Wrap in group** is offered only when **both** hold: (a) wrapping the node would keep the tree **within the 2-level cap** (FR3.6) — which is why it disappears at depth 2; and (b) **at least one condition in the scope is complete**, since wrapping an empty condition is meaningless (progressive disclosure).
+  - **Delete is always offered** on any deletable node — regardless of depth, and regardless of whether the node is complete. A half-filled condition and a deepest-level node must both remain removable; the `⋮` button is therefore **always present and always enabled**, never gated behind the completeness lock that hides Wrap.
+  - **Groups never offer Wrap** — a group is already a group, so wrapping it would only add depth for no expressive gain.
+  - **Deleting a group deletes its contents** with it. Deleting the **last remaining condition** in the root leaves a single empty condition row rather than an empty scope, since a rule requires at least one condition (FR3.11).
+  - Negation is absent from every menu — inversion lives in the operators (FR3.7).
+  *Implementation note (2026-07-29):* the prototype currently gives **conditions** a `⋮` menu as specified, but gives **groups a direct delete button with no menu**. The two need aligning — either add the single-item `⋮` menu to groups for affordance consistency, or keep the direct button on groups and accept two affordances. Trade-off: a `⋮` revealing exactly one item costs an extra click and hides a one-item list, which is why decision #28 originally kept delete as a direct control; decision #34 moved *condition* delete into the menu only because that row had four competing trailing controls, which a group header does not.
 - **FR3.11** **Validation.** Flag incomplete conditions (missing attribute, operator, or value) inline. A created rule **requires at least one condition** — an empty scope is not allowed, because the catch-all case is already served by the Default rule.
+- **FR3.12 - (Good to have)** **Plain-language read-back of the scope, inside the rule editor.** Show a **read-only** restatement of the scope expression beneath the condition builder, using the **same attribute labels as the dropdowns** and **explicit parentheses** for grouping — e.g. *"Process name = saplogon.exe OR (URL contains payroll AND (Application title = Chrome OR Application title = Edge))"*. It updates live as the scope is edited.
+  - **Only shown once there is more than one condition.** A lone condition has no precedence to disambiguate, so a summary would merely restate the row above it.
+  - **Read-only, deliberately.** An editable expression field would require a parser, syntax-error states and two-way sync with the tree — effectively teaching Admins a query language. The builder stays the single way to author a scope.
+  - Incomplete conditions degrade to `… = …` rather than being hidden, so the read-back always reflects the tree as it actually stands.
+  - *(Replaces the intent of the removed FR3.10, but relocated: a summary is unusable in a card-width line yet valuable in the editor, where its usefulness grows with nesting depth — precisely the case the stacked builder can only imply. The current Advanced editor already offers a text view of conditions, so this also preserves continuity for existing Admins. See decision #43.)*
+- **FR3.13** **Per-attribute "how to find this value" help — required.** Each condition row carries a small **info affordance next to the value field** giving guidance specific to the **selected attribute**: where to obtain that value on the user's machine, plus a concrete example. This is **required, not optional** — an Admin writing a scope frequently does not know that *Process name* means the executable name, or where to read it, and the failure is **silent**: a wrong process name produces a rule that simply never matches, with no error to diagnose. Suggestions/typeahead (FR3.1) cover the common values; this covers the case where the value the Admin needs is **not** in the suggestion list.
+  - **Trigger.** Opens on **hover** and on **keyboard focus** — the icon is focusable, so the guidance is reachable without a mouse. Dismisses on mouse-out, blur, or scroll.
+  - **Content follows the attribute** and updates when the attribute changes. Before an attribute is chosen, show a generic fallback rather than nothing.
+  - **Where the attribute supports wildcards**, the help says so — keeping the `*` hint next to the field where it is used rather than only in the operator list (FR3.2).
+  - **Copy as built** (the source of truth for implementation):
+
+    | Attribute | Help text |
+    |---|---|
+    | Process name | The app's executable name. Find it in Windows Task Manager → Details tab (e.g. `saplogon.exe`, `chrome.exe`). |
+    | Application name | The friendly app name from the title bar or Task Manager → Processes (e.g. Google Chrome). |
+    | Application title | Text shown in the window's title bar (e.g. "Payroll"). Use `*` as a wildcard. |
+    | Active window | The full active-window title — copy it from the window's title bar. Use `*` as a wildcard. |
+    | URL | The web address — copy it from the browser address bar. Use `*` as a wildcard (e.g. `*.mybank.com`). |
+    | SAP transaction code | The SAP transaction code from the SAP command field (e.g. `VA01`, `ME21N`). |
+    | SAP program | The SAP program/report name (e.g. `SAPMV45A`). |
+    | *(none selected)* | Enter the value to match. Pick from the suggestions, or type your own. |
+
+  - *(Already built in the prototype; recorded here because it was implemented under decision #27 but never written into the user story. Any new scope attribute added under FR3.3 must ship with its own help text — the generic fallback is for the no-attribute-selected state, not a substitute.)*
 
 ---
 
 ## User Story 4
+
 **As an Admin, I want to choose what a rule captures and see plainly what that means, so I'm confident the rule collects the right data.**
 
 **Functional requirements:**
-- **FR4.1** For each rule, the Admin selects one **capture level: Full, Custom, or Deny.**
+
+- **FR4.1** For each rule, the Admin selects one **capture level: Full, Custom, or Deny.** A **new rule opens with Custom pre-selected** — never with nothing selected. Custom is the privacy-safe middle option (FR4.4: interaction events on, content and screenshots off), so a pre-selection the Admin doesn't engage with can only ever *under*-capture, never quietly widen capture. It also keeps the "what this captures" preview (FR4.3) populated from the moment the dialog opens, rather than showing an empty panel until a level is picked. The Admin can switch to Full or Deny at any point. *(Changed from v2, which was silent on this, and from decision #17's "no tier preselected"; superseded by decision #44.)*
 - **FR4.2** **Full** and **Deny** are **locked presets** (not editable); **Custom** is the only editable level.
-- **FR4.3** Show a persistent **"what this captures" preview** for the selected level. Events and logs are **combined inside the capture level** (per decision record #8/#15): the preview has **two sections**, listing **actual fields organised into groups** (not a flat dump), using the inventory groupings:
+- **FR4.3** Show a persistent **"what this captures" preview** for the selected level — **for Full and Custom** (Deny is the exception; see FR4.5). Events and logs are **combined inside the capture level** (per decision record #8/#15): the preview has **two sections**, listing **actual fields organised into groups** (not a flat dump), using the inventory groupings:
   - **Events** (which interactions are recorded): Navigation & window · Interaction · Content & clipboard · Scroll · Session & lifecycle.
   - **Data fields** (attributes logged per event): Identity · Timestamps & IDs · App & window context · Element / interaction · Content / input · Web / DOM · Screenshot dimensions · Coordinates & geometry · Versioning & meta · SAP family · UIAA family · Custom.
-  
   *(The grouped, two-section preview directly addresses the Full/Usage-only confusion both VEs hit in testing — the Admin can see which events and which data fields each level actually collects.)*
 - **FR4.4** **Custom** defaults to **interactions on, content/screenshots off** (safe-by-default) — the Admin turns content capture on deliberately.
 - **FR4.5** **Deny** captures **nothing** for the rule's scope — a functional level used to exclude an app/URL from an otherwise-broad rule.
+  - **Deny shows no field inventory and no screenshot control.** Both would render locked to "off"/"none", so the preview of FR4.3 does not apply here: instead of the event and data-field families, show a **single statement** confirming that no events are recorded, no data fields are logged and no screenshots are taken for anything this rule matches — plus a pointer to Full or Custom for anyone who landed on Deny by mistake.
+  - **A statement, not blank space.** An empty region inside the dialog reads as broken or half-loaded; the statement carries the same reassurance the locked list used to, in one sentence.
+  - *Why this doesn't contradict FR4.3:* the preview exists to resolve the **Full vs Custom** comprehension failure both VEs hit in testing (decision #23). Deny has no such gap — the answer is trivially "nothing" — so ~1.7 screens of disabled controls restated one word and invited futile clicking. *(Changed from v2, which applied the preview to all three levels; see decision #46.)*
 - **FR4.6** Situational groups (SAP, UIAA, extension) appear in the preview **only when their source is enabled**; noise groups are not surfaced by default.
 
 ---
 
 ## User Story 5
+
 **As an Admin, I want to edit exactly which fields a Custom rule captures, so I can tune data collection and keep privacy-sensitive fields off unless I need them.**
 
 **Functional requirements:**
+
 - **FR5.1** The Custom editor is **only reachable when the level is Custom** (Full/Deny are locked, per FR4.2). It edits **both sections** of the capture level — **Events** (which interactions to record) and **Data fields** (attributes logged per event) — mirroring the two-section preview (FR4.3).
 - **FR5.2** Present both sections in the **same groups as the preview**. In **Events**, each event group (Navigation & window, Interaction, Content & clipboard, Scroll, Session & lifecycle) is **toggleable on/off**. In **Data fields**, each family (Identity, App & window context, Element/interaction, Content/input, Web/DOM, etc.) and each field within it is **individually toggleable**.
 - **FR5.3** Provide a **whole-family / whole-section toggle** (turn an entire event group or data-field family on/off in one action) in addition to per-field toggles.
 - **FR5.4** **Default state = interaction events on, content fields + screenshots off** (FR4.4). Content/input fields (EnteredText, ClipboardText, SelectedText, etc.) are **flagged as privacy-sensitive** in the UI.
 - **FR5.5** **Conditional & rarely-used groups.** SAP, UIAA, and extension families appear **only when their source is enabled**. Noise groups (Scroll, Coordinates & geometry, Screenshot dimensions) are **hidden behind a "show rarely-used fields" disclosure** — not surfaced by default.
 - **FR5.6** **Screenshot mode** is part of the Custom editor: the Admin selects **none / active window / full desktop / all**. (This is a rule-level setting, not just a field toggle.) Where a mode other than "none" is chosen, captured screenshots are uploaded to the **Image Service Bucket** configured in Data Connection (FR9.2) — surface a hint/dependency so the Admin knows a destination bucket must be set for screenshots to be stored.
-- **FR5.7** Keep the **"what this captures" summary live** as the Admin toggles, so edits are legible immediately.
 
 ---
 
 ## User Story 6
+
 **As an Admin, I want to redact sensitive content from captured data, so that PII and regulated data never leave the client.**
 
 **Functional requirements:**
-- **FR6.1** Ship **pre-set patterns**. **Enabled out of the box:** email addresses, social security numbers, credit card numbers. **Shipped but OFF by default:** Redact Windows username, Redact machine name — because **identity fields are pseudonymised by Hashing instead** (see US7 and FR7.9). This avoids identity being redacted to `***` and thereby making its hash meaningless; an Admin who prefers full anonymisation over joinable pseudonyms can turn these two presets on.
+
+- **FR6.1** Ship **pre-set patterns**. **Enabled out of the box:** email addresses, social security numbers, credit card numbers. **Shipped but OFF by default:** Redact Windows username, Redact machine name — because **identity fields are pseudonymised by Hashing instead** (see US7 and FR7.9). This avoids identity being redacted to `*`** and thereby making its hash meaningless; an Admin who prefers full anonymisation over joinable pseudonyms can turn these two presets on.
 - **FR6.2** The Admin can **create a new pattern** and **edit any pattern — including the pre-sets** (name, description, and regex are all editable).
 - **FR6.3** Pattern editor fields: **Pattern name** (required), **Description** (optional), **Regular expression** (required, editable; supports tokens like `{{username}}` and raw regex).
-- **FR6.4** **Replacement method** per pattern: **asterisk mask** (`***`) or a **tag/label**.
+- **FR6.4** **Replacement method** per pattern: **asterisk mask** (`*`**) or a **tag/label**.
 - **FR6.5** Each pattern applies to a set of **captured content fields, pre-selected per pattern by default**; the Admin can **toggle off** fields they don't want that pattern to redact.
 - **FR6.6** Patterns apply **top-to-bottom in list order**; the Admin can **reorder** (move up/down). Order matters — patterns apply sequentially.
 - **FR6.7** The Admin can **delete** a pattern (confirmation dialog, per FR2.6).
@@ -114,9 +166,11 @@
 ---
 
 ## User Story 7
+
 **As an Admin, I want to hash sensitive attributes across all captured data, so identifying values are pseudonymized everywhere while staying joinable for analysis.**
 
 **Functional requirements:**
+
 - **FR7.1** A global **"Hash selected attributes"** master toggle (on/off for the whole project).
 - **FR7.2** Display **only content/privacy-relevant attributes** — do **not** list non-sensitive fields (timestamps, IDs, ProcessName, geometry/coordinates, versioning, Custom). The curated set:
   - **Identity:** SystemUser, UserId, MachineName.
@@ -128,14 +182,16 @@
 - **FR7.6** Show the warning that **hashing limits analysis scope**, so the trade-off is explicit.
 - **FR7.7** Applies **globally across all rules** (project-level), consistent with Redaction being global — regardless of a rule's capture level.
 - **FR7.8** Where a source is enabled, include its **privacy-relevant fields only** (e.g. ElementTextSAP, ElementLabelSAP, Value_UIAA, Name_UIAA); hide the source's structural/geometry fields.
-- **FR7.9** **Order of operations with Redaction:** redaction is applied **first** (mask/remove PII), then hashing — so redacted values are never hashed raw. By default the two features **do not overlap on identity**: identity fields (SystemUser, MachineName, UserId) are **hashed, not redacted** (the identity redaction presets ship off — FR6.1), so identity produces a stable joinable hash rather than `***`. If an Admin turns an identity redaction preset back on, redaction wins for that field and its hash is voided — surface this trade-off where the presets are toggled.
+- **FR7.9** **Order of operations with Redaction:** redaction is applied **first** (mask/remove PII), then hashing — so redacted values are never hashed raw. By default the two features **do not overlap on identity**: identity fields (SystemUser, MachineName, UserId) are **hashed, not redacted** (the identity redaction presets ship off — FR6.1), so identity produces a stable joinable hash rather than `*`**. If an Admin turns an identity redaction preset back on, redaction wins for that field and its hash is voided — surface this trade-off where the presets are toggled.
 
 ---
 
 ## User Story 8
+
 **As an Admin, I want to author the consent notice employees see, so data capture is transparent and lawfully based.**
 
 **Functional requirements:**
+
 - **FR8.1** User Consent is a **global (project-level) area**.
 - **FR8.2** **Consent Text** editor, pre-filled with an **editable example template** covering the six standard sections — purpose of processing, legal basis, categories of personal data, recipients, retention, and contact — clearly marked as an example to be adapted by the project lead.
 - **FR8.3** **Link to Additional Information** (optional) — a URL field (e.g. the company privacy policy).
@@ -145,11 +201,13 @@
 ---
 
 ## User Story 9
+
 **As an Admin, I want to review and adjust where captured data is sent and how it's cached, so the client connects to the right project without me setting it up from scratch.**
 
 *(Low-touch screen — most Admins rarely change it. All values are pre-filled; the Admin edits only if needed.)*
 
 **Functional requirements:**
+
 - **FR9.1** One screen, **two sections**: Platform Upload and Caching. **All fields pre-filled**; every field is editable.
 - **FR9.2** **Platform Upload** — Send Data to Celonis Platform (master toggle), Data Pool ID, Celonis Platform Team Subdomain, Server ID, Target Table Name, Image Service Bucket ID, Update Cloud Period (minutes). *(SQL generation lives only in More actions → Generate SQL 'CREATE TABLE' query, FR14.5 — not on this screen.)*
 - **FR9.3** **Caching** — Encrypt Local Data, Path for Transfer File Cache (with Browse), Number of Entries Limit, Timer Limit (minutes), Timeout (seconds), Auto Upload Old Cached Files, Maximum Cached File Age (optional, days).
@@ -158,11 +216,13 @@
 ---
 
 ## User Story 10
+
 **As an Admin, I want to control how and when the client records, so capture fits our environment and can be validated during setup.**
 
 *(Simple screen. All values pre-filled; the Admin edits only if needed.)*
 
 **Functional requirements:**
+
 - **FR10.1** One screen, **three sections**: Recording Behaviour, Live Event Monitor, Startup Mode.
 - **FR10.2** **Recording Behaviour** — general capture settings: Snippet Split Time (secs), Idle Waiting Time (mins), Alive Interval (mins), Use Native URL Retrieval, and the **UIAA** control.
 - **FR10.3** **Prominently present the UIAA (UI Automation Accessibility) toggle** with a **callout/description of its benefit** — some users didn't know what it was for. Enabling it **reveals the UIAA attribute family inside Capture Rules** (same producer→consumer conditional display as SAP). Include the companion **"Applications to exclude from UIAA"** field.
@@ -173,12 +233,14 @@
 ---
 
 ## User Story 11
+
 **As an Admin, I want to define custom attributes end users pick when they start recording, so every capture is tagged with context like which team ran it.**
 
 *Purpose: when an end user starts recording, the client prompts them to select from these custom attributes — e.g. Label "Team", value "HR-Payroll" — and all captures in that session are attributed accordingly (e.g. executed by someone from Payroll).*
 
 **Functional requirements:**
-- **FR11.1** The area opens with an **empty custom-attributes section** when none are defined yet.
+
+- **FR11.1** The area opens with a designed **empty state** when no attributes are defined yet — not a blank panel. It carries four things: an **icon**, a **title** naming what is absent ("No user attributes yet"), a **line explaining the consequence** (users go straight into recording without being asked anything, so nothing tags the session), and **no call to action of its own** — the create button already sits in the section header (FR11.2), and duplicating it would give one action two homes. The same empty-state pattern is used wherever a collection can be empty (FR12.2). *(Changed from v2, which only required that the section be "empty" — an empty region reads as broken or half-loaded, and it leaves the Admin with nothing to act on.)*
 - **FR11.2** A clear **Create custom attribute** button.
 - **FR11.3** Creating an attribute: enter a **Label** (required, e.g. "Team") and **add multiple Values** (at least one required, e.g. Payroll, Talent Acquisition, Finance).
 - **FR11.4** Option to **make the field mandatory** for end users ("Make this field mandatory for users").
@@ -190,11 +252,13 @@
 ---
 
 ## User Story 12
+
 **As an Admin, I want to enable browser extensions and define what data to pull from specific web pages, so browser-based work is captured with the right context.**
 
 **Functional requirements:**
+
 - **FR12.1** **General** — a **"Receive Data From All Extensions"** master toggle. Enabling it **reveals the extension/DOM attribute family inside Capture Rules** (URL, WepPageExtractions, DomPath, ExtensionName) — same producer→consumer conditional display as UIAA and SAP.
-- **FR12.2** **Web Page Data Extractions** (Google Chrome & Microsoft Edge) — a list of extraction rules with an **Add Rule** action; opens with an **empty state** when none are defined. This section is **shown only when "Receive Data From All Extensions" is on** — **hidden** otherwise (not greyed/disabled), consistent with how all source-gated sections behave (SAP retrieval settings, UIAA fields).
+- **FR12.2** **Web Page Data Extractions** (Google Chrome & Microsoft Edge) — a list of extraction rules with an **Add Rule** action. When the master toggle is **on but no rules exist**, show the same designed **empty state** as FR11.1: icon, title and consequence, with **no button of its own** (Add Rule stays in the section header). Here the consequence line must actively **correct a likely misreading** — that no extraction rules means no browser capture. It does not: browser activity is still captured, and an extraction rule is only needed to read a *specific* value off a page. Without that sentence an Admin may add rules they do not need, or assume the extensions are not working. This section is **shown only when "Receive Data From All Extensions" is on** — **hidden** otherwise (not greyed/disabled), consistent with how all source-gated sections behave (SAP retrieval settings, UIAA fields).
 - **FR12.3** Each extraction rule is defined by: **Key** (required — the name the extracted value is stored under), **URL** (required — the page the rule applies to), and **Path** (required — the element path/selector to extract from). Provide **inline guidance for Path creation with a worked example** (e.g. a sample selector/XPath), since users won't know the expected format.
 - **FR12.4** **Validation.** Reject an **invalid URL** — the Admin cannot save a rule with a malformed URL; show the error inline. Required fields (Key, URL, Path) must be filled before the rule can be saved.
 - **FR12.5** The Admin can **edit** and **delete** extraction rules (delete via confirmation dialog, per FR2.6).
@@ -203,11 +267,13 @@
 ---
 
 ## User Story 13
+
 **As an Admin, I want to enable SAP data capture and tune its retrieval, so SAP GUI work is captured reliably.**
 
 *(Simple screen. All values pre-filled; the Admin edits only if needed.)*
 
 **Functional requirements:**
+
 - **FR13.1** A **"Retrieve SAP Data"** master toggle. Enabling it **reveals the SAP attribute family inside Capture Rules** (ElementTextSAP, TransactionSAP, ScreenNumberSAP, etc.) — same producer→consumer conditional display as UIAA and Extensions. Keep the SAP fields hidden for non-SAP customers until this is on.
 - **FR13.2** Show the **retrieval settings only when "Retrieve SAP Data" is on** (hidden otherwise). Settings are **pre-filled and editable**: Number of Retry Attempts, Waiting Time for Retry (ms), SAP Process Monitor Interval (ms).
 - **FR13.3** **Dynamically Enable Native Windows Dialogs for SAP GUI Scripting** (toggle, off by default; shown with the other SAP settings when the master toggle is on).
@@ -216,9 +282,11 @@
 ---
 
 ## User Story 14
+
 **As an Admin, I want to export, import, and generate the table DDL for a configuration, so I can reuse configs across projects and set up the destination data model.**
 
 **Functional requirements:**
+
 - **FR14.1** These actions live behind the **More actions** menu next to Save (per FR1.4) — **not** a separate Configuration File tab.
 - **FR14.2** **Export configuration as JSON** (base64-encoded) — produces a portable file representing the full configuration.
 - **FR14.3** **Import configuration from JSON** (base64-encoded) — loads a configuration into the editor as the working (unsaved) state; it does not take effect until the Admin Saves.
@@ -227,4 +295,26 @@
 
 ---
 
-*All 14 stories drafted. Validation is captured inline per area (FR1.3, FR3.11, FR12.4) rather than as a dedicated story. Open item: C1 — identity-field default (hash vs redact) — see note below.*
+## User Story 15
+**As an Admin at a regulated customer, I want configuration changes to be reviewed and approved before they take effect for users, so that capture settings cannot be changed unilaterally.**
+
+*Context: customers with change-control obligations (e.g. investment banks) require sign-off before capture settings apply to their workforce. **The approval itself happens outside this application** — the Admin downloads the configuration, circulates it (email, Slack, an internal change-management ticket), and the approvers respond there. The app therefore cannot verify that approval occurred; its job is to make applying a **separate, deliberate, attested** act rather than a side effect of saving.*
+
+**Functional requirements:**
+- **FR15.1** **Save and Apply are separate actions.** **Save draft** persists the configuration without affecting any user; **Apply to all users** is what pushes it to the client population. A configuration therefore has three states: **working** (unsaved edits) · **saved draft** · **applied (live)**. Clients keep running the **applied** configuration for as long as a draft sits unapplied.
+- **FR15.2** **Rollout state is always visible**, as an indicator beside the page title (not among the actions — it describes the configuration, not an action):
+  - **Not applied** — nothing has ever been applied; no capture is running for this project yet. This takes precedence while true, even once a draft has been saved.
+  - **Draft** — a configuration is live, and a newer saved draft is waiting to be applied.
+  - **Live for all users** — the saved draft matches what users are running.
+- **FR15.3** **Apply always acts on the saved draft, and is unavailable while unsaved edits exist** (the button explains why: *"Save your draft first"*). This is deliberate: the artefact sent for approval is the saved draft, so the Admin cannot get sign-off, tweak something, and apply the tweaked version. It removes the need to fingerprint or diff the approved file.
+- **FR15.4** **Apply requires an attestation.** Confirm via a dialog stating that the settings take effect for **every user in this project straight away**, and that the Admin should continue **only if the configuration has been reviewed and approved**. **No inputs are captured** — no approver name, ticket reference or evidence. The app is not recording or verifying approval; the dialog exists to make the moment deliberate. Cancel and a primary **Apply to all users**; Escape cancels.
+- **FR15.5** **Download configuration file** — available from **More actions** (FR1.4), this produces the artefact the Admin circulates for approval. It downloads the **saved draft** (the thing that will be applied), as **human-readable** content, with a timestamped filename in the client's existing format: `generated_from_basic_settings_YYYY-MM-DD HH_MM_SS.recconf`. **Readability is the requirement, not a preference** — an approver who has never used this product must be able to read what they are approving, which the base64-encoded export of FR14.2 cannot satisfy. The two are separate artefacts with separate purposes: this one for human review, FR14.2's for machine round-tripping.
+- **FR15.6** **Apply is immediate.** Once confirmed, the configuration becomes the live one for all users; the confirmation copy says so plainly rather than implying a delayed rollout.
+- **FR15.7** **Approval covers the whole configuration**, not individual areas. There is one Save, one Apply, and one live configuration spanning all six areas — a change to a redaction pattern and a change to a screenshot setting go through the same gate.
+- **FR15.8** **Admins can apply.** No separate approver or publisher role exists in the product, because the approval step is external. Anyone who can edit the configuration can apply it.
+- **FR15.9** **No configuration version history.** Only two stored snapshots are required — the current **draft** and the current **live** configuration. Client settings are configured a handful of times during initial setup and rarely revisited, so a version list, rollback and change history are **out of scope**. *(Engineering note: two snapshots are nonetheless mandatory, not optional — without retaining the applied configuration separately, clients could not keep running it while a draft is pending, and the "Draft" state could not be detected.)*
+- **FR15.10** Validity gates **both** actions. Because Save is blocked while the configuration is invalid (FR1.3), a draft is always coherent, and so is the file sent for approval; Apply inherits the same guarantee.
+
+---
+
+*15 stories drafted. Validation is captured inline per area (FR1.3, FR3.11, FR12.4) rather than as a dedicated story. Open item: C1 — identity-field default (hash vs redact) — see note below. Parked: US14 import/export (FR14.2–FR14.4) pending Product confirmation of the use case.*
