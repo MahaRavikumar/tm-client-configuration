@@ -164,13 +164,12 @@
   - **Remove the value** — deleted, nothing left behind.
   - **Replace with a label** — fixed text such as `[redacted]`. The label is **required** when this action is chosen.
   - *(Expanded from v2's two options — asterisk mask or a tag. Partial masking and outright removal both exist in Sentry, Datadog and Google Cloud DLP, and partial masking is the one the card pattern actually needs.)*
-- **FR6.5** **Where a pattern looks.** Each pattern carries a scope with **two modes**, presented as an explicit either/or:
-  - **All maskable attributes** *(default)* — the pattern applies wherever it appears in captured text.
-  - **Selected attributes only** — reveals the maskable set with **everything ticked**, and the Admin unticks what they do not want.
-  - **The maskable set is defined by the engine, not the Admin** (confirmed by Engineering, 2026-08-05): Comment · Entered text · Clipboard text · Selected text · Active window · URL · Target element name · Target element value · Target link URL · Web page extractions · Element name (SAP) · Element text (SAP) · Window name (SAP) · User (SAP) · Control name (UIAA) · Control value (UIAA) · Help text (UIAA).
-  - **Attributes the capture rules match on are not in the set** — `ProcessName` and similar. Redacting them would stop the Admin's own scope conditions matching, so the engine excludes them and the UI cannot offer them.
-  - **A narrowed pattern with nothing selected is invalid** and blocks Submit; it would match nowhere and fail silently.
-  - **The two modes must be visibly exclusive.** *(v2 described only the checklist, and the existing product shows a dropdown reading "all attributes that can be masked" alongside a partial selection — which reads as a contradiction and which Engineering confirmed nobody could explain. The mode is the fix: "All" and "Custom" are choices, not a list plus a label.)*
+- **FR6.5** **Where a pattern looks.** Each pattern carries a per-attribute scope, shown as an **always-open accordion** — the same family/parent-toggle pattern as the capture-rules field families and the hashing picker. There is **no All/Selected mode switch**.
+  - **Everything is on by default.** A new pattern looks in every maskable attribute; the Admin narrows it by turning attributes off, group by group or individually.
+  - **Grouped, each group with a parent toggle** (all-on / mixed / off): **Captured text** · **SAP** · **UI Automation**. The maskable set is **engine-defined, not Admin-defined**: Comment · Entered text · Clipboard text · Selected text · Active window · URL · Target element name · Target element value · Target link URL · Web page extractions · Element name (SAP) · Element text (SAP) · Window name (SAP) · User (SAP) · Control name (UIAA) · Control value (UIAA) · Help text (UIAA).
+  - **The SAP and UI Automation groups are shown even when their source is off** — a deliberate departure from the producer→consumer rule used elsewhere. Redaction is a fail-safe: an Admin must be able to configure "mask these SAP fields" *before* SAP is enabled, so that turning SAP on later does not expose those fields unredacted until every pattern is revisited. See decision #60.
+  - **Attributes the capture rules match on are not in the set** — `ProcessName` and similar — because redacting them would stop the Admin's own scope conditions matching. The engine excludes them and the UI cannot offer them.
+  - **A pattern with every attribute off is invalid** and blocks Save; it would match nowhere and fail silently. *(Reworked from v2 and from an interim All/Selected two-mode design — see decision #58.)*
 - **FR6.6** Patterns apply **top-to-bottom in list order**; the Admin can **reorder** (move up/down). Order matters — patterns apply sequentially.
 - **FR6.7** The Admin can **delete** a pattern (confirmation dialog, per FR2.6).
 - **FR6.8** Data Redaction is a **project-level (global) area**, applied across all rules; redaction runs **on the client before upload**.
@@ -194,7 +193,9 @@
   - **Identity:** SystemUser, UserId, MachineName.
   - **Content / input:** EnteredText, ClipboardText, ClipboardContentType, SelectedText, TargetElementValue, Comment, KeyboardCommand.
   - **Potentially-identifying context:** ApplicationTitle, ActiveWindow, ActiveElementName, TargetElementName, URL, WepPageExtractions, DomPath.
-- **FR7.3** All displayed (privacy-relevant) fields are **checked by default**.
+- **FR7.3** **Only the Identity group is on by default** — System user, User ID, Machine name. The other groups (Content / input, Potentially identifying context) ship **off**, behind a **"Show other attributes"** disclosure, and are toggled on only if the Admin needs them. Each group has a **parent toggle** (all on / mixed / off), mirroring the capture-rules field families; there are no separate select-all / select-none buttons.
+  - **The attributes-to-hash section is hidden entirely while the master toggle is off** — there is nothing to configure until hashing is on.
+  - *(Changed from v2's "all displayed fields checked by default". Ankit, Lead VE, 2026-07-13: hashing is used "for system users and machine ids… nothing else." Defaulting all 17 on contradicted the one piece of field evidence we have, and over-broad hashing was itself a named pain point — a user found the feature useless because it swallowed whole subject lines. See decision #59.)*
 - **FR7.4** **Select-all / select-none** bulk actions.
 - **FR7.5** Hashing is **deterministic** (same input → same hash), so data stays **joinable** across events but de-identified.
 - **FR7.6** Show the warning that **hashing limits analysis scope**, so the trade-off is explicit.

@@ -521,20 +521,9 @@
         white-space:pre-wrap;min-height:44px}
   .rdempty{color:var(--grey2);font-style:italic}
   /* hashing attribute groups */
-  .hashgrp{margin-top:14px}
-  .hashgrp-t{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
-        color:var(--grey2);padding:0 0 4px}
 
   /* Try-it panel — deliberately outside the form: a scratchpad, not a saved field */
   /* Attribute picker, shown only when a pattern is narrowed */
-  .masksel{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:4px;background:#fcfcfd}
-  .masksel-h{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;
-        color:var(--grey);margin-bottom:10px}
-  .maskgrp{margin-bottom:10px}
-  .maskgrp:last-of-type{margin-bottom:0}
-  .maskgrp-t{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
-        color:var(--grey2);margin-bottom:6px}
-  .maskitem{display:flex;align-items:center;gap:9px;padding:4px 0;font-size:13.5px;color:var(--navy)}
 
   /* In flow with the form, marked off by a divider rather than by being its own panel */
   .rdtest{border-top:1px solid var(--line);margin-top:24px;padding-top:18px}
@@ -1235,6 +1224,7 @@ const MASKABLE=[
   {key:'HelpText_UIAA',      grp:'uiaa', label:'Help text'},
 ];
 const defaultMaskAttrs = () => { const o={}; MASKABLE.forEach(a=>o[a.key]=true); return o; };
+/* Every group is now shown and controllable regardless of source, so any on attribute counts. */
 const maskCount = d => MASKABLE.filter(a=>d.attrs && d.attrs[a.key]).length;
 
 const REDACT_ACTIONS={
@@ -1294,7 +1284,10 @@ const HASH_ATTRS=[
   {key:'DomPath',             grp:'context',  label:'DOM path'},
 ];
 /* All displayed attributes are checked by default (FR7.3). */
-const defaultHashAttrs = () => { const o={}; HASH_ATTRS.forEach(a=>o[a.key]=true); return o; };
+/* Identity on, everything else off. Ankit (2026-07-13): hashing is used "for system users and
+   machine ids… nothing else", so the Identity group is the default and the other groups start
+   off — they sit behind the "Show other attributes" disclosure as the occasional case. */
+const defaultHashAttrs = () => { const o={}; HASH_ATTRS.forEach(a=>o[a.key]=(a.grp==='identity')); return o; };
 /* Redaction wins over hashing (FR7.9), so an attribute an enabled rule already redacts cannot
    usefully be hashed. Returns the rule doing the covering, for the explanation shown beside it. */
 function redactionCovering(attrKey){
@@ -1317,21 +1310,21 @@ const initialConfig = () => ({
     redaction:{ rules:[
       {id:'rd-email', builtin:true, label:'Email addresses',
        description:'Anything shaped like an email address, wherever it appears in captured text.',
-       pattern:'[\\w.+-]+@[\\w-]+\\.[\\w.-]+', action:'mask', enabled:true, scope:'all', attrs:defaultMaskAttrs()},
+       pattern:'[\\w.+-]+@[\\w-]+\\.[\\w.-]+', action:'mask', enabled:true, attrs:defaultMaskAttrs()},
       {id:'rd-ssn', builtin:true, label:'Social security numbers',
        description:'US social security numbers, with or without dashes.',
-       pattern:'\\b\\d{3}-?\\d{2}-?\\d{4}\\b', action:'mask', enabled:true, scope:'all', attrs:defaultMaskAttrs()},
+       pattern:'\\b\\d{3}-?\\d{2}-?\\d{4}\\b', action:'mask', enabled:true, attrs:defaultMaskAttrs()},
       {id:'rd-card', builtin:true, label:'Credit card numbers',
        description:'13\u201316 digit card numbers, including ones written with spaces or dashes.',
-       pattern:'\\b(?:\\d[ -]?){13,16}\\b', action:'partial', enabled:true, scope:'all', attrs:defaultMaskAttrs()},
+       pattern:'\\b(?:\\d[ -]?){13,16}\\b', action:'partial', enabled:true, attrs:defaultMaskAttrs()},
       /* Off by default: identity is pseudonymised by Hashing instead, so a stable hash survives
          (FR6.1 / FR7.9). Their pattern is a token the client resolves per machine. */
       {id:'rd-winuser', builtin:true, label:'Windows username',
        description:'The signed-in Windows account name, wherever it appears \u2014 including inside file paths.',
-       pattern:'{{username}}', action:'mask', enabled:false, scope:'all', attrs:defaultMaskAttrs(), covers:['SystemUser']},
+       pattern:'{{username}}', action:'mask', enabled:false, attrs:defaultMaskAttrs(), covers:['SystemUser']},
       {id:'rd-machine', builtin:true, label:'Machine name',
        description:'The computer\u2019s name, wherever it appears.',
-       pattern:'{{machinename}}', action:'mask', enabled:false, scope:'all', attrs:defaultMaskAttrs(), covers:['MachineName']},
+       pattern:'{{machinename}}', action:'mask', enabled:false, attrs:defaultMaskAttrs(), covers:['MachineName']},
     ]},
     hashing:{enabled:true, attrs:defaultHashAttrs(), algorithm:'sha-256'},
     consent:{requireConsent:false, consentMessage:'This application captures activity data to help improve your workflows.', blockUntilGranted:false},
@@ -1958,24 +1951,8 @@ function areaHTML(area){
         ${toggleRow('hash','Hash selected attributes','',h.enabled,'p-hash')}
         ${h.enabled?`
           <div class="note warn">${svg('warn',17)}<span><b>Hashing limits what analysis can do.</b> A hashed value can be counted and grouped, but never read back — so anything that depends on the actual text, such as searching for a specific document number, stops working for these attributes.</span></div>
-          <div class="subhead" style="margin-top:22px;display:flex;align-items:center;gap:8px">
-            <span style="flex:1">Attributes to hash</span>
-            <button class="btn sm" data-hashall="1">Select all</button>
-            <button class="btn sm" data-hashnone="1">Select none</button>
-          </div>
-          ${HASH_GROUPS.map(g=>{
-            const items=HASH_ATTRS.filter(a=>a.grp===g.key);
-            return `<div class="hashgrp"><div class="hashgrp-t">${g.label}</div>
-              ${items.map(a=>{
-                const cover=redactionCovering(a.key);
-                const on=!!h.attrs[a.key];
-                return `<div class="trow ${cover?'off':(on?'':'off')}">
-                  <div class="tmain"><div class="tname">${a.label}</div>
-                    ${cover?`<div class="tdesc">Already redacted by <b>${esc(ruleLabel(cover))}</b> — hashing would have nothing left to hash.</div>`:''}</div>
-                  ${cover ? chk(false,'locked','') : chk(on,'',`data-hashattr="${a.key}"`)}
-                </div>`;
-              }).join('')}</div>`;
-          }).join('')}`:''}
+          <div class="subhead" style="margin-top:22px">Attributes to hash</div>
+          ${hashGroups()}`:''}
       </div></div>
 
       <div class="card"><div class="sechead"><div><h2>User consent</h2></div></div>
@@ -2325,6 +2302,88 @@ function renderExtract(){
 }
 /* Patch errors + Submit in place while typing, so the caret survives. */
 
+/* Hashing attribute picker, built on the same accordion as the rule editor's captured details:
+   one group row per family with its own parent switch, and the groups beyond Identity kept
+   behind a disclosure link. Identity is the only one VEs actually use (Ankit, 2026-07-13),
+   so it is the only one shown by default. */
+/* A pattern's "Where to look" scope, on the same accordion as hashing: one group row per family
+   with its own parent toggle, always open, everything on by default. Unlike capture rules, the
+   SAP / UI Automation groups are shown even when their source is off — redaction is a safety net,
+   so an Admin should be able to say "mask these SAP fields" before SAP is enabled, rather than
+   having those fields flow unredacted the moment it is turned on. `d` is the rule draft; its
+   `attrs` map holds the per-attribute on/off state. */
+function maskGroups(d){
+  const on = k => !!(d.attrs && d.attrs[k]);
+  return MASK_GROUPS.map(g=>{
+    const items=MASKABLE.filter(a=>a.grp===g.key);
+    if(!items.length) return '';
+    const onCount=items.filter(a=>on(a.key)).length;
+    const famCls = onCount===items.length ? 'on' : (onCount?'mixed':'');
+    const sum = onCount===items.length ? 'All on' : (onCount?`${onCount} of ${items.length}`:'Off');
+    const sumCls = onCount===items.length ? '' : (onCount?'part':'off');
+    const gid='mask:'+g.key, open=capOpen.has(gid);
+    return `<div class="cgrp ${open?'open':''}">
+      <div class="cghead" data-grp="${gid}" role="button" aria-expanded="${open}" tabindex="0">
+        <span class="cgchev">${svg('chevR',15)}</span>
+        <div class="cgtitle">${g.label}</div>
+        <span class="cgsum ${sumCls}">${sum}</span>
+        <button class="switch ${famCls}" data-rdmaskfam="${g.key}" aria-label="Toggle all in ${g.label}"></button>
+      </div>
+      ${open?`<div class="cgbody">${items.map(a=>`
+        <div class="trow ${on(a.key)?'':'off'}">
+          <div class="tmain"><div class="tname">${a.label}</div></div>
+          ${chk(on(a.key),'',`data-rdattr="${a.key}"`)}
+        </div>`).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function hashGroups(){
+  const h=state.working.privacy.hashing;
+  const attrsOf = g => HASH_ATTRS.filter(a=>a.grp===g.key);
+  /* An attribute an enabled redaction pattern already covers is out of play entirely, so it is
+     excluded from the group's own on/off maths as well as being locked in the list (FR7.9a). */
+  const live = g => attrsOf(g).filter(a=>!redactionCovering(a.key));
+  const oneGroup = g => {
+    const all=attrsOf(g), usable=live(g);
+    if(!all.length) return '';
+    const on=usable.filter(a=>!!h.attrs[a.key]).length;
+    const famCls = usable.length&&on===usable.length ? 'on' : (on?'mixed':'');
+    const sum = !usable.length ? 'Redacted' : (on===usable.length ? 'All on' : (on?`${on} of ${usable.length}`:'Off'));
+    const sumCls = (usable.length&&on===usable.length) ? '' : (on?'part':'off');
+    const gid='hash:'+g.key, open=capOpen.has(gid);
+    return `<div class="cgrp ${open?'open':''}">
+      <div class="cghead" data-grp="${gid}" role="button" aria-expanded="${open}" tabindex="0">
+        <span class="cgchev">${svg('chevR',15)}</span>
+        <div class="cgtitle">${g.label}</div>
+        <span class="cgsum ${sumCls}">${sum}</span>
+        <button class="switch ${famCls} ${usable.length?'':'locked'}"
+          ${usable.length?`data-hashfam="${g.key}" aria-label="Toggle all in ${g.label}"`:''}></button>
+      </div>
+      ${open?`<div class="cgbody">${all.map(a=>{
+        const cover=redactionCovering(a.key);
+        const isOn=!cover&&!!h.attrs[a.key];
+        return `<div class="trow ${isOn?'':'off'}">
+          <div class="tmain"><div class="tname">${a.label}</div>
+            ${cover?`<div class="tdesc">Already redacted by <b>${esc(ruleLabel(cover))}</b> — hashing would have nothing left to hash.</div>`:''}</div>
+          ${cover?chk(false,'locked',''):chk(isOn,'',`data-hashattr="${a.key}"`)}
+        </div>`;
+      }).join('')}</div>`:''}
+    </div>`;
+  };
+  const primary=HASH_GROUPS.filter(g=>g.key==='identity');
+  const others =HASH_GROUPS.filter(g=>g.key!=='identity');
+  let html=primary.map(oneGroup).join('');
+  if(others.length){
+    const shown=capShowRare.has('hash');
+    const n=others.reduce((a,g)=>a+attrsOf(g).length,0);
+    html+=`<button class="rarelink ${shown?'open':''}" data-showrare="hash">
+      <span class="rchev">${svg('chevR',14)}</span>${shown?'Hide':'Show'} other attributes${shown?'':`<span class="rarecount">${n}</span>`}</button>`;
+    if(shown) html+=others.map(oneGroup).join('');
+  }
+  return html;
+}
+
 function redactRow(r){
   return `<div class="rdrow ${r.enabled?'':'off'}" draggable="true" data-dragitem="${r.id}" data-draglist="redact">
     <div class="rc-grip" title="Drag to reorder" data-grip="1">${svg('grip',18)}</div>
@@ -2352,8 +2411,8 @@ function rdErr(d){
     try{ new RegExp(d.pattern); }catch(e){ return 'That expression is not valid.'; }
   }
   if(d.action==='replace' && !String(d.tag||'').trim()) return 'Enter the text to put in its place.';
-  // A narrowed pattern with nothing ticked would match nowhere and fail silently.
-  if(d.scope==='selected' && maskCount(d)===0) return 'Choose at least one attribute to look in.';
+  // Every attribute off means the pattern matches nowhere and fails silently.
+  if(maskCount(d)===0) return 'Turn on at least one attribute for this pattern to look in.';
   return '';
 }
 /* Patch the dialog's errors, Submit state and live result in place — no re-render, so the
@@ -2390,10 +2449,10 @@ function refreshRedact(){
 }
 function openRedact(id){
   const found=id?rdList().find(x=>x.id===id):null;
-  // An uploaded config from before scope existed has neither field — treat it as "all".
-  if(found){ if(!found.scope) found.scope='all'; if(!found.attrs) found.attrs=defaultMaskAttrs(); }
+  // A pattern from before per-attribute scope existed has no attrs map — default to all on.
+  if(found && !found.attrs) found.attrs=defaultMaskAttrs();
   rdIsNew=!found;
-  rdDraft=found?clone(found):{id:'rd-'+Date.now(),builtin:false,label:'',description:'',pattern:'',action:'mask',tag:'',enabled:true,scope:'all',attrs:defaultMaskAttrs()};
+  rdDraft=found?clone(found):{id:'rd-'+Date.now(),builtin:false,label:'',description:'',pattern:'',action:'mask',tag:'',enabled:true,attrs:defaultMaskAttrs()};
   rdSample='Contact ravi.avvari@acme.com or call about invoice 4532 8899 1234 5678.';
   renderRedact();
   const f=$('#rd-label')||$('#rd-sample'); if(f) f.focus();
@@ -2448,29 +2507,6 @@ function renderRedact(){
           <input id="rd-tag" class="mono-in" value="${esc(d.tag||'')}" placeholder="[redacted]" autocomplete="off">
           <div class="errmsg" id="rd-tag-err" role="alert" style="display:none">${svg('warn',14)}<span></span></div></div>`:''}
 
-        <div class="subhead" style="margin-top:24px">Where to look</div>
-        <div role="radiogroup" aria-label="Where to look">
-          <div class="optrow ${d.scope!=='selected'?'sel':''}" data-rdscope="all" role="radio" aria-checked="${d.scope!=='selected'}" tabindex="0">
-            <span class="orc"></span><div><div class="orname">All maskable attributes</div>
-              <div class="ordesc">Wherever this pattern appears in captured text. The usual choice.</div></div></div>
-          <div class="optrow ${d.scope==='selected'?'sel':''}" data-rdscope="selected" role="radio" aria-checked="${d.scope==='selected'}" tabindex="0">
-            <span class="orc"></span><div><div class="orname">Selected attributes only</div>
-              <div class="ordesc">Narrow it — for example redact emails in comments but leave URLs alone.</div></div></div>
-        </div>
-        ${d.scope==='selected'?`
-          <div class="masksel">
-            <div class="masksel-h"><span style="flex:1">${maskCount(d)} of ${MASKABLE.length} selected</span>
-              <button class="btn sm" data-rdattrall="1">Select all</button>
-              <button class="btn sm" data-rdattrnone="1">Select none</button></div>
-            ${MASK_GROUPS.map(g=>{
-              const items=MASKABLE.filter(a=>a.grp===g.key);
-              return `<div class="maskgrp"><div class="maskgrp-t">${g.label}</div>
-                ${items.map(a=>`<div class="maskitem">
-                  ${chk(!!d.attrs[a.key],'',`data-rdattr="${a.key}"`)}<span>${a.label}</span>
-                </div>`).join('')}</div>`;
-            }).join('')}
-          </div>`:''}
-
         <!-- Scrolls with the form, set off by a divider \u2014 it is a scratchpad, not a saved field. -->
         <div class="rdtest">
           <div class="rdtest-h">Try it <span class="rdtest-note">nothing here is saved</span></div>
@@ -2480,6 +2516,10 @@ function renderRedact(){
                <div class="rdresult"><div class="rdresult-t">Result <span class="rdtest-note">this pattern only</span></div>
                  <div class="rdresult-b mono" id="rd-result">${esc(redactSample(rdSample,[{...d,enabled:true}]))}</div></div>`}
         </div>
+
+        <div class="subhead" style="margin-top:24px">Where to look</div>
+        <div class="shint" style="margin:-4px 0 12px">Everything is on by default — turn off any attribute this pattern should skip.</div>
+        ${maskGroups(d)}
       </div>
 
       <div class="modal-foot">
@@ -2584,12 +2624,15 @@ document.addEventListener('click',e=>{
   if(near('data-rdcancel')){ closeRedact(); return; }
   const rdsub=near('data-rdsubmit');
   if(rdsub){ if(!rdsub.disabled) submitRedact(); return; }
-  const rdsc=near('data-rdscope');
-  if(rdsc){ if(rdDraft){ rdDraft.scope=rdsc.dataset.rdscope; renderRedact(); } return; }
   const rdat=near('data-rdattr');
   if(rdat){ if(rdDraft){ const k=rdat.dataset.rdattr; rdDraft.attrs[k]=!rdDraft.attrs[k]; renderRedact(); } return; }
-  if(near('data-rdattrall')){ if(rdDraft){ MASKABLE.forEach(a=>rdDraft.attrs[a.key]=true); renderRedact(); } return; }
-  if(near('data-rdattrnone')){ if(rdDraft){ MASKABLE.forEach(a=>rdDraft.attrs[a.key]=false); renderRedact(); } return; }
+  const rdmf=near('data-rdmaskfam');
+  if(rdmf){ if(rdDraft){
+    const items=MASKABLE.filter(a=>a.grp===rdmf.dataset.rdmaskfam);
+    const allOn=items.every(a=>rdDraft.attrs[a.key]);
+    items.forEach(a=>rdDraft.attrs[a.key]=!allOn);
+    renderRedact();
+  } return; }
   if(near('data-rdadd')){ openRedact(null); return; }
   const rded=near('data-rdedit');
   if(rded){ openRedact(rded.dataset.rdedit); return; }
@@ -2611,8 +2654,15 @@ document.addEventListener('click',e=>{
   // Hashing attribute selection (US7)
   const hattr=near('data-hashattr');
   if(hattr){ const a=state.working.privacy.hashing.attrs; const k=hattr.dataset.hashattr; a[k]=!a[k]; render(); return; }
-  if(near('data-hashall')){ HASH_ATTRS.forEach(a=>state.working.privacy.hashing.attrs[a.key]=true); render(); return; }
-  if(near('data-hashnone')){ HASH_ATTRS.forEach(a=>state.working.privacy.hashing.attrs[a.key]=false); render(); return; }
+  const hfam=near('data-hashfam');
+  if(hfam){
+    const h=state.working.privacy.hashing;
+    // Only attributes still in play count — a redacted one cannot be turned on either way.
+    const usable=HASH_ATTRS.filter(a=>a.grp===hfam.dataset.hashfam && !redactionCovering(a.key));
+    const allOn=usable.length>0 && usable.every(a=>!!h.attrs[a.key]);
+    usable.forEach(a=>h.attrs[a.key]=!allOn);
+    render(); return;
+  }
 
   // Extraction dialog (US12) — owns the interaction while open.
   if(near('data-excancel')){ closeExtract(); return; }
