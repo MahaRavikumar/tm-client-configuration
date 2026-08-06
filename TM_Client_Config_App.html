@@ -429,11 +429,11 @@
         padding:2px;border-radius:5px}
   .rc-grip:hover{color:var(--grey);background:var(--subtle)}
   .rulecard[draggable="true"]:active .rc-grip,.rc-grip:active{cursor:grabbing}
-  .rulecard.dragging{opacity:.45}
-  .rulecard.drop-before::before,.rulecard.drop-after::after{content:"";position:absolute;left:0;right:0;
+  [data-dragitem].dragging{opacity:.45}
+  [data-dragitem].drop-before::before,[data-dragitem].drop-after::after{content:"";position:absolute;left:0;right:0;
         height:3px;background:var(--indigo);border-radius:3px}
-  .rulecard.drop-before::before{top:-8px}
-  .rulecard.drop-after::after{bottom:-8px}
+  [data-dragitem].drop-before::before{top:-8px}
+  [data-dragitem].drop-after::after{bottom:-8px}
   /* default / fallback rule */
   .rule-fallback-label{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
         color:var(--grey2);margin:22px 0 10px}
@@ -497,6 +497,60 @@
         font-size:12.5px;min-height:78px;resize:vertical;line-height:1.5}
   .pathhelp{font-size:12.5px;color:var(--grey);margin-top:7px;line-height:1.65}
   .pathhelp .ph-eg{display:block;margin-top:3px}
+
+  /* ---- Data redaction rule rows (US6) ---- */
+  .rdrow{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;background:#fff;
+        border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+  .rdrow.off{background:#fcfcfd}
+  .rdrow.off .rdname,.rdrow.off .rdwhat{opacity:.55}
+  .rdrow .rdord{display:flex;flex-direction:column;gap:2px;flex:none;margin-top:1px}
+  .rdrow .rdmain{flex:1;min-width:0}
+  .rdrow .rdhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .rdrow .rdname{font-weight:600;font-size:14px;color:var(--navy)}
+  .rdrow .rdwhat{font-size:12.5px;color:var(--grey);margin-top:4px;line-height:1.55}
+  .rdrow .rdacts{display:flex;align-items:center;gap:4px;flex:none}
+  /* built-in matcher, shown read-only in the editor */
+  .rdbuiltin{border:1px solid var(--line);background:var(--subtle);border-radius:10px;padding:13px 14px}
+  .rdbuiltin .rdname{font-weight:600;font-size:14px;color:var(--navy);display:flex;align-items:center;gap:8px}
+  .rdbuiltin .rdwhat{font-size:13px;color:var(--grey);margin-top:5px;line-height:1.55}
+  /* sample tester result */
+  .rdresult{border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+  .rdresult-t{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+        color:var(--grey2);padding:8px 12px;background:var(--subtle);border-bottom:1px solid var(--line)}
+  .rdresult-b{padding:12px;font-size:12.5px;line-height:1.6;color:var(--ink);word-break:break-word;
+        white-space:pre-wrap;min-height:44px}
+  .rdempty{color:var(--grey2);font-style:italic}
+  /* hashing attribute groups */
+  .hashgrp{margin-top:14px}
+  .hashgrp-t{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+        color:var(--grey2);padding:0 0 4px}
+
+  /* Try-it panel — deliberately outside the form: a scratchpad, not a saved field */
+  /* Attribute picker, shown only when a pattern is narrowed */
+  .masksel{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:4px;background:#fcfcfd}
+  .masksel-h{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;
+        color:var(--grey);margin-bottom:10px}
+  .maskgrp{margin-bottom:10px}
+  .maskgrp:last-of-type{margin-bottom:0}
+  .maskgrp-t{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+        color:var(--grey2);margin-bottom:6px}
+  .maskitem{display:flex;align-items:center;gap:9px;padding:4px 0;font-size:13.5px;color:var(--navy)}
+
+  /* In flow with the form, marked off by a divider rather than by being its own panel */
+  .rdtest{border-top:1px solid var(--line);margin-top:24px;padding-top:18px}
+  .rdtest-h{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+        color:var(--grey2);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .rdtest-note{text-transform:none;letter-spacing:0;font-weight:400;font-size:11.5px;color:var(--grey2)}
+  .rdtest textarea{width:100%;border:1px solid var(--line2);border-radius:8px;padding:8px 10px;
+        font-family:inherit;font-size:13px;resize:vertical;background:#fff}
+  .rdtest textarea:focus{outline:none;border-color:var(--indigo);box-shadow:0 0 0 3px var(--indigo-soft)}
+  .rdresult{margin-top:9px}
+  .rdresult-t{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+        color:var(--grey2);margin-bottom:5px;display:flex;align-items:center;gap:8px}
+  .rdresult-b{background:var(--subtle);border:1px solid var(--line);border-radius:8px;padding:9px 11px;
+        font-size:12.5px;color:var(--ink);min-height:20px;word-break:break-word;line-height:1.55}
+  .rdrow .rdname{font-weight:600;font-size:14px;color:var(--navy)}
+  .rdrow .rdwhat{font-size:13px;color:var(--grey);margin-top:3px;line-height:1.5}
 
   /* radio rows — used where each option needs its own explanation, which a dropdown can't show */
   .optrow{display:flex;align-items:flex-start;gap:12px;padding:14px 15px;background:#fff;
@@ -635,7 +689,7 @@
           <div class="titlerow-actions">
             <button class="iconbtn" id="moreBtn" aria-label="More actions" title="More actions"></button>
             <button class="btn" id="saveBtn" disabled>Save draft</button>
-            <button class="btn primary" id="applyBtn" disabled>Apply to all users</button>
+            <button class="btn primary" id="applyBtn" disabled>Apply</button>
           </div>
         </div>
         <div class="pagebody tabs" id="pagebody">
@@ -653,6 +707,7 @@
 <div class="modal-ov" id="ruleModal" hidden></div>
 <div class="modal-ov" id="uaModal" hidden></div>
 <input type="file" id="configFile" accept=".recconf,.json,application/json" hidden>
+<div class="modal-ov" id="redactModal" hidden></div>
 <div class="modal-ov" id="extractModal" hidden></div>
 <div class="modal-ov modal-ov--confirm" id="confirmModal" hidden></div>
 
@@ -693,6 +748,7 @@ const I = {
   chevR:'<path d="m9 5 7 7-7 7"/>',
   chevL:'<path d="m15 5-7 7 7 7"/>',
   chevD:'<path d="m6 9 6 6 6-6"/>',
+  chevU:'<path d="m6 15 6-6 6 6"/>',
   plus:'<path d="M12 5v14M5 12h14"/>',
   wrap:'<path d="M4 7V5a1 1 0 0 1 1-1h2M4 17v2a1 1 0 0 0 1 1h2M20 7V5a1 1 0 0 0-1-1h-2M20 17v2a1 1 0 0 1-1 1h-2"/>',
   more:'<path d="M6 12h.01M12 12h.01M18 12h.01"/>',
@@ -1140,6 +1196,112 @@ function formInvalidReason(){
 }
 function formValid(){ return !formInvalidReason(); }
 
+/* =========================================================
+   Privacy: redaction detectors, actions, and the hashing attribute set (US6 / US7)
+   ========================================================= */
+/* Built-in detectors are maintained by us, not rewritten by the Admin — a customer editing the
+   credit-card expression breaks it silently, and the failure is invisible. Custom rules carry
+   their own expression instead. Pattern follows Sentry's "data type" and Datadog's rule library.
+   `covers` names the hashing attributes a rule makes redundant (FR7.9). */
+/* What to do with a match. Same four-action vocabulary the reference products use, plus partial
+   masking — useful here for keeping a URL's domain or a card's last four digits. */
+/* ---- Where a pattern looks (FR6.5) ----
+   The engine decides which attributes are maskable at all; this is that set, confirmed by
+   Engineering 2026-08-05. Attributes the capture rules depend on — ProcessName and the like —
+   are deliberately absent, so an Admin cannot redact a field their own scope conditions match on.
+   Every pattern starts at "all" and the Admin narrows only if they need to. */
+const MASK_GROUPS=[
+  {key:'core', label:'Captured text'},
+  {key:'sap',  label:'SAP',           src:'sap'},
+  {key:'uiaa', label:'UI Automation', src:'uiaa'},
+];
+const MASKABLE=[
+  {key:'Comment',            grp:'core', label:'Comment'},
+  {key:'EnteredText',        grp:'core', label:'Entered text'},
+  {key:'ClipboardText',      grp:'core', label:'Clipboard text'},
+  {key:'SelectedText',       grp:'core', label:'Selected text'},
+  {key:'ActiveWindow',       grp:'core', label:'Active window'},
+  {key:'URL',                grp:'core', label:'URL'},
+  {key:'TargetElementName',  grp:'core', label:'Target element name'},
+  {key:'TargetElementValue', grp:'core', label:'Target element value'},
+  {key:'TargetLinkURL',      grp:'core', label:'Target link URL'},
+  {key:'WebPageExtractions', grp:'core', label:'Web page extractions'},
+  {key:'ElementNameSAP',     grp:'sap',  label:'Element name'},
+  {key:'ElementTextSAP',     grp:'sap',  label:'Element text'},
+  {key:'WindowNameSAP',      grp:'sap',  label:'Window name'},
+  {key:'UserSAP',            grp:'sap',  label:'User'},
+  {key:'Name_UIAA',          grp:'uiaa', label:'Control name'},
+  {key:'Value_UIAA',         grp:'uiaa', label:'Control value'},
+  {key:'HelpText_UIAA',      grp:'uiaa', label:'Help text'},
+];
+const defaultMaskAttrs = () => { const o={}; MASKABLE.forEach(a=>o[a.key]=true); return o; };
+const maskCount = d => MASKABLE.filter(a=>d.attrs && d.attrs[a.key]).length;
+
+const REDACT_ACTIONS={
+  mask:    {label:'Mask completely',        chip:'Masked',      about:'Replace every character with •'},
+  partial: {label:'Mask all but the last 4', chip:'Last 4 kept', about:'Keep the final four characters, mask the rest'},
+  remove:  {label:'Remove the value',       chip:'Removed',     about:'Delete it, leaving nothing behind'},
+  replace: {label:'Replace with a label',   chip:'Replaced',    about:'Swap in fixed text, such as [redacted]'},
+};
+function applyAction(match,rule){
+  switch(rule.action){
+    case 'remove':  return '';
+    case 'replace': return rule.tag||'[redacted]';
+    case 'partial': return match.length>4 ? '•'.repeat(match.length-4)+match.slice(-4) : '•'.repeat(match.length);
+    default:        return '•'.repeat(match.length);
+  }
+}
+const ruleLabel = r => r.label || 'Untitled pattern';
+/* A pattern containing a {{token}} is resolved on the user's machine, so it cannot be tried here. */
+const hasToken = p => /\{\{[a-z]+\}\}/i.test(String(p||''));
+/* Compile a rule's matcher: a built-in detector, or the Admin's own expression. */
+function ruleRegex(r){
+  if(!r.pattern || hasToken(r.pattern)) return null;
+  try{ return new RegExp(r.pattern,'g'); }catch(e){ return null; }
+}
+/* Run the enabled rules over sample text, in list order — order matters (FR6.6). */
+function redactSample(text,rules){
+  let out=String(text||'');
+  (rules||[]).filter(r=>r.enabled).forEach(r=>{
+    const re=ruleRegex(r); if(!re) return;
+    out=out.replace(re,m=>applyAction(m,r));
+  });
+  return out;
+}
+/* Hashing attribute set, curated to privacy-relevant fields only (FR7.2). */
+const HASH_GROUPS=[
+  {key:'identity', label:'Identity'},
+  {key:'content',  label:'Content / input'},
+  {key:'context',  label:'Potentially identifying context'},
+];
+const HASH_ATTRS=[
+  {key:'SystemUser',          grp:'identity', label:'System user'},
+  {key:'UserId',              grp:'identity', label:'User ID'},
+  {key:'MachineName',         grp:'identity', label:'Machine name'},
+  {key:'EnteredText',         grp:'content',  label:'Entered text'},
+  {key:'ClipboardText',       grp:'content',  label:'Clipboard text'},
+  {key:'ClipboardContentType',grp:'content',  label:'Clipboard content type'},
+  {key:'SelectedText',        grp:'content',  label:'Selected text'},
+  {key:'TargetElementValue',  grp:'content',  label:'Target element value'},
+  {key:'Comment',             grp:'content',  label:'Comment'},
+  {key:'KeyboardCommand',     grp:'content',  label:'Keyboard command'},
+  {key:'ApplicationTitle',    grp:'context',  label:'Application title'},
+  {key:'ActiveWindow',        grp:'context',  label:'Active window'},
+  {key:'ActiveElementName',   grp:'context',  label:'Active element name'},
+  {key:'TargetElementName',   grp:'context',  label:'Target element name'},
+  {key:'URL',                 grp:'context',  label:'URL'},
+  {key:'WepPageExtractions',  grp:'context',  label:'Web page extractions'},
+  {key:'DomPath',             grp:'context',  label:'DOM path'},
+];
+/* All displayed attributes are checked by default (FR7.3). */
+const defaultHashAttrs = () => { const o={}; HASH_ATTRS.forEach(a=>o[a.key]=true); return o; };
+/* Redaction wins over hashing (FR7.9), so an attribute an enabled rule already redacts cannot
+   usefully be hashed. Returns the rule doing the covering, for the explanation shown beside it. */
+function redactionCovering(attrKey){
+  return (state.working.privacy.redaction.rules||[]).find(r=>
+    r.enabled && (r.covers||[]).includes(attrKey)) || null;
+}
+
 /* The full, editable configuration document */
 const initialConfig = () => ({
   captureRules:{ rules:[
@@ -1149,14 +1311,29 @@ const initialConfig = () => ({
     {id:'default', name:'Default rule', scope:null, level:'full', isDefault:true, custom:defaultCustom()},
   ]},
   privacy:{
-    redaction:{ presets:[
-      {key:'email',label:'Email address',enabled:true},
-      {key:'ssn',label:'Social security number',enabled:true},
-      {key:'credit-card',label:'Credit card number',enabled:true},
-      {key:'windows-username',label:'Windows username',enabled:false},
-      {key:'machine-name',label:'Machine name',enabled:false},
-    ], customRules:[]},
-    hashing:{hashIdentity:true, algorithm:'sha-256', salt:''},
+    /* One ordered list of rules, each "what to look for" + "what to do about it" — the shape
+       Sentry, Datadog and Google Cloud DLP all converge on. Built-ins ship enabled per FR6.1;
+       their matcher is ours to maintain, but the action and on/off are the Admin's. */
+    redaction:{ rules:[
+      {id:'rd-email', builtin:true, label:'Email addresses',
+       description:'Anything shaped like an email address, wherever it appears in captured text.',
+       pattern:'[\\w.+-]+@[\\w-]+\\.[\\w.-]+', action:'mask', enabled:true, scope:'all', attrs:defaultMaskAttrs()},
+      {id:'rd-ssn', builtin:true, label:'Social security numbers',
+       description:'US social security numbers, with or without dashes.',
+       pattern:'\\b\\d{3}-?\\d{2}-?\\d{4}\\b', action:'mask', enabled:true, scope:'all', attrs:defaultMaskAttrs()},
+      {id:'rd-card', builtin:true, label:'Credit card numbers',
+       description:'13\u201316 digit card numbers, including ones written with spaces or dashes.',
+       pattern:'\\b(?:\\d[ -]?){13,16}\\b', action:'partial', enabled:true, scope:'all', attrs:defaultMaskAttrs()},
+      /* Off by default: identity is pseudonymised by Hashing instead, so a stable hash survives
+         (FR6.1 / FR7.9). Their pattern is a token the client resolves per machine. */
+      {id:'rd-winuser', builtin:true, label:'Windows username',
+       description:'The signed-in Windows account name, wherever it appears \u2014 including inside file paths.',
+       pattern:'{{username}}', action:'mask', enabled:false, scope:'all', attrs:defaultMaskAttrs(), covers:['SystemUser']},
+      {id:'rd-machine', builtin:true, label:'Machine name',
+       description:'The computer\u2019s name, wherever it appears.',
+       pattern:'{{machinename}}', action:'mask', enabled:false, scope:'all', attrs:defaultMaskAttrs(), covers:['MachineName']},
+    ]},
+    hashing:{enabled:true, attrs:defaultHashAttrs(), algorithm:'sha-256'},
     consent:{requireConsent:false, consentMessage:'This application captures activity data to help improve your workflows.', blockUntilGranted:false},
   },
   // FR9.2 / FR9.3 — matches the product's Data Connection screen. Every value ships pre-filled
@@ -1187,7 +1364,7 @@ const initialConfig = () => ({
   clientBehaviour:{
     snippetSplitSecs:20, idleWaitingMins:10, aliveIntervalMins:15,
     nativeUrlRetrieval:true,
-    liveEventMonitor:false,
+    viewCapturedEvents:false,
     uiaa:{enabled:false, excludeApps:''},
     startupMode:'manual',        // 'auto' | 'manual'
     minimizeOnStart:false,
@@ -1322,6 +1499,7 @@ function render(){
   else c.innerHTML = areaHTML(state.area);
   renderRuleModal();   // the rule editor lives in a dialog over the list (FR1.6)
   renderExtract();     // …as does the extraction editor (US12)
+  renderRedact();      // …and the redaction rule editor (US6)
   renderUA();          // …and the user-attribute editor (US11)
   syncNotch();  // align the Captured-details pull-out notch under the selected level card
 }
@@ -1426,6 +1604,7 @@ function closeConfirm(){ confirmAction=null; const box=$('#confirmModal'); box.h
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape') return;
   if(!$('#confirmModal').hidden){ e.stopImmediatePropagation(); closeConfirm(); return; }
+  if(rdDraft){ e.stopImmediatePropagation(); closeRedact(); return; }
   if(exDraft){ e.stopImmediatePropagation(); closeExtract(); return; }
   if(uaDraft){ e.stopImmediatePropagation(); closeUA(); return; }
 },true);
@@ -1453,7 +1632,7 @@ document.addEventListener('keydown',e=>{
 /* ---------- Capture Rules: list (separate rule cards) ---------- */
 function ruleCard(r,draggable){
   const lv=LEVELS[r.level];
-  return `<div class="rulecard${draggable?'':' rulecard--default'}" data-open="${r.id}" ${draggable?'draggable="true"':''}>
+  return `<div class="rulecard${draggable?'':' rulecard--default'}" data-open="${r.id}" ${draggable?`draggable="true" data-dragitem="${r.id}" data-draglist="rules"`:''}>
     ${draggable
       ? `<div class="rc-grip" title="Drag to reorder" data-grip="1">${svg('grip',18)}</div>`
       : `<div class="rc-grip rc-grip--none" aria-hidden="true"></div>`}
@@ -1763,16 +1942,40 @@ function screenshotMode(r){
 function areaHTML(area){
   const w=state.working;
   if(area==='privacy'){
-    return `<div class="card"><div class="sechead"><div style="flex:1"><h2>Data redaction</h2><div class="shint">Patterns removed before data leaves the machine.</div></div>
-        <button class="btn sm">${svg('plus',16)} Add pattern</button></div>
-      <div class="cbody">${w.privacy.redaction.presets.map((p,i)=>toggleRow('shield',p.label,'',p.enabled,`p-redact:${i}`)).join('')}</div></div>
-
-      <div class="card"><div class="sechead"><div><h2>Hashing</h2></div></div>
+    const rules=w.privacy.redaction.rules, h=w.privacy.hashing;
+    return `<div class="card"><div class="sechead"><div style="flex:1"><h2>Data redaction</h2>
+        <div class="shint">Values matched here are masked or removed <b>on the user's machine, before anything is uploaded</b>. Patterns run in order, top to bottom \u2014 drag one by its handle to change the order.</div></div>
+        <button class="btn sm" data-rdadd="1">${svg('plus',16)} Add pattern</button></div>
       <div class="cbody">
-        ${toggleRow('hash','Hash identity fields','Anonymise usernames &amp; machine IDs globally instead of redacting them.',w.privacy.hashing.hashIdentity,'p-hash')}
-        <div class="field" style="margin-top:16px"><label>Algorithm</label>
-          <select id="p-alg"><option value="sha-256" ${w.privacy.hashing.algorithm==='sha-256'?'selected':''}>SHA-256</option>
-          <option value="sha-512" ${w.privacy.hashing.algorithm==='sha-512'?'selected':''}>SHA-512</option></select></div>
+        ${rules.length ? rules.map(redactRow).join('')
+          : emptyState('shield','No redaction rules',
+              'Captured text is uploaded exactly as recorded. Add a rule to mask or remove sensitive values before they leave the machine.')}
+      </div></div>
+
+      <div class="card"><div class="sechead"><div style="flex:1"><h2>Hashing</h2>
+        <div class="shint">Replaces a value with a consistent, unreadable string. You can still group and count by it, but never read it.</div></div></div>
+      <div class="cbody">
+        ${toggleRow('hash','Hash selected attributes','',h.enabled,'p-hash')}
+        ${h.enabled?`
+          <div class="note warn">${svg('warn',17)}<span><b>Hashing limits what analysis can do.</b> A hashed value can be counted and grouped, but never read back — so anything that depends on the actual text, such as searching for a specific document number, stops working for these attributes.</span></div>
+          <div class="subhead" style="margin-top:22px;display:flex;align-items:center;gap:8px">
+            <span style="flex:1">Attributes to hash</span>
+            <button class="btn sm" data-hashall="1">Select all</button>
+            <button class="btn sm" data-hashnone="1">Select none</button>
+          </div>
+          ${HASH_GROUPS.map(g=>{
+            const items=HASH_ATTRS.filter(a=>a.grp===g.key);
+            return `<div class="hashgrp"><div class="hashgrp-t">${g.label}</div>
+              ${items.map(a=>{
+                const cover=redactionCovering(a.key);
+                const on=!!h.attrs[a.key];
+                return `<div class="trow ${cover?'off':(on?'':'off')}">
+                  <div class="tmain"><div class="tname">${a.label}</div>
+                    ${cover?`<div class="tdesc">Already redacted by <b>${esc(ruleLabel(cover))}</b> — hashing would have nothing left to hash.</div>`:''}</div>
+                  ${cover ? chk(false,'locked','') : chk(on,'',`data-hashattr="${a.key}"`)}
+                </div>`;
+              }).join('')}</div>`;
+          }).join('')}`:''}
       </div></div>
 
       <div class="card"><div class="sechead"><div><h2>User consent</h2></div></div>
@@ -1815,7 +2018,7 @@ function areaHTML(area){
   }
   if(area==='client-behaviour'){
     const b=w.clientBehaviour;
-    // Three sections, per FR10.1: Recording behaviour · Live Event Monitor · Startup mode.
+    // Three sections, per FR10.1: Recording behaviour · View captured events · Startup mode.
     const opt=(key,cur,name,desc)=>`<div class="optrow ${cur===key?'sel':''}" data-startup="${key}" role="radio" aria-checked="${cur===key}" tabindex="0">
       <span class="orc"></span>
       <div><div class="orname">${name}</div><div class="ordesc">${desc}</div></div></div>`;
@@ -1834,11 +2037,10 @@ function areaHTML(area){
           <div class="hint">Comma-separated process names. Use it for apps where the accessibility layer is slow or noisy.</div></div>`:''}
       </div></div>
 
-      <div class="card"><div class="sechead"><div><h2>Live Event Monitor</h2><div class="shint">A real-time view, inside the client, of the events being captured.</div></div></div>
+      <div class="card"><div class="sechead"><div><h2>View captured events</h2>
+        <div class="shint">A view inside the client of activity that has already been recorded.</div></div></div>
       <div class="cbody">
-        <div class="note">${svg('info',17)}<span>Use it to check that your rules capture what you expect <b>before rolling out</b> — it shows each event as it is recorded, so a scope that matches nothing, or captures too much, shows up immediately. The monitor is only ever shown to <b>Admin users</b>.</span></div>
-        ${toggleRow('eye','Show Live Event Monitor in Client','',b.liveEventMonitor,'b-monitor')}
-        <div class="note">${svg('info',17)}<span>Who counts as an Admin is not set here — it is managed on the <b>Users &amp; Invite</b> page. This setting only decides whether the monitor is available to them in the client.</span></div>
+        ${toggleRow('eye','Show captured events in client','Adds a control in the client that a user can open to see what has been recorded on their machine. It does not display anything by itself. Applies to <b>every user</b> in this project — it cannot be limited to some people.',b.viewCapturedEvents,'b-monitor')}
       </div></div>
 
       <div class="card"><div class="sechead"><div><h2>Startup mode</h2><div class="shint">What happens when the user's computer starts.</div></div></div>
@@ -2028,6 +2230,7 @@ function emptyState(icon,title,body){
   </div>`;
 }
 
+/* ---------- Data redaction: rule rows + editor dialog (US6) ---------- */
 /* ---------- Web page data extractions: list + empty state (FR12.2) ---------- */
 function extractionsSection(){
   const rows=exList();
@@ -2121,6 +2324,174 @@ function renderExtract(){
     </div>`;
 }
 /* Patch errors + Submit in place while typing, so the caret survives. */
+
+function redactRow(r){
+  return `<div class="rdrow ${r.enabled?'':'off'}" draggable="true" data-dragitem="${r.id}" data-draglist="redact">
+    <div class="rc-grip" title="Drag to reorder" data-grip="1">${svg('grip',18)}</div>
+    <div class="rdmain">
+      <div class="rdname">${esc(ruleLabel(r))}</div>
+      ${r.description?`<div class="rdwhat">${esc(r.description)}</div>`:''}
+    </div>
+    <div class="rdacts">
+      <button class="rc-del" data-rdedit="${r.id}" title="Edit pattern" aria-label="Edit ${esc(ruleLabel(r))}">${svg('rule',17)}</button>
+      ${r.builtin?'':`<button class="rc-del" data-rddel="${r.id}" title="Delete pattern" aria-label="Delete ${esc(ruleLabel(r))}">${svg('trash',17)}</button>`}
+      ${sw(r.enabled,'',`data-rdtoggle="${r.id}"`)}
+    </div>
+  </div>`;
+}
+
+/* Editor dialog. Built-ins expose their action only — the matcher stays ours (FR6.2, revised). */
+let rdDraft=null, rdIsNew=false, rdSample='';
+const rdList = () => state.working.privacy.redaction.rules;
+/* Every pattern is validated the same way — built-ins are editable, so they are not exempt. */
+function rdErr(d){
+  if(!String(d.label||'').trim()) return 'Give the pattern a name.';
+  if(!String(d.pattern||'').trim()) return 'Enter an expression to match.';
+  // A {{token}} is resolved on the client, so it is not expected to compile as a regex here.
+  if(!hasToken(d.pattern)){
+    try{ new RegExp(d.pattern); }catch(e){ return 'That expression is not valid.'; }
+  }
+  if(d.action==='replace' && !String(d.tag||'').trim()) return 'Enter the text to put in its place.';
+  // A narrowed pattern with nothing ticked would match nowhere and fail silently.
+  if(d.scope==='selected' && maskCount(d)===0) return 'Choose at least one attribute to look in.';
+  return '';
+}
+/* Patch the dialog's errors, Submit state and live result in place — no re-render, so the
+   caret survives typing in the expression or the sample box. */
+function refreshRedact(){
+  if(!rdDraft) return;
+  const blocked=rdErr(rdDraft);
+  const btn=$('#redactModal [data-rdsubmit]'), foot=$('#redactModal .modal-foot');
+  if(btn) btn.disabled=!!blocked;
+  if(foot){
+    let hint=foot.querySelector('.mf-hint');
+    if(blocked){
+      if(!hint){ hint=document.createElement('div'); hint.className='mf-hint'; foot.insertBefore(hint,foot.firstChild); }
+      hint.innerHTML=`${svg('warn',15)}<span>${esc(blocked)}</span>`;
+    }else if(hint){ hint.remove(); }
+  }
+  // Field-level errors sit under the field they belong to.
+  const put=(id,msg)=>{
+    const inp=$('#'+id), box=$('#'+id+'-err'); if(!inp||!box) return;
+    inp.classList.toggle('err',!!msg);
+    inp.setAttribute('aria-invalid',msg?'true':'false');
+    box.querySelector('span').textContent=msg||'';
+    box.style.display=msg?'flex':'none';
+  };
+  const d=rdDraft;
+  put('rd-label', String(d.label||'').trim()?'':'Give the pattern a name.');
+  let pErr='';
+  if(!String(d.pattern||'').trim()) pErr='Enter an expression to match.';
+  else if(!hasToken(d.pattern)){ try{ new RegExp(d.pattern); }catch(e){ pErr='That expression is not valid.'; } }
+  put('rd-pattern', pErr);
+  if(d.action==='replace') put('rd-tag', String(d.tag||'').trim()?'':'Enter the text to put in its place.');
+  const res=$('#rd-result');
+  if(res) res.textContent = redactSample(rdSample,[{...d,enabled:true}]);
+}
+function openRedact(id){
+  const found=id?rdList().find(x=>x.id===id):null;
+  // An uploaded config from before scope existed has neither field — treat it as "all".
+  if(found){ if(!found.scope) found.scope='all'; if(!found.attrs) found.attrs=defaultMaskAttrs(); }
+  rdIsNew=!found;
+  rdDraft=found?clone(found):{id:'rd-'+Date.now(),builtin:false,label:'',description:'',pattern:'',action:'mask',tag:'',enabled:true,scope:'all',attrs:defaultMaskAttrs()};
+  rdSample='Contact ravi.avvari@acme.com or call about invoice 4532 8899 1234 5678.';
+  renderRedact();
+  const f=$('#rd-label')||$('#rd-sample'); if(f) f.focus();
+}
+function closeRedact(){ rdDraft=null; rdIsNew=false; renderRedact(); }
+function submitRedact(){
+  if(!rdDraft||rdErr(rdDraft)) return;
+  const d={...rdDraft};
+  if(!d.builtin){ d.label=d.label.trim(); d.pattern=d.pattern.trim(); }
+  const i=rdList().findIndex(x=>x.id===d.id);
+  if(i>=0) rdList()[i]=d; else rdList().push(d);
+  rdDraft=null; rdIsNew=false; render();
+}
+function renderRedact(){
+  const box=$('#redactModal');
+  if(!rdDraft){ box.hidden=true; box.innerHTML=''; return; }
+  const d=rdDraft, blocked=rdErr(d);
+  // A {{token}} pattern is resolved per machine, so it can't be run against pasted text here.
+  const tokenPattern = hasToken(d.pattern);
+  box.hidden=false;
+  box.innerHTML=`
+    <div class="modal modal--form" role="dialog" aria-modal="true" aria-labelledby="rdTitle">
+      <div class="modal-head"><div>
+        <h2 id="rdTitle">${rdIsNew?'Add pattern':'Edit pattern'}</h2>
+        <div class="mh-sub">What to look for, and what to do when it is found.</div>
+      </div><button class="modal-x" data-rdcancel="1" aria-label="Cancel">${svg('x',18)}</button></div>
+
+      <div class="modal-body">
+        <div class="subhead">What to look for</div>
+        <div class="field"><label for="rd-label">Pattern name</label>
+          <input id="rd-label" value="${esc(d.label||'')}" placeholder="e.g. Employee number" autocomplete="off">
+          <div class="errmsg" id="rd-label-err" role="alert" style="display:none">${svg('warn',14)}<span></span></div></div>
+
+        <div class="field"><label for="rd-desc">Description <span class="optional">optional</span></label>
+          <input id="rd-desc" value="${esc(d.description||'')}" placeholder="What this pattern is for" autocomplete="off"></div>
+
+        <div class="field"><label for="rd-pattern">Expression</label>
+          <input id="rd-pattern" class="mono-in" value="${esc(d.pattern||'')}" placeholder="e.g. EMP-\\d{6}" autocomplete="off" spellcheck="false">
+          <div class="hint">A regular expression. Anything it matches is handled by the action below.${
+            tokenPattern?' A <span class="mono">{{token}}</span> is filled in on each user\u2019s machine.':''}</div>
+          <div class="errmsg" id="rd-pattern-err" role="alert" style="display:none">${svg('warn',14)}<span></span></div></div>
+
+        <div class="subhead" style="margin-top:24px">What to do with it</div>
+        <div role="radiogroup" aria-label="Action">
+          ${Object.keys(REDACT_ACTIONS).map(k=>{
+            const a=REDACT_ACTIONS[k];
+            return `<div class="optrow ${d.action===k?'sel':''}" data-rdaction="${k}" role="radio" aria-checked="${d.action===k}" tabindex="0">
+              <span class="orc"></span><div><div class="orname">${a.label}</div><div class="ordesc">${a.about}</div></div></div>`;
+          }).join('')}
+        </div>
+        ${d.action==='replace'?`<div class="field" style="margin-top:4px"><label for="rd-tag">Replace with</label>
+          <input id="rd-tag" class="mono-in" value="${esc(d.tag||'')}" placeholder="[redacted]" autocomplete="off">
+          <div class="errmsg" id="rd-tag-err" role="alert" style="display:none">${svg('warn',14)}<span></span></div></div>`:''}
+
+        <div class="subhead" style="margin-top:24px">Where to look</div>
+        <div role="radiogroup" aria-label="Where to look">
+          <div class="optrow ${d.scope!=='selected'?'sel':''}" data-rdscope="all" role="radio" aria-checked="${d.scope!=='selected'}" tabindex="0">
+            <span class="orc"></span><div><div class="orname">All maskable attributes</div>
+              <div class="ordesc">Wherever this pattern appears in captured text. The usual choice.</div></div></div>
+          <div class="optrow ${d.scope==='selected'?'sel':''}" data-rdscope="selected" role="radio" aria-checked="${d.scope==='selected'}" tabindex="0">
+            <span class="orc"></span><div><div class="orname">Selected attributes only</div>
+              <div class="ordesc">Narrow it — for example redact emails in comments but leave URLs alone.</div></div></div>
+        </div>
+        ${d.scope==='selected'?`
+          <div class="masksel">
+            <div class="masksel-h"><span style="flex:1">${maskCount(d)} of ${MASKABLE.length} selected</span>
+              <button class="btn sm" data-rdattrall="1">Select all</button>
+              <button class="btn sm" data-rdattrnone="1">Select none</button></div>
+            ${MASK_GROUPS.map(g=>{
+              const items=MASKABLE.filter(a=>a.grp===g.key);
+              return `<div class="maskgrp"><div class="maskgrp-t">${g.label}</div>
+                ${items.map(a=>`<div class="maskitem">
+                  ${chk(!!d.attrs[a.key],'',`data-rdattr="${a.key}"`)}<span>${a.label}</span>
+                </div>`).join('')}</div>`;
+            }).join('')}
+          </div>`:''}
+
+        <!-- Scrolls with the form, set off by a divider \u2014 it is a scratchpad, not a saved field. -->
+        <div class="rdtest">
+          <div class="rdtest-h">Try it <span class="rdtest-note">nothing here is saved</span></div>
+          ${tokenPattern
+            ? `<div class="hint">This pattern is filled in on each user\u2019s machine, so it cannot be tried against pasted text.</div>`
+            : `<textarea id="rd-sample" rows="2" spellcheck="false" placeholder="Paste text that looks like what your users type\u2026">${esc(rdSample)}</textarea>
+               <div class="rdresult"><div class="rdresult-t">Result <span class="rdtest-note">this pattern only</span></div>
+                 <div class="rdresult-b mono" id="rd-result">${esc(redactSample(rdSample,[{...d,enabled:true}]))}</div></div>`}
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        ${blocked?`<div class="mf-hint">${svg('warn',15)}<span>${esc(blocked)}</span></div>`:''}
+        <div class="modal-acts">
+          <button class="btn" data-rdcancel="1">Cancel</button>
+          <button class="btn primary" data-rdsubmit="1"${blocked?' disabled':''}>Submit</button>
+        </div>
+      </div>
+    </div>`;
+}
+/* Patch errors + Submit in place while typing, so the caret survives. */
 function refreshExtract(){
   if(!exDraft) return;
   const map={'x-key':['key',exKeyErr],'x-url':['url',exUrlErr],'x-path':['path',exPathErr]};
@@ -2208,6 +2579,40 @@ document.addEventListener('click',e=>{
     });
     return;
   }
+
+  // Redaction rule dialog (US6)
+  if(near('data-rdcancel')){ closeRedact(); return; }
+  const rdsub=near('data-rdsubmit');
+  if(rdsub){ if(!rdsub.disabled) submitRedact(); return; }
+  const rdsc=near('data-rdscope');
+  if(rdsc){ if(rdDraft){ rdDraft.scope=rdsc.dataset.rdscope; renderRedact(); } return; }
+  const rdat=near('data-rdattr');
+  if(rdat){ if(rdDraft){ const k=rdat.dataset.rdattr; rdDraft.attrs[k]=!rdDraft.attrs[k]; renderRedact(); } return; }
+  if(near('data-rdattrall')){ if(rdDraft){ MASKABLE.forEach(a=>rdDraft.attrs[a.key]=true); renderRedact(); } return; }
+  if(near('data-rdattrnone')){ if(rdDraft){ MASKABLE.forEach(a=>rdDraft.attrs[a.key]=false); renderRedact(); } return; }
+  if(near('data-rdadd')){ openRedact(null); return; }
+  const rded=near('data-rdedit');
+  if(rded){ openRedact(rded.dataset.rdedit); return; }
+  const rdact=near('data-rdaction');
+  if(rdact){ if(rdDraft){ rdDraft.action=rdact.dataset.rdaction; renderRedact(); } return; }
+  const rdtog=near('data-rdtoggle');
+  if(rdtog){ const r=rdList().find(x=>x.id===rdtog.dataset.rdtoggle); if(r) r.enabled=!r.enabled; render(); return; }
+  const rddel=near('data-rddel');
+  if(rddel){
+    const r=rdList().find(x=>x.id===rddel.dataset.rddel); if(!r) return;
+    openConfirm({
+      title:'Delete this redaction rule?',
+      body:`<b>${esc(ruleLabel(r))}</b> will no longer be redacted before upload. The change takes effect when you Save.`,
+      confirmLabel:'Delete rule',
+      onConfirm(){ const i=rdList().findIndex(x=>x.id===rddel.dataset.rddel); if(i>=0) rdList().splice(i,1); render(); }
+    });
+    return;
+  }
+  // Hashing attribute selection (US7)
+  const hattr=near('data-hashattr');
+  if(hattr){ const a=state.working.privacy.hashing.attrs; const k=hattr.dataset.hashattr; a[k]=!a[k]; render(); return; }
+  if(near('data-hashall')){ HASH_ATTRS.forEach(a=>state.working.privacy.hashing.attrs[a.key]=true); render(); return; }
+  if(near('data-hashnone')){ HASH_ATTRS.forEach(a=>state.working.privacy.hashing.attrs[a.key]=false); render(); return; }
 
   // Extraction dialog (US12) — owns the interaction while open.
   if(near('data-excancel')){ closeExtract(); return; }
@@ -2343,9 +2748,9 @@ $('#saveBtn').addEventListener('click',()=>{
 $('#applyBtn').addEventListener('click',()=>{
   if($('#applyBtn').disabled) return;
   openConfirm({
-    title:'Apply these settings to all users?',
-    body:'These settings take effect for <b>every user in this project</b> straight away, replacing whatever is running now.<br><br>Only continue if this configuration has been <b>reviewed and approved</b>.',
-    confirmLabel:'Apply to all users',
+    title:'Apply these settings?',
+    body:'These settings take effect for <b>every user in this project</b> straight away, replacing whatever is running now.',
+    confirmLabel:'Apply',
     tone:'primary',
     onConfirm(){
       state.applied=clone(state.saved);
@@ -2457,6 +2862,11 @@ document.addEventListener('input',e=>{
   if(uaDraft && id==='ua-label'){ uaDraft.label=v; refreshUALabel(); return; }
 
   // Extraction dialog fields write into the draft, never straight into the config (FR1.6).
+  if(rdDraft && (id==='rd-label'||id==='rd-desc'||id==='rd-pattern'||id==='rd-tag'||id==='rd-sample')){
+    if(id==='rd-sample') rdSample=v;
+    else rdDraft[{'rd-label':'label','rd-desc':'description','rd-pattern':'pattern','rd-tag':'tag'}[id]]=v;
+    refreshRedact(); return;
+  }
   if(exDraft && (id==='x-key'||id==='x-url'||id==='x-path')){
     exDraft[{'x-key':'key','x-url':'url','x-path':'path'}[id]]=v;
     refreshExtract(); return;
@@ -2464,7 +2874,6 @@ document.addEventListener('input',e=>{
 
   switch(id){
     case 'f-name': if(r)r.name=v; refreshName(); break;
-    case 'p-alg': w.privacy.hashing.algorithm=v; markDirty(); break;
     case 'p-msg': w.privacy.consent.consentMessage=v; markDirty(); break;
     case 'b-uiaa-ex': w.clientBehaviour.uiaa.excludeApps=v; markDirty(); break;
     // Keep '' (rather than coercing to 0) so a cleared field reads as "Enter a value", not as zero.
@@ -2534,10 +2943,10 @@ function saveState(){
     : !hasUnapplied() ? 'No changes to apply'
     : '';
   a.disabled = !!applyWhy;
-  a.title = applyWhy || 'Push the saved draft to every user in this project';
+  a.title = applyWhy || 'Put the saved draft into effect for this project';
   // A disabled button's reason must not live in a hover title alone — that reaches neither
   // keyboard nor touch users. The enabled "Save draft" button beside it carries the visual cue.
-  a.setAttribute('aria-label', applyWhy ? `Apply to all users — ${applyWhy}` : 'Apply to all users');
+  a.setAttribute('aria-label', applyWhy ? `Apply — ${applyWhy}` : 'Apply');
 
   renderStatus();
 }
@@ -2547,15 +2956,14 @@ function markDirty(){saveState();}
 function toggleSetting(key){
   const [grp,idx]=key.split(':');const w=state.working;
   switch(grp){
-    case 'p-redact': w.privacy.redaction.presets[+idx].enabled^=1; break;
-    case 'p-hash': w.privacy.hashing.hashIdentity=!w.privacy.hashing.hashIdentity; break;
+    case 'p-hash': w.privacy.hashing.enabled=!w.privacy.hashing.enabled; break;
     case 'p-consent': w.privacy.consent.requireConsent=!w.privacy.consent.requireConsent; break;
     case 'p-block': w.privacy.consent.blockUntilGranted=!w.privacy.consent.blockUntilGranted; break;
     case 'd-send': w.dataConnection.platform.sendToPlatform=!w.dataConnection.platform.sendToPlatform; break;
     case 'd-encrypt': w.dataConnection.caching.encryptLocal=!w.dataConnection.caching.encryptLocal; break;
     case 'd-autoupload': w.dataConnection.caching.autoUploadOld=!w.dataConnection.caching.autoUploadOld; break;
     case 'b-nativeurl': w.clientBehaviour.nativeUrlRetrieval=!w.clientBehaviour.nativeUrlRetrieval; break;
-    case 'b-monitor': w.clientBehaviour.liveEventMonitor=!w.clientBehaviour.liveEventMonitor; break;
+    case 'b-monitor': w.clientBehaviour.viewCapturedEvents=!w.clientBehaviour.viewCapturedEvents; break;
     case 'b-minimize': w.clientBehaviour.minimizeOnStart=!w.clientBehaviour.minimizeOnStart; break;
     case 'i-sap': w.integrations.sap.enabled=!w.integrations.sap.enabled; break;
     case 'i-sap-native': w.integrations.sap.nativeDialogs=!w.integrations.sap.nativeDialogs; break;
@@ -2564,59 +2972,70 @@ function toggleSetting(key){
   }
 }
 
-/* ---------- Drag & drop reordering (non-default rules) ---------- */
-let dragId=null;
-function clearDropMarks(){document.querySelectorAll('.rulecard.drop-before,.rulecard.drop-after')
+/* ---------- Drag & drop reordering, shared by every ordered list ----------
+   An element opts in with draggable="true" data-dragitem="<id>" data-draglist="<key>".
+   Capture rules and redaction patterns both use it, so ordering behaves identically. */
+const DRAG_LISTS={
+  rules:  ()=>state.working.captureRules.rules,
+  redact: ()=>state.working.privacy.redaction.rules,
+};
+let dragId=null, dragList=null;
+const DRAG_SEL='[data-dragitem][draggable="true"]';
+function clearDropMarks(){document.querySelectorAll('.drop-before,.drop-after')
   .forEach(c=>c.classList.remove('drop-before','drop-after'));}
 
 document.addEventListener('dragstart',e=>{
-  const card=e.target.closest?e.target.closest('.rulecard[draggable="true"]'):null;
-  if(!card)return;
-  dragId=card.dataset.open;
-  card.classList.add('dragging');
+  const el=e.target.closest?e.target.closest(DRAG_SEL):null;
+  if(!el)return;
+  dragId=el.dataset.dragitem; dragList=el.dataset.draglist;
+  el.classList.add('dragging');
   e.dataTransfer.effectAllowed='move';
   try{e.dataTransfer.setData('text/plain',dragId);}catch(_){}
 });
 document.addEventListener('dragend',()=>{
-  document.querySelectorAll('.rulecard.dragging').forEach(c=>c.classList.remove('dragging'));
-  clearDropMarks();dragId=null;
+  document.querySelectorAll('.dragging').forEach(c=>c.classList.remove('dragging'));
+  clearDropMarks(); dragId=null; dragList=null;
 });
 document.addEventListener('dragover',e=>{
   if(dragId===null)return;
-  const card=e.target.closest?e.target.closest('.rulecard[draggable="true"]'):null;
-  if(!card)return;
+  const el=e.target.closest?e.target.closest(DRAG_SEL):null;
+  if(!el || el.dataset.draglist!==dragList)return;      // never drop across lists
   e.preventDefault();
   e.dataTransfer.dropEffect='move';
-  if(card.dataset.open===dragId){clearDropMarks();return;}
-  const rect=card.getBoundingClientRect();
+  if(el.dataset.dragitem===dragId){clearDropMarks();return;}
+  const rect=el.getBoundingClientRect();
   const before=(e.clientY-rect.top)<rect.height/2;
   clearDropMarks();
-  card.classList.add(before?'drop-before':'drop-after');
+  el.classList.add(before?'drop-before':'drop-after');
 });
 document.addEventListener('drop',e=>{
   if(dragId===null)return;
-  const card=e.target.closest?e.target.closest('.rulecard[draggable="true"]'):null;
-  if(!card){clearDropMarks();dragId=null;return;}
+  const el=e.target.closest?e.target.closest(DRAG_SEL):null;
+  if(!el || el.dataset.draglist!==dragList){clearDropMarks();dragId=null;dragList=null;return;}
   e.preventDefault();
-  const before=card.classList.contains('drop-before');
-  reorderRule(dragId,card.dataset.open,before);
-  dragId=null;
+  reorderInList(dragList,dragId,el.dataset.dragitem,el.classList.contains('drop-before'));
+  dragId=null; dragList=null;
   render();
 });
-function reorderRule(fromId,targetId,before){
-  if(fromId===targetId)return;
+/* Move `fromId` to sit before or after `targetId` within one list. */
+function reorderInList(listKey,fromId,targetId,before){
+  const get=DRAG_LISTS[listKey]; if(!get || fromId===targetId) return;
+  const arr=get();
+  const from=arr.findIndex(x=>x.id===fromId);
+  if(from<0) return;
+  const [moved]=arr.splice(from,1);
+  let to=arr.findIndex(x=>x.id===targetId);
+  if(to<0){ arr.splice(from,0,moved); return; }
+  arr.splice(before?to:to+1,0,moved);
+  if(listKey==='rules') keepDefaultLast();
+}
+/* The Default rule must always evaluate last (FR2.5). */
+function keepDefaultLast(){
   const rules=state.working.captureRules.rules;
-  const from=rules.findIndex(r=>r.id===fromId);
-  if(from<0)return;
-  const [moved]=rules.splice(from,1);
-  let to=rules.findIndex(r=>r.id===targetId);
-  if(to<0){rules.splice(from,0,moved);return;}
-  if(!before)to+=1;
-  rules.splice(to,0,moved);
-  // Default rule must always stay last.
   const di=rules.findIndex(r=>r.isDefault);
   if(di>=0&&di!==rules.length-1){const [d]=rules.splice(di,1);rules.push(d);}
 }
+
 
 /* Inject nav icons that were placeholdered in the static HTML */
 document.querySelectorAll('.navitem').forEach(n=>{
