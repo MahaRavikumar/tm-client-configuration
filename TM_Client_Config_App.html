@@ -1077,7 +1077,7 @@ const TEXT_FIELDS={
     help:'The cluster your team is hosted on, e.g. eu-1 or us-1. It appears in the same address.'},
   'dc-table':{section:'Data Connection', label:'Target Table Name', required:true, mono:true,
     active:()=>DCP().sendToPlatform, get:()=>DCP().targetTable, set:v=>DCP().targetTable=v,
-    help:'The table events are written to. Use More actions to generate the CREATE TABLE statement for it.'},
+    help:'The table events are written to, in the target data pool.'},
   // Optional: only needed once a rule captures screenshots (FR5.6).
   'dc-bucket':{section:'Data Connection', label:'Image Service Bucket ID', mono:true,
     active:()=>DCP().sendToPlatform, get:()=>DCP().imageBucketId, set:v=>DCP().imageBucketId=v,
@@ -1175,12 +1175,32 @@ function exPathErr(d){
 }
 function exFirstErr(d){ return exKeyErr(d)||exUrlErr(d)||exPathErr(d); }
 
+/* Consent "additional information" URL — optional, but must be a real address if filled (FR8.3). */
+function consentUrlErr(){
+  const u=String(state.working.privacy.consent.moreInfoUrl||'').trim();
+  if(!u) return '';
+  if(!/^https?:\/\//i.test(u)) return 'Start with http:// or https://';
+  try{ new URL(u); }catch(e){ return "This doesn't look like a valid address."; }
+  return '';
+}
+function refreshConsentUrl(){
+  const inp=$('#c-url');
+  if(inp){
+    const err=consentUrlErr();
+    inp.classList.toggle('err',!!err);
+    inp.setAttribute('aria-invalid',err?'true':'false');
+    const box=$('#c-url-err');
+    if(box){ box.querySelector('span').textContent=err; box.style.display=err?'flex':'none'; }
+  }
+  saveState();
+}
 function formInvalidReason(){
   const rules=state.working.captureRules.rules.filter(r=>!r.isDefault);
   if(rules.some(r=>nameError(r)))  return 'Fix rule name to save';
   if(rules.some(r=>!scopeValid(r))) return 'Fix scope errors to save';
   const numWhy=numsInvalid(); if(numWhy) return numWhy;
   const textWhy=textsInvalid(); if(textWhy) return textWhy;
+  if(consentUrlErr()) return 'Fix the consent link to save';
   return '';
 }
 function formValid(){ return !formInvalidReason(); }
@@ -1259,10 +1279,36 @@ function redactSample(text,rules){
   return out;
 }
 /* Hashing attribute set, curated to privacy-relevant fields only (FR7.2). */
+/* Editable example consent notice (FR8.2). Marked as a template so the project lead adapts it;
+   covers the six standard sections. Not legal wording — a starting point to replace. */
+const CONSENT_TEMPLATE = `This is an example notice — replace it with wording approved by your legal or works-council team.
+
+Purpose of processing
+We record how work is carried out in desktop and web applications to understand and improve business processes.
+
+Legal basis
+[State the legal basis that applies to your organisation, e.g. legitimate interest or a works-council agreement.]
+
+Categories of personal data
+Application and window titles, URLs, the actions you take (clicks, typing, navigation) and, where enabled, their content. Sensitive values are redacted or hashed before anything leaves your machine.
+
+Recipients
+The data is sent to your organisation's Celonis environment and is accessible to the teams responsible for process analysis.
+
+Retention
+[State how long the data is kept.]
+
+Contact
+[Name a contact for questions about this processing.]`;
+
 const HASH_GROUPS=[
   {key:'identity', label:'Identity'},
   {key:'content',  label:'Content / input'},
   {key:'context',  label:'Potentially identifying context'},
+  // Source families. Shown even when the source is off (FR7.8) — same fail-safe as redaction (#60),
+  // so hashing is armed before SAP/UIAA is enabled. Exact field set to be confirmed with Eng (FR7.2).
+  {key:'sap',      label:'SAP'},
+  {key:'uiaa',     label:'UI Automation'},
 ];
 const HASH_ATTRS=[
   {key:'SystemUser',          grp:'identity', label:'System user'},
@@ -1282,6 +1328,13 @@ const HASH_ATTRS=[
   {key:'URL',                 grp:'context',  label:'URL'},
   {key:'WepPageExtractions',  grp:'context',  label:'Web page extractions'},
   {key:'DomPath',             grp:'context',  label:'DOM path'},
+  // SAP / UIAA privacy-relevant fields only — not the structural / geometry ones (FR7.2, FR7.8).
+  {key:'ElementTextSAP',      grp:'sap',      label:'Element text'},
+  {key:'ElementLabelSAP',     grp:'sap',      label:'Element label'},
+  {key:'ValueSAP',            grp:'sap',      label:'Field value'},
+  {key:'Value_UIAA',          grp:'uiaa',     label:'Control value'},
+  {key:'Name_UIAA',           grp:'uiaa',     label:'Control name'},
+  {key:'HelpText_UIAA',       grp:'uiaa',     label:'Help text'},
 ];
 /* All displayed attributes are checked by default (FR7.3). */
 /* Identity on, everything else off. Ankit (2026-07-13): hashing is used "for system users and
@@ -1327,7 +1380,9 @@ const initialConfig = () => ({
        pattern:'{{machinename}}', action:'mask', enabled:false, attrs:defaultMaskAttrs(), covers:['MachineName']},
     ]},
     hashing:{enabled:true, attrs:defaultHashAttrs(), algorithm:'sha-256'},
-    consent:{requireConsent:false, consentMessage:'This application captures activity data to help improve your workflows.', blockUntilGranted:false},
+    // US8: the Admin authors the notice employees see. No enable/block toggles — consent is
+    // simply shown (FR8.5). Text pre-filled with an editable six-section example (FR8.2).
+    consent:{ text:CONSENT_TEMPLATE, moreInfoUrl:'', checkboxLabel:'I have read and agree to the above' },
   },
   // FR9.2 / FR9.3 — matches the product's Data Connection screen. Every value ships pre-filled
   // (FR9.1); the Admin edits only if their landscape differs.
@@ -1950,17 +2005,22 @@ function areaHTML(area){
       <div class="cbody">
         ${toggleRow('hash','Hash selected attributes','',h.enabled,'p-hash')}
         ${h.enabled?`
-          <div class="note warn">${svg('warn',17)}<span><b>Hashing limits what analysis can do.</b> A hashed value can be counted and grouped, but never read back — so anything that depends on the actual text, such as searching for a specific document number, stops working for these attributes.</span></div>
-          <div class="subhead" style="margin-top:22px">Attributes to hash</div>
-          ${hashGroups()}`:''}
+          <div style="margin-top:18px">${hashGroups()}</div>`:''}
       </div></div>
 
-      <div class="card"><div class="sechead"><div><h2>User consent</h2></div></div>
+      <div class="card"><div class="sechead"><div><h2>User consent</h2>
+        <div class="shint">Shown to users when they first open the Task Mining client — on the welcome page, and afterwards in the client's Privacy settings.</div></div></div>
       <div class="cbody">
-        ${toggleRow('shield','Require consent before capture starts','',w.privacy.consent.requireConsent,'p-consent')}
-        ${toggleRow('shield','Block capture until consent is granted','',w.privacy.consent.blockUntilGranted,'p-block')}
-        <div class="field" style="margin-top:16px"><label>Consent message</label>
-          <textarea id="p-msg" rows="2">${esc(w.privacy.consent.consentMessage)}</textarea></div>
+        <div class="field">
+          <div class="lblrow"><label for="c-text">Consent text</label>
+            <button class="help-ic" tabindex="0" aria-label="About the consent text" data-help="Pre-filled with an example covering the six standard sections. Replace it with wording approved by your legal or works-council team before rollout.">${svg('info',15)}</button></div>
+          <textarea id="c-text" rows="12">${esc(w.privacy.consent.text)}</textarea></div>
+        <div class="field"><label for="c-url">Link to additional information <span class="optional">optional</span></label>
+          <input id="c-url" value="${esc(w.privacy.consent.moreInfoUrl)}" placeholder="https://intranet.acme.com/privacy-policy" autocomplete="off">
+          <div class="hint">A page users can open for more detail, such as your privacy policy.</div>
+          <div class="errmsg" id="c-url-err" role="alert" style="display:none">${svg('warn',14)}<span></span></div></div>
+        <div class="field" style="margin-bottom:0"><label for="c-label">Label of consent checkbox</label>
+          <input id="c-label" value="${esc(w.privacy.consent.checkboxLabel)}"></div>
       </div></div>`;
   }
   if(area==='data-connection'){
@@ -2819,9 +2879,7 @@ function showMoreMenu(btn){
     <button class="more-item" data-dlconfig="1">${svg('download',17)}
       <span>Download configuration file<span class="mi-sub">Share this with your approvers for review</span></span></button>
     <button class="more-item" data-ulconfig="1">${svg('upload',17)}
-      <span>Upload configuration file<span class="mi-sub">Load the approved file back before applying</span></span></button>
-    <div class="more-sep"></div>
-    <div class="more-note">Import / export of the encoded config file is not available in this prototype.</div>`;
+      <span>Upload configuration file<span class="mi-sub">Load the approved file back before applying</span></span></button>`;
   moreMenu.hidden=false;
   const r=btn.getBoundingClientRect(), m=moreMenu.getBoundingClientRect();
   moreMenu.style.top = (r.bottom+6)+'px';
@@ -2924,7 +2982,9 @@ document.addEventListener('input',e=>{
 
   switch(id){
     case 'f-name': if(r)r.name=v; refreshName(); break;
-    case 'p-msg': w.privacy.consent.consentMessage=v; markDirty(); break;
+    case 'c-text':  w.privacy.consent.text=v; markDirty(); break;
+    case 'c-label': w.privacy.consent.checkboxLabel=v; markDirty(); break;
+    case 'c-url':   w.privacy.consent.moreInfoUrl=v; refreshConsentUrl(); break;
     case 'b-uiaa-ex': w.clientBehaviour.uiaa.excludeApps=v; markDirty(); break;
     // Keep '' (rather than coercing to 0) so a cleared field reads as "Enter a value", not as zero.
     // numeric settings are all handled by the registry above the switch
@@ -3007,8 +3067,6 @@ function toggleSetting(key){
   const [grp,idx]=key.split(':');const w=state.working;
   switch(grp){
     case 'p-hash': w.privacy.hashing.enabled=!w.privacy.hashing.enabled; break;
-    case 'p-consent': w.privacy.consent.requireConsent=!w.privacy.consent.requireConsent; break;
-    case 'p-block': w.privacy.consent.blockUntilGranted=!w.privacy.consent.blockUntilGranted; break;
     case 'd-send': w.dataConnection.platform.sendToPlatform=!w.dataConnection.platform.sendToPlatform; break;
     case 'd-encrypt': w.dataConnection.caching.encryptLocal=!w.dataConnection.caching.encryptLocal; break;
     case 'd-autoupload': w.dataConnection.caching.autoUploadOld=!w.dataConnection.caching.autoUploadOld; break;
