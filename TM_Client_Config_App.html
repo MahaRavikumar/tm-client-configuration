@@ -1255,10 +1255,11 @@ const REDACT_ACTIONS={
 };
 function applyAction(match,rule){
   switch(rule.action){
+    case 'mask':    return '•'.repeat(match.length);
     case 'remove':  return '';
     case 'replace': return rule.tag||'[redacted]';
     case 'partial': return match.length>4 ? '•'.repeat(match.length-4)+match.slice(-4) : '•'.repeat(match.length);
-    default:        return '•'.repeat(match.length);
+    default:        return match;   // no action chosen yet — leave the text unchanged in Try it
   }
 }
 const ruleLabel = r => r.label || 'Untitled pattern';
@@ -1436,13 +1437,15 @@ const initialConfig = () => ({
   },
 });
 
+/* Tab order = importance / mental model, not setup sequence (decision #12): the most-used areas
+   lead, the optional/low-touch ones trail. */
 const AREAS=[
-  {id:'capture-rules',   label:'Capture Rules',   icon:'rule'},
-  {id:'privacy',         label:'Privacy',         icon:'shield'},
-  {id:'data-connection', label:'Data Connection', icon:'cloud'},
-  {id:'client-behaviour',label:'Client Behaviour',icon:'gear'},
-  {id:'user-attributes', label:'User Attributes', icon:'idcard'},
-  {id:'integrations',    label:'Integrations',    icon:'puzzle'},
+  {id:'capture-rules',   label:'Capture Rules',            icon:'rule'},
+  {id:'privacy',         label:'Privacy',                  icon:'shield'},
+  {id:'integrations',    label:'Integrations & Extensions',icon:'puzzle'},
+  {id:'user-attributes', label:'User Attributes',          icon:'idcard'},
+  {id:'client-behaviour',label:'Client Behaviour',         icon:'gear'},
+  {id:'data-connection', label:'Data Connection',          icon:'cloud'},
 ];
 
 /* =========================================================
@@ -1578,6 +1581,10 @@ function renderRuleModal(){
   const r=state.modalOpen?editing():null;
   if(!r){ box.hidden=true; box.innerHTML=''; return; }
   const why=ruleModalWhy(r);
+  // Re-rendering rewrites the whole dialog, which would reset the scroll position — so an
+  // in-place action like expanding a field group jumps the view to the top. Preserve it.
+  const prevBody=box.querySelector('.modal-body');
+  const prevScroll=prevBody?prevBody.scrollTop:0;
   box.hidden=false;
   box.innerHTML=`
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rmTitle">
@@ -1599,6 +1606,8 @@ function renderRuleModal(){
         </div>
       </div>
     </div>`;
+  // Restore the scroll the fresh .modal-body lost when innerHTML was rewritten.
+  if(prevScroll){ const nb=box.querySelector('.modal-body'); if(nb) nb.scrollTop=prevScroll; }
   syncNotch();
 }
 function openRuleModal(id,isNew){
@@ -2470,6 +2479,7 @@ function rdErr(d){
   if(!hasToken(d.pattern)){
     try{ new RegExp(d.pattern); }catch(e){ return 'That expression is not valid.'; }
   }
+  if(!d.action) return 'Choose what to do with a match.';
   if(d.action==='replace' && !String(d.tag||'').trim()) return 'Enter the text to put in its place.';
   // Every attribute off means the pattern matches nowhere and fails silently.
   if(maskCount(d)===0) return 'Turn on at least one attribute for this pattern to look in.';
@@ -2512,7 +2522,7 @@ function openRedact(id){
   // A pattern from before per-attribute scope existed has no attrs map — default to all on.
   if(found && !found.attrs) found.attrs=defaultMaskAttrs();
   rdIsNew=!found;
-  rdDraft=found?clone(found):{id:'rd-'+Date.now(),builtin:false,label:'',description:'',pattern:'',action:'mask',tag:'',enabled:true,attrs:defaultMaskAttrs()};
+  rdDraft=found?clone(found):{id:'rd-'+Date.now(),builtin:false,label:'',description:'',pattern:'',action:'',tag:'',enabled:true,attrs:defaultMaskAttrs()};
   rdSample='Contact ravi.avvari@acme.com or call about invoice 4532 8899 1234 5678.';
   renderRedact();
   const f=$('#rd-label')||$('#rd-sample'); if(f) f.focus();
